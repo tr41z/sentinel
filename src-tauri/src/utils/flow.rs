@@ -1,3 +1,4 @@
+#[derive(serde::Serialize, Clone)]
 pub struct Flow {}
 
 impl Flow {
@@ -5,8 +6,16 @@ impl Flow {
     pub fn update() {}
 }
 
+#[derive(serde::Serialize)]
 pub struct FlowKey {}
 
 impl FlowKey {
+    pub fn new() {}
+}
+
+#[derive(serde::Serialize)]
+pub struct FlowData {}
+
+impl FlowData {
     pub fn new() {}
 }
