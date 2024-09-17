@@ -5,7 +5,7 @@ use pnet::packet::ip::IpNextHeaderProtocol;
 
 use crate::utils::flow::{Flow, FlowKey};
 
-/* REMEMBER: EVERYTHING HERE IS IN LOOP */
+/* REMINDER: EVERYTHING HERE IS IN LOOP */
 pub fn handle_packet_flow
 (
     src_ip: Ipv4Addr,
