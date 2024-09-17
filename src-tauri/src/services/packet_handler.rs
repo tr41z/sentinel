@@ -1,8 +1,12 @@
-use std::net::Ipv4Addr;
+use std::{collections::HashMap, net::Ipv4Addr, sync::Mutex};
 
 use pnet::packet::ip::IpNextHeaderProtocol;
 
-use crate::utils::flow::Flow;
+use crate::utils::flow::{Flow, FlowKey};
+
+lazy_static::lazy_static! {
+    static ref flows_map: Mutex<HashMap<FlowKey, Flow>> = Mutex::new(HashMap::new());
+}
 
 pub fn handle_packet_flow
 (
@@ -20,8 +24,16 @@ pub fn handle_packet_flow
     /* Using HashMap (and possibly Mutex) for flow aggregation and updates.*/
 
     let flow: Flow = Flow::new(
-        src_ip, dst_ip, src_port, dst_port, 
+        src_ip, dst_ip, 
+        src_port, dst_port, 
         protocol.0, size
     );
+    
+    #[allow(unused)]
+    let flow_key: FlowKey = FlowKey::new(
+        src_ip, dst_ip, 
+        src_port, dst_port, protocol.0
+    );
+
     flow
 }

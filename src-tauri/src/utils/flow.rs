@@ -14,10 +14,8 @@ pub struct Flow {
 impl Flow {
     pub fn new(src_ip: Ipv4Addr, dst_ip: Ipv4Addr, src_port: u16, dst_port: u16, protocol: u8, size: u16) -> Self {
         Flow {
-            src_ip,
-            dst_ip,
-            src_port,
-            dst_port,
+            src_ip, dst_ip,
+            src_port, dst_port,
             protocol,
             total_bytes: size,
             packet_count: 0,
@@ -30,8 +28,20 @@ impl Flow {
 }
 
 #[derive(serde::Serialize)]
-pub struct FlowKey {}
+pub struct FlowKey {
+    src_ip: Ipv4Addr,
+    dst_ip: Ipv4Addr,
+    src_port: u16,
+    dst_port: u16,
+    protocol: u8
+}
 
 impl FlowKey {
-    pub fn new() {}
+    pub fn new(src_ip: Ipv4Addr, dst_ip: Ipv4Addr, src_port: u16, dst_port: u16, protocol: u8) -> Self {
+        FlowKey {
+            src_ip, dst_ip,
+            src_port, dst_port,
+            protocol
+        }
+    }
 }
