@@ -10,14 +10,14 @@ mod services;
 mod utils;
 
 fn main() {
-    // set the default log level to info
+    // Set the default log level to info
     env::set_var("RUST_LOG", "info");
-    // initialize logger
+    // Initialize logger
     env_logger::init();
 
     commands::commands::start_sniffer();
 
-    // initialize the Tauri app
+    // Initialize the Tauri app
     tauri::Builder::default()
         .setup(|app: &mut tauri::App| {
             let app_handle: AppHandle = app.handle();
@@ -25,7 +25,7 @@ fn main() {
             main_window.show().unwrap();
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![start_sniffer]) // add the Tauri command
+        .invoke_handler(tauri::generate_handler![start_sniffer]) // Add the Tauri command
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -34,3 +34,4 @@ fn main() {
 fn start_sniffer() {
     commands::commands::start_sniffer();
 }
+
