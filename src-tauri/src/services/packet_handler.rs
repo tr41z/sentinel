@@ -5,10 +5,7 @@ use pnet::packet::ip::IpNextHeaderProtocol;
 
 use crate::utils::flow::{Flow, FlowKey};
 
-// lazy_static::lazy_static! {
-    // static ref flows_map: Mutex<HashMap<FlowKey, Flow>> = Mutex::new(HashMap::new());
-// }
-
+/* REMEMBER: EVERYTHING HERE IS IN LOOP */
 pub fn handle_packet_flow
 (
     src_ip: Ipv4Addr,
@@ -16,14 +13,9 @@ pub fn handle_packet_flow
     src_port: u16,
     dst_port: u16,
     protocol: IpNextHeaderProtocol,
-    size: u16
-) -> Flow {
-    let mut flows_map: HashMap<FlowKey, Flow> = HashMap::new();
-    // TODO:
-    // let flow: Flow = Flow::new(all above vars);
-    // let flow_key: FlowKey = FlowKey::new(only first five vars);
-
-    /* Using HashMap (and possibly Mutex) for flow aggregation and updates.*/
+    size: u16,
+    flows_map: &mut HashMap<FlowKey, Flow>
+) {
 
     let flow: Flow = Flow::new(
         src_ip, dst_ip, 
@@ -31,13 +23,22 @@ pub fn handle_packet_flow
         protocol.0, size
     );
     
-    #[allow(unused)]
     let flow_key: FlowKey = FlowKey::new(
         src_ip, dst_ip, 
         src_port, dst_port, protocol.0
     );
 
-    flows_map.get_mut(&flow_key);
-
-    flow
+    // TODO get value hidden under key
+    // TODO then if it already exists, update
+    // TODO if doesn't initialise new one
+    match flows_map.get_mut(&flow_key) {
+        Some(flow) => {
+            flow.update(size);
+            flow.pretty_display("Flow Updated");
+        },
+        None => {
+            flows_map.insert(flow_key, flow);
+            flow.pretty_display("New Flow");
+        }
+    };
 }

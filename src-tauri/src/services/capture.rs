@@ -5,16 +5,24 @@ use pnet::packet::tcp::TcpPacket;
 use pnet::packet::udp::UdpPacket;
 use pnet::packet::Packet;
 
+use std::collections::HashMap;
 use std::net::Ipv4Addr;
 
 use pnet::datalink::{self, NetworkInterface};
 
 use crate::services::capture::datalink::Channel::Ethernet;
-use crate::utils::flow::Flow;
+use crate::utils::flow::{Flow, FlowKey};
 
 use super::packet_handler::handle_packet_flow;
 
+// lazy_static::lazy_static! {
+    // static ref flows_map: Mutex<HashMap<FlowKey, Flow>> = Mutex::new(HashMap::new());
+// }
+
+/* FIXME Using HashMap (and possibly Mutex) for flow aggregation and updates. (line 19) */
 pub fn capture_packets(interface: NetworkInterface) {
+    let mut flows_map: HashMap<FlowKey, Flow> = HashMap::new();
+
     let (_, mut rx) = match datalink::channel(&interface, Default::default()) {
         Ok(Ethernet(tx, rx)) => (tx, rx),
         Ok(_) => panic!("Unhandled channel type: {}", &interface),
@@ -49,7 +57,7 @@ pub fn capture_packets(interface: NetworkInterface) {
                             _ => continue
                         };
 
-                        let flow: Flow = handle_packet_flow(
+                        handle_packet_flow(
                             // FlowKey attr
                             src_ip, 
                             dst_ip, 
@@ -58,13 +66,11 @@ pub fn capture_packets(interface: NetworkInterface) {
                             protocol,
                             
                             // Flow + FlowKey attr
-                            size
-                        );
+                            size,
 
-                        log::info!(
-                            "Flow: {:#?}",
-                            flow
-                        )
+                            // Flows map
+                            &mut flows_map
+                        );
                     }
                 }
             },

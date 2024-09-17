@@ -25,9 +25,20 @@ impl Flow {
         self.packet_count += 1;
         self.total_bytes += size;
     }
+
+    pub fn pretty_display(&self, prefix: &str) {
+        println!(
+            "{} ||| {}:{} -> {}:{} | Size: {} | Packet Count: {}",
+            prefix,
+            self.src_ip, self.dst_port,
+            self.dst_ip, self.dst_port,
+            self.total_bytes,
+            self.packet_count
+        )
+    }
 }
 
-#[derive(serde::Serialize, Eq, Hash, PartialEq)]
+#[derive(serde::Serialize, Eq, Hash, PartialEq, Debug)]
 pub struct FlowKey {
     src_ip: Ipv4Addr,
     dst_ip: Ipv4Addr,
