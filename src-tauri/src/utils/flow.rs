@@ -27,7 +27,7 @@ impl Flow {
     }
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, Eq, Hash, PartialEq)]
 pub struct FlowKey {
     src_ip: Ipv4Addr,
     dst_ip: Ipv4Addr,
