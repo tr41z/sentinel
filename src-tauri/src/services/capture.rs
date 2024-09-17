@@ -8,6 +8,9 @@ use pnet::packet::Packet;
 use std::collections::HashMap;
 use std::net::Ipv4Addr;
 
+#[allow(unused)]
+use std::sync::{Arc, Mutex};
+
 use pnet::datalink::{self, NetworkInterface};
 
 use crate::services::capture::datalink::Channel::Ethernet;
@@ -16,10 +19,10 @@ use crate::utils::flow::{Flow, FlowKey};
 use super::packet_handler::handle_packet_flow;
 
 // lazy_static::lazy_static! {
-    // static ref flows_map: Mutex<HashMap<FlowKey, Flow>> = Mutex::new(HashMap::new());
+//     static ref flows_map: Arc<Mutex<HashMap<FlowKey, Flow>>> = Arc::new(Mutex::new(HashMap::new()));
 // }
 
-/* FIXME Using HashMap (and possibly Mutex) for flow aggregation and updates. (line 19) */
+/* FIXME using HashMap (and possibly Mutex) for flow aggregation and updates. (line 20) */
 pub fn capture_packets(interface: NetworkInterface) {
     let mut flows_map: HashMap<FlowKey, Flow> = HashMap::new();
 
