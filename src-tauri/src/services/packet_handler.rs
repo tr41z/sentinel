@@ -4,7 +4,6 @@ use pnet::packet::ip::IpNextHeaderProtocol;
 
 use crate::utils::flow::Flow;
 
-#[allow(unused)]
 pub fn handle_packet_flow
 (
     src_ip: Ipv4Addr,
@@ -20,5 +19,9 @@ pub fn handle_packet_flow
 
     /* Using HashMap (and possibly Mutex) for flow aggregation and updates.*/
 
-    Flow {}
+    let flow: Flow = Flow::new(
+        src_ip, dst_ip, src_port, dst_port, 
+        protocol.0, size
+    );
+    flow
 }

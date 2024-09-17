@@ -1,5 +1,3 @@
-use tauri::{AppHandle, Manager};
-
 use pnet::packet::ethernet::EthernetPacket;
 use pnet::packet::ip::{IpNextHeaderProtocol, IpNextHeaderProtocols};
 use pnet::packet::ipv4::Ipv4Packet;
@@ -16,8 +14,7 @@ use crate::utils::flow::Flow;
 
 use super::packet_handler::handle_packet_flow;
 
-#[allow(unused)]
-pub fn capture_packets(interface: NetworkInterface, app_handle: AppHandle) {
+pub fn capture_packets(interface: NetworkInterface) {
     let (_, mut rx) = match datalink::channel(&interface, Default::default()) {
         Ok(Ethernet(tx, rx)) => (tx, rx),
         Ok(_) => panic!("Unhandled channel type: {}", &interface),
@@ -39,17 +36,17 @@ pub fn capture_packets(interface: NetworkInterface, app_handle: AppHandle) {
                                 if let Some(tcp_packet) = TcpPacket::new(ip_packet.payload()) {
                                     (tcp_packet.get_source(), tcp_packet.get_destination())
                                 } else {
-                                    return
+                                    continue;
                                 }
                             }
                             IpNextHeaderProtocols::Udp => {
                                 if let Some(udp_packet) = UdpPacket::new(ip_packet.payload()) {
                                     (udp_packet.get_source(), udp_packet.get_destination())
                                 } else {
-                                    return
+                                    continue;
                                 }
                             }
-                            _ => return
+                            _ => continue
                         };
 
                         let flow: Flow = handle_packet_flow(
@@ -64,9 +61,10 @@ pub fn capture_packets(interface: NetworkInterface, app_handle: AppHandle) {
                             size
                         );
 
-                        if let Err(e) = app_handle.emit_all("pass_flow", flow) {
-                            log::error!("Failed to emit flows: {}", e)
-                        }
+                        log::info!(
+                            "Flow: {:#?}",
+                            flow
+                        )
                     }
                 }
             },

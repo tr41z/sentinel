@@ -1,16 +1,19 @@
-use tauri::AppHandle;
+use std::thread;
 
-use pnet::datalink::NetworkInterface;
-use pnet::datalink::interfaces;
+use pnet::datalink;
 
 use crate::services::capture::capture_packets;
 
-// en0 interface
-pub fn start_sniffer(app_handle: AppHandle) {
+// all interfaces
+pub fn start_sniffer() {
     // FIXME: Apply threads for each interface (or many threads for one interface)
-    let interfaces: Vec<NetworkInterface> = interfaces();
+    let interfaces = datalink::interfaces();
+    let mut handles = vec![];
 
     for interface in interfaces {
-        capture_packets(interface, app_handle.clone());
+        let handle = thread::spawn(move || {
+            capture_packets(interface);
+        });
+        handles.push(handle);
     }
 }

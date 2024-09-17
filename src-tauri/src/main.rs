@@ -15,6 +15,8 @@ fn main() {
     // initialize logger
     env_logger::init();
 
+    commands::commands::start_sniffer();
+
     // initialize the Tauri app
     tauri::Builder::default()
         .setup(|app: &mut tauri::App| {
@@ -29,6 +31,6 @@ fn main() {
 }
 
 #[tauri::command]
-fn start_sniffer(app_handle: AppHandle) {
-    commands::commands::start_sniffer(app_handle);
+fn start_sniffer() {
+    commands::commands::start_sniffer();
 }
