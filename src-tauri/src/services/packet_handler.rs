@@ -20,7 +20,7 @@ pub fn handle_packet_flow
     let flow: Flow = Flow::new(
         src_ip, dst_ip, 
         src_port, dst_port, 
-        protocol.0, size
+        protocol.0, size as u64
     );
     
     let flow_key: FlowKey = FlowKey::new(
@@ -33,12 +33,12 @@ pub fn handle_packet_flow
     // TODO if doesn't initialise new one
     match flows_map.get_mut(&flow_key) {
         Some(flow) => {
-            flow.update(size);
-            flow.pretty_display("Flow Updated");
+            flow.update(size as u64);
+            flow.pretty_print("Flow Updated");
         },
         None => {
             flows_map.insert(flow_key, flow);
-            flow.pretty_display("New Flow");
+            flow.pretty_print("New Flow");
         }
     };
 }

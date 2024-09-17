@@ -7,33 +7,34 @@ pub struct Flow {
     src_port: u16,
     dst_port: u16,
     protocol: u8,
-    total_bytes: u16,
+    total_bytes: u64,
     packet_count: u32,
 }
 
 impl Flow {
-    pub fn new(src_ip: Ipv4Addr, dst_ip: Ipv4Addr, src_port: u16, dst_port: u16, protocol: u8, size: u16) -> Self {
+    pub fn new(src_ip: Ipv4Addr, dst_ip: Ipv4Addr, src_port: u16, dst_port: u16, protocol: u8, size: u64) -> Self {
         Flow {
             src_ip, dst_ip,
             src_port, dst_port,
             protocol,
             total_bytes: size,
-            packet_count: 0,
+            packet_count: 1,
         }
     }
-    pub fn update(&mut self, size: u16) {
+    pub fn update(&mut self, size: u64) {
         self.packet_count += 1;
         self.total_bytes += size;
     }
 
-    pub fn pretty_display(&self, prefix: &str) {
+    pub fn pretty_print(&self, prefix: &str) {
         println!(
-            "{} ||| {}:{} -> {}:{} | Size: {} | Packet Count: {}",
+            "{} ||| {}:{} -> {}:{} | Size: {} bytes | Packet Count: {} | Protocol: {}",
             prefix,
             self.src_ip, self.dst_port,
             self.dst_ip, self.dst_port,
             self.total_bytes,
-            self.packet_count
+            self.packet_count,
+            self.protocol
         )
     }
 }

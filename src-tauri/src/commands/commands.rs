@@ -13,9 +13,11 @@ pub fn start_sniffer() {
     let mut handles: Vec<JoinHandle<()>> = vec![];
 
     for interface in interfaces {
-        let handle: JoinHandle<()> = thread::spawn(move || {
-            capture_packets(interface);
-        });
-        handles.push(handle);
+        if interface.name == "en0" {
+            let handle: JoinHandle<()> = thread::spawn(move || {
+                capture_packets(interface);
+            });
+            handles.push(handle);
+        }
     }
 }
