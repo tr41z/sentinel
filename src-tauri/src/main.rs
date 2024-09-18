@@ -12,6 +12,7 @@ mod utils;
 fn main() {
     // Set the default log level to info
     env::set_var("RUST_LOG", "info");
+
     // Initialize logger
     env_logger::init();
 
@@ -25,7 +26,7 @@ fn main() {
             main_window.show().unwrap();
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![start_sniffer]) // Add the Tauri command
+        .invoke_handler(tauri::generate_handler![start_sniffer]) // NOTE: Need to invoke on front-end side
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
