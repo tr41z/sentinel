@@ -14,19 +14,32 @@ pub struct Flow {
     packet_count: u32,
     start_time: SystemTime,
     last_update_time: SystemTime,
-    end_time: Option<SystemTime>
+    end_time: Option<SystemTime>,
 }
 
 impl Flow {
-    pub fn new(src_ip: Ipv4Addr, dst_ip: Ipv4Addr, src_port: u16, dst_port: u16, protocol: u8, size: u64, 
-               start_time: SystemTime, last_update_time: SystemTime, end_time: Option<SystemTime>) -> Self {
+    pub fn new(
+        src_ip: Ipv4Addr,
+        dst_ip: Ipv4Addr,
+        src_port: u16,
+        dst_port: u16,
+        protocol: u8,
+        size: u64,
+        start_time: SystemTime,
+        last_update_time: SystemTime,
+        end_time: Option<SystemTime>,
+    ) -> Self {
         Flow {
-            src_ip, dst_ip,
-            src_port, dst_port,
+            src_ip,
+            dst_ip,
+            src_port,
+            dst_port,
             protocol,
             total_bytes: size,
             packet_count: 1,
-            start_time, last_update_time, end_time
+            start_time,
+            last_update_time,
+            end_time,
         }
     }
 
@@ -61,15 +74,24 @@ pub struct FlowKey {
     dst_ip: Ipv4Addr,
     src_port: u16,
     dst_port: u16,
-    protocol: u8
+    protocol: u8,
 }
 
 impl FlowKey {
-    pub fn new(src_ip: Ipv4Addr, dst_ip: Ipv4Addr, src_port: u16, dst_port: u16, protocol: u8) -> Self {
+    pub fn new(
+        src_ip: Ipv4Addr,
+        dst_ip: Ipv4Addr,
+        src_port: u16,
+        dst_port: u16,
+        protocol: u8,
+    ) -> Self {
         FlowKey {
-            src_ip, dst_ip,
-            src_port, dst_port,
-            protocol
+            src_ip,
+            dst_ip,
+            src_port,
+            dst_port,
+            protocol,
         }
     }
 }
+
