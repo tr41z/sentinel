@@ -15,6 +15,7 @@ pub struct Flow {
     start_time: SystemTime,
     last_update_time: SystemTime,
     end_time: Option<SystemTime>,
+    finished: bool,
 }
 
 impl Flow {
@@ -40,6 +41,7 @@ impl Flow {
             start_time,
             last_update_time,
             end_time,
+            finished: false,
         }
     }
 
@@ -47,6 +49,10 @@ impl Flow {
         self.packet_count += 1;
         self.total_bytes += size;
         self.last_update_time = last_update_time;
+
+        // TODO: Calculate 5 seconds since last update, if over or equal mark as finished
+        // and update `end_time`, if not, continue updating `last_update_time` until first
+        // condition is met
     }
 
     pub fn pretty_print(&self, prefix: &str) {
@@ -94,4 +100,3 @@ impl FlowKey {
         }
     }
 }
-

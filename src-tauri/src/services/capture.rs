@@ -18,7 +18,7 @@ use crate::utils::flow::{Flow, FlowKey};
 
 use super::packet_handler::handle_packet_flow;
 
-// NOTE: Adding Arc<Mutex<HashMap<FlowKey, Flow>>> later to eliminate risk of data races 
+// NOTE: Adding Arc<Mutex<HashMap<FlowKey, Flow>>> later to eliminate risk of data races
 // lazy_static::lazy_static! {
 //     static ref flows_map: Arc<Mutex<HashMap<FlowKey, Flow>>> = Arc::new(Mutex::new(HashMap::new()));
 // }
@@ -30,7 +30,7 @@ pub fn capture_packets(interface: NetworkInterface) {
     let (_, mut rx) = match datalink::channel(&interface, Default::default()) {
         Ok(Ethernet(tx, rx)) => (tx, rx),
         Ok(_) => panic!("Unhandled channel type: {}", &interface),
-        Err(e) => panic!("An error occured when creating the datalink channel: {}", e)
+        Err(e) => panic!("An error occured when creating the datalink channel: {}", e),
     };
 
     loop {
@@ -60,26 +60,24 @@ pub fn capture_packets(interface: NetworkInterface) {
                                     continue;
                                 }
                             }
-                            _ => continue
+                            _ => continue,
                         };
 
                         handle_packet_flow(
                             // FlowKey attributes
-                            src_ip, 
-                            dst_ip, 
-                            src_port, 
+                            src_ip,
+                            dst_ip,
+                            src_port,
                             dst_port,
                             protocol,
-                            
                             // Flow + FlowKey attributes
                             size,
-
                             // Flows map
-                            &mut flows_map
+                            &mut flows_map,
                         );
                     }
                 }
-            },
+            }
             Err(e) => {
                 panic!("An error occurred while reading: {}", e);
             }
