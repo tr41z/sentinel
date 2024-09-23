@@ -70,8 +70,10 @@ pub fn capture_packets(interface: NetworkInterface) {
                             src_port,
                             dst_port,
                             protocol,
+                            
                             // Flow + FlowKey attributes
                             size,
+                            
                             // Flows map
                             &mut flows_map,
                         );
