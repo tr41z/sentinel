@@ -36,12 +36,32 @@ pub fn handle_packet_flow(
     // TODO: if doesn't initialize new one
     match flows_map.get_mut(&flow_key) {
         Some(flow) => {
-            flow.update(size as u64, SystemTime::now());
-            flow.pretty_print("Flow Updated");
+            terminate_flows(flow);
+
+            if !flow.finished {
+                flow.update(size as u64, SystemTime::now());
+                flow.pretty_print("Flow Updated");
+            } else {
+                flow.update(size as u64, SystemTime::now());
+                flow.pretty_print("New Flow");
+            }
         }
         None => {
             flows_map.insert(flow_key, flow);
             flow.pretty_print("New Flow")
         }
     };
+}
+
+fn terminate_flows(flow: &mut Flow) {
+    let now: SystemTime = SystemTime::now();
+    let elapsed = now.duration_since(flow.last_update_time).unwrap().as_secs() >= 5;
+
+    if elapsed {
+        flow.finished = true;
+        flow.end_time = Some(now);
+        flow.total_bytes = 0;
+        flow.packet_count = 0;
+        flow.flow_termination_print();
+    }
 }

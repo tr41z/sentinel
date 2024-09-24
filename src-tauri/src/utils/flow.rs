@@ -1,4 +1,4 @@
-use std::{net::Ipv4Addr, time::SystemTime};
+use std:: {net::Ipv4Addr, time::SystemTime};
 
 use chrono::{DateTime, Utc};
 use serde::Serialize;
@@ -10,12 +10,12 @@ pub struct Flow {
     src_port: u16,
     dst_port: u16,
     protocol: u8,
-    total_bytes: u64,
-    packet_count: u32,
+    pub total_bytes: u64,
+    pub packet_count: u32,
     start_time: SystemTime,
-    last_update_time: SystemTime,
-    end_time: Option<SystemTime>,
-    finished: bool,
+    pub last_update_time: SystemTime,
+    pub end_time: Option<SystemTime>,
+    pub finished: bool,
 }
 
 impl Flow {
@@ -49,22 +49,29 @@ impl Flow {
         self.packet_count += 1;
         self.total_bytes += size;
         self.last_update_time = last_update_time;
-
-        // TODO: Calculate 5 seconds since last update, if over or equal mark as finished
-        // and update `end_time`, if not, continue updating `last_update_time` until first
-        // condition is met
     }
 
+    // NOTE: TO BE REMOVED LATER
     pub fn pretty_print(&self, prefix: &str) {
         println!(
             "{} ||| {}:{} -> {}:{} | Size: {} bytes | Packet Count: {} | Protocol: {} | Start Time: {} | Last Updated: {}",
             prefix,
-            self.src_ip, self.dst_port,
+            self.src_ip, self.src_port,
             self.dst_ip, self.dst_port,
             self.total_bytes,
             self.packet_count,
             self.protocol,
             system_time_to_date_time(self.start_time), system_time_to_date_time(self.last_update_time)
+        )
+    }
+
+    // NOTE: TO BE REMOVED LATER
+    pub fn flow_termination_print(&self) {
+        println!(
+            "FLOW ||| {}:{} -> {}:{} TERMINATED | DURATION: {:?}",
+            self.src_ip, self.src_port,
+            self.dst_ip, self.dst_port,
+            self.end_time.unwrap().duration_since(self.start_time)
         )
     }
 }
