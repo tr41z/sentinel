@@ -5,6 +5,8 @@ use std::{collections::HashMap, net::Ipv4Addr};
 use pnet::packet::ip::IpNextHeaderProtocol;
 
 use crate::utils::flow::{Flow, FlowKey};
+#[allow(unused)]
+use crate::database::db;
 
 // WARNING: EVERYTHING IN THAT FUNCTION IS LOOPED
 pub fn handle_packet_flow(

@@ -5,10 +5,8 @@ use serde::Serialize;
 
 #[derive(Serialize, Clone, Debug, Copy)]
 pub struct Flow {
-    src_ip: Ipv4Addr,
-    dst_ip: Ipv4Addr,
-    src_port: u16,
-    dst_port: u16,
+    src_ip: Ipv4Addr, dst_ip: Ipv4Addr,
+    src_port: u16, dst_port: u16,
     protocol: u8,
     pub total_bytes: u64,
     pub packet_count: u32,
@@ -20,10 +18,8 @@ pub struct Flow {
 
 impl Flow {
     pub fn new(
-        src_ip: Ipv4Addr,
-        dst_ip: Ipv4Addr,
-        src_port: u16,
-        dst_port: u16,
+        src_ip: Ipv4Addr, dst_ip: Ipv4Addr,
+        src_port: u16, dst_port: u16,
         protocol: u8,
         size: u64,
         start_time: SystemTime,
@@ -84,26 +80,20 @@ fn system_time_to_date_time(time: SystemTime) -> String {
 
 #[derive(serde::Serialize, Eq, Hash, PartialEq, Debug)]
 pub struct FlowKey {
-    src_ip: Ipv4Addr,
-    dst_ip: Ipv4Addr,
-    src_port: u16,
-    dst_port: u16,
+    src_ip: Ipv4Addr, dst_ip: Ipv4Addr,
+    src_port: u16, dst_port: u16,
     protocol: u8,
 }
 
 impl FlowKey {
     pub fn new(
-        src_ip: Ipv4Addr,
-        dst_ip: Ipv4Addr,
-        src_port: u16,
-        dst_port: u16,
+        src_ip: Ipv4Addr, dst_ip: Ipv4Addr,
+        src_port: u16, dst_port: u16,
         protocol: u8,
     ) -> Self {
         FlowKey {
-            src_ip,
-            dst_ip,
-            src_port,
-            dst_port,
+            src_ip, dst_ip,
+            src_port, dst_port,
             protocol,
         }
     }

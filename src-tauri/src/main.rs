@@ -8,6 +8,7 @@ use std::env;
 mod commands;
 mod services;
 mod utils;
+mod database;
 
 fn main() {
     // Set the default log level to info
