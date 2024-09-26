@@ -1,6 +1,6 @@
 use std::time::SystemTime;
-#[allow(unused)]
-use std::{collections::HashMap, net::Ipv4Addr, sync::Mutex};
+
+use std::{collections::HashMap, net::Ipv4Addr};
 
 use pnet::packet::ip::IpNextHeaderProtocol;
 
@@ -36,15 +36,11 @@ pub fn handle_packet_flow(
     // TODO: if doesn't initialize new one
     match flows_map.get_mut(&flow_key) {
         Some(flow) => {
+            // Terminate flows that were inactive for specified duration
             terminate_flows(flow);
 
-            if !flow.finished {
-                flow.update(size as u64, SystemTime::now());
-                flow.pretty_print("Flow Updated");
-            } else {
-                flow.update(size as u64, SystemTime::now());
-                flow.pretty_print("New Flow");
-            }
+            flow.update(size as u64, SystemTime::now());
+            flow.pretty_print("Flow Updated");
         }
         None => {
             flows_map.insert(flow_key, flow);
@@ -60,8 +56,6 @@ fn terminate_flows(flow: &mut Flow) {
     if elapsed {
         flow.finished = true;
         flow.end_time = Some(now);
-        flow.total_bytes = 0;
-        flow.packet_count = 0;
         flow.flow_termination_print();
     }
 }

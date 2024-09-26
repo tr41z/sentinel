@@ -8,9 +8,6 @@ use pnet::packet::Packet;
 use std::collections::HashMap;
 use std::net::Ipv4Addr;
 
-#[allow(unused)]
-use std::sync::{Arc, Mutex};
-
 use pnet::datalink::{self, NetworkInterface};
 
 use crate::services::capture::datalink::Channel::Ethernet;

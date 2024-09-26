@@ -68,9 +68,10 @@ impl Flow {
     // NOTE: TO BE REMOVED LATER
     pub fn flow_termination_print(&self) {
         println!(
-            "FLOW ||| {}:{} -> {}:{} TERMINATED | DURATION: {:?}",
+            "FLOW ||| {}:{} -> {}:{} TERMINATED | Start Time: {} | End Time: {} | DURATION: {:?}",
             self.src_ip, self.src_port,
             self.dst_ip, self.dst_port,
+            system_time_to_date_time(self.start_time), system_time_to_date_time(self.end_time.unwrap()),
             self.end_time.unwrap().duration_since(self.start_time)
         )
     }
