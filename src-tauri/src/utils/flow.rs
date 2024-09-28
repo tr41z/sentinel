@@ -10,10 +10,7 @@ pub struct Flow {
     protocol: u8,
     pub total_bytes: u64,
     pub packet_count: u32,
-    start_time: SystemTime,
-    pub last_update_time: SystemTime,
-    pub end_time: Option<SystemTime>,
-    pub finished: bool,
+    start_time: SystemTime, pub last_update_time: SystemTime, pub end_time: Option<SystemTime>, pub finished: bool,
 }
 
 impl Flow {
@@ -22,21 +19,15 @@ impl Flow {
         src_port: u16, dst_port: u16,
         protocol: u8,
         size: u64,
-        start_time: SystemTime,
-        last_update_time: SystemTime,
-        end_time: Option<SystemTime>,
+        start_time: SystemTime, last_update_time: SystemTime, end_time: Option<SystemTime>,
     ) -> Self {
         Flow {
-            src_ip,
-            dst_ip,
-            src_port,
-            dst_port,
+            src_ip, dst_ip,
+            src_port, dst_port,
             protocol,
             total_bytes: size,
             packet_count: 1,
-            start_time,
-            last_update_time,
-            end_time,
+            start_time, last_update_time, end_time,
             finished: false,
         }
     }

@@ -1,6 +1,6 @@
 use std::{net::Ipv4Addr, time::SystemTime};
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, sqlx::FromRow)]
 #[allow(unused)]
 pub struct DataModel {
     flow_id: i32,
