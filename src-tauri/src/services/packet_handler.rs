@@ -19,6 +19,9 @@ pub fn handle_packet_flow(
 
     flows_map: &mut HashMap<FlowKey, Flow>,
 ) {
+    // Cleanup terminated flows before handling new packets
+    flows_map.retain(|_, flow| !flow.finished);
+
     let flow: Flow = Flow::new(
         src_ip,
         dst_ip,
@@ -41,8 +44,11 @@ pub fn handle_packet_flow(
             // Terminate flows that were inactive for specified duration
             terminate_flows(flow);
 
-            flow.update(size as u64, SystemTime::now());
-            flow.pretty_print("Flow Updated");
+            // Update flow only if it's not finished
+            if !flow.finished {
+                flow.update(size as u64, SystemTime::now());
+                flow.pretty_print("Flow Updated");
+            }
         }
         None => {
             flows_map.insert(flow_key, flow);
@@ -51,13 +57,15 @@ pub fn handle_packet_flow(
     };
 }
 
+// Terminate flows that were inactive for more than 5 seconds
 fn terminate_flows(flow: &mut Flow) {
     let now: SystemTime = SystemTime::now();
-    let elapsed = now.duration_since(flow.last_update_time).unwrap().as_secs() >= 5;
-
-    if elapsed {
-        flow.finished = true;
-        flow.end_time = Some(now);
-        flow.flow_termination_print();
+    
+    if let Ok(duration) = now.duration_since(flow.last_update_time) {
+        if duration.as_secs() >= 5 {
+            flow.finished = true;
+            flow.end_time = Some(now);
+            flow.flow_termination_print();
+        }
     }
 }

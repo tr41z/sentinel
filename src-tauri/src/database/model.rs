@@ -3,6 +3,7 @@ use std::{net::Ipv4Addr, time::SystemTime};
 #[derive(Debug, PartialEq, Eq)]
 #[allow(unused)]
 pub struct DataModel {
+    flow_id: i32,
     src_ip: Ipv4Addr, dst_ip: Ipv4Addr,
     src_port: u16, dst_port: u16,
     protocol: u8,

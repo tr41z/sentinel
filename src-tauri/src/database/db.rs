@@ -1,21 +1,31 @@
-use std::error::Error;
-use std::result::Result;
+use sqlx::{Pool, MySql, Error, MySqlPool};
 
-use mysql::prelude::Queryable;
-use mysql::Pool;
+use async_std::task;
 
-#[allow(unused)]
-pub fn connect() -> Result<(), Box<dyn Error>> {
-    let url = "mysql://root:jestemkox1@localhost:3306/sentinel";
-    let pool = Pool::new(url)?;
+use dotenv::dotenv;
+use std::env;
 
-    let mut conn = pool.get_conn()?;
+async fn connect() -> Result<Pool<MySql>, Error> {
+    dotenv().ok();
 
-    conn.query_drop(
-        r"
-            CREATE TEMPORARY TABLE sentinel (
+    let username = env::var("DB_USERNAME").expect("'DB_USERNAME' must be set!");
+    let password = env::var("DB_PASSWORD").expect("'DB_PASSWORD' must be set!");
+    let db_name = env::var("DB_NAME").expect("'DB_NAME' must be set!");
+    let db_url = env::var("DB_URL").expect("'DB_URL' must be set!");
 
-        )")?;
+    let connection_string = format!("mysql://{}:{}@{}/{}", username, password, db_url, db_name);
+    return MySqlPool::connect(&connection_string).await;
+}
 
-    Ok(())
+pub async fn do_test_connection() {
+    let res = task::block_on(connect());
+
+    match res {
+        Err(err) => {
+            println!("Cannot connect to database [{}]", err.to_string());
+        }
+        Ok(_) => {
+            println!("Connected to database successfully!");
+        }
+    }
 }
