@@ -74,8 +74,10 @@ pub async fn handle_packet_flow(
 }
 
 // Terminate flows that were inactive for more than 5 seconds
-/* FIXME: The mechanism doesn't work correctly, it's waiting for the the same flow update and then it checks if it was >= 5 seconds.
-   FIXME: Should work asynchronously, indepented of flow updates. Should be thread spawned for each flow with some kind of timer. */
+/* 
+FIXME: The mechanism doesn't work correctly, it's waiting for the the same flow update and then it checks if it was >= 5 seconds.
+FIXME: Should work asynchronously, indepented of flow updates. Should be thread spawned for each flow with some kind of timer. 
+*/
 fn terminate_flows(flow: &mut Flow) {
     let now: SystemTime = SystemTime::now();
     
