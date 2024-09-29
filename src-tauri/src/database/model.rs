@@ -9,6 +9,7 @@ pub struct DataModel {
     pub total_packet_count: u32,
     pub start_time: SystemTime,
     pub end_time: Option<SystemTime>,
+    pub duration: String
 }
 
 impl DataModel {
@@ -20,6 +21,7 @@ impl DataModel {
         total_packet_count: u32,
         start_time: SystemTime,
         end_time: Option<SystemTime>,
+        duration: String
     ) -> Self {
         return Self {
            src_ip, dst_ip,
@@ -27,7 +29,8 @@ impl DataModel {
            protocol,
            total_bytes,
            total_packet_count,
-           start_time, end_time
+           start_time, end_time,
+           duration
         }
     }
 }

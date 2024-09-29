@@ -8,5 +8,6 @@ CREATE TABLE IF NOT EXISTS flows (
     total_bytes INT,
     total_packet_count INT,
     start_time DATETIME,
-    end_time DATETIME
+    end_time DATETIME,
+    duration TEXT
 );

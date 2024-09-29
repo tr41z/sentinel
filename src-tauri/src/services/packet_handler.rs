@@ -1,4 +1,4 @@
-use std::time::SystemTime;
+use std::time::{Duration, SystemTime, SystemTimeError};
 
 use std::{collections::HashMap, net::Ipv4Addr};
 
@@ -38,9 +38,6 @@ pub async fn handle_packet_flow(
 
     let flow_key: FlowKey = FlowKey::new(src_ip, dst_ip, src_port, dst_port, protocol.0);
 
-    // TODO: get value hidden under key
-    // TODO: then if it already exists, update
-    // TODO: if doesn't initialize new one
     match flows_map.get_mut(&flow_key) {
         Some(flow) => {
             // Terminate flows that were inactive for specified duration
@@ -57,7 +54,8 @@ pub async fn handle_packet_flow(
                      flow.protocol, 
                      flow.total_bytes, 
                      flow.packet_count, 
-                     flow.start_time, flow.end_time
+                     flow.start_time, flow.end_time,
+                     duration_to_str(flow.end_time.unwrap().duration_since(flow.start_time))
                 );
 
                 match database::db::save_flow(db, data_model).await {
@@ -76,7 +74,7 @@ pub async fn handle_packet_flow(
 // Terminate flows that were inactive for more than 5 seconds
 /* 
 FIXME: The mechanism doesn't work correctly, it's waiting for the the same flow update and then it checks if it was >= 5 seconds.
-FIXME: Should work asynchronously, indepented of flow updates. Should be thread spawned for each flow with some kind of timer. 
+TODO: Should work asynchronously, indepented of flow updates. Should be thread spawned for each flow with some kind of timer. 
 */
 fn terminate_flows(flow: &mut Flow) {
     let now: SystemTime = SystemTime::now();
@@ -87,5 +85,12 @@ fn terminate_flows(flow: &mut Flow) {
             flow.end_time = Some(now);
             flow.flow_termination_print();
         }
+    }
+}
+
+fn duration_to_str(duration: Result<Duration, SystemTimeError>) -> String {
+    match duration {
+        Ok(duration) => format!("{}", duration.as_secs()),
+        Err(_) => String::from("Error in converting duration to string!")
     }
 }
