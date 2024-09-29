@@ -5,12 +5,12 @@ use serde::Serialize;
 
 #[derive(Serialize, Clone, Debug, Copy)]
 pub struct Flow {
-    src_ip: Ipv4Addr, dst_ip: Ipv4Addr,
-    src_port: u16, dst_port: u16,
-    protocol: u8,
+    pub src_ip: Ipv4Addr, pub dst_ip: Ipv4Addr,
+    pub src_port: u16, pub dst_port: u16,
+    pub protocol: u8,
     pub total_bytes: u64,
     pub packet_count: u32,
-    start_time: SystemTime, pub last_update_time: SystemTime, pub end_time: Option<SystemTime>, pub finished: bool,
+    pub start_time: SystemTime, pub last_update_time: SystemTime, pub end_time: Option<SystemTime>, pub finished: bool,
 }
 
 impl Flow {
@@ -64,9 +64,9 @@ impl Flow {
     }
 }
 
-fn system_time_to_date_time(time: SystemTime) -> String {
-    let new_time: DateTime<Utc> = time.into();
-    format!("{}", new_time.format("%d/%m/%Y %H:%M:%S")).to_string()
+pub fn system_time_to_date_time(system_time: SystemTime) -> String {
+    let datetime: DateTime<Utc> = system_time.into();
+    datetime.format("%Y-%m-%d %H:%M:%S").to_string()
 }
 
 #[derive(serde::Serialize, Eq, Hash, PartialEq, Debug)]

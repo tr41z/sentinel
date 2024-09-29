@@ -1,3 +1,4 @@
+use async_std::task;
 use pnet::packet::ethernet::EthernetPacket;
 use pnet::packet::ip::{IpNextHeaderProtocol, IpNextHeaderProtocols};
 use pnet::packet::ipv4::Ipv4Packet;
@@ -8,8 +9,11 @@ use pnet::packet::Packet;
 use std::collections::HashMap;
 use std::net::Ipv4Addr;
 
+use sqlx::{Pool, MySql};
+
 use pnet::datalink::{self, NetworkInterface};
 
+use crate::database;
 use crate::services::capture::datalink::Channel::Ethernet;
 use crate::utils::flow::{Flow, FlowKey};
 
@@ -22,6 +26,11 @@ use super::packet_handler::handle_packet_flow;
 
 /* FIXME: Using HashMap (and possibly Mutex) for flow aggregation and updates. (line 20) */
 pub fn capture_packets(interface: NetworkInterface) {
+    let db: Pool<MySql> = match task::block_on(database::db::connect()) {
+        Ok(pool) => pool,
+        Err(e) => panic!("Failed to connect to the database: {}", e),
+    };
+
     let mut flows_map: HashMap<FlowKey, Flow> = HashMap::new();
 
     let (_, mut rx) = match datalink::channel(&interface, Default::default()) {
@@ -60,7 +69,7 @@ pub fn capture_packets(interface: NetworkInterface) {
                             _ => continue,
                         };
 
-                        handle_packet_flow(
+                        task::block_on(handle_packet_flow(
                             // FlowKey attributes
                             src_ip,
                             dst_ip,
@@ -73,7 +82,8 @@ pub fn capture_packets(interface: NetworkInterface) {
                             
                             // Flows map
                             &mut flows_map,
-                        );
+                            &db
+                        ));
                     }
                 }
             }

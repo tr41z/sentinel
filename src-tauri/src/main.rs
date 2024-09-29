@@ -3,8 +3,6 @@
 // #![cfg_attr(not(debug_assertions), windows_subsystem = "window")]
 use tauri::{AppHandle, Manager};
 
-use async_std::task;
-
 use std::env;
 
 mod commands;
@@ -19,7 +17,6 @@ fn main() {
     // Initialize logger
     env_logger::init();
 
-    task::block_on(database::db::do_test_connection());
     commands::commands::start_sniffer();
 
     // Initialize the Tauri app

@@ -1,11 +1,13 @@
 use sqlx::{Error, Executor, MySql, MySqlPool, Pool};
 
-use async_std::task;
-
 use dotenv::dotenv;
 use std::{env, fs};
 
-async fn connect() -> Result<Pool<MySql>, Error> {
+use crate::utils::flow;
+
+use super::model::DataModel;
+
+pub async fn connect() -> Result<Pool<MySql>, Error> {
     dotenv().ok();
 
     let username: String = env::var("DB_USERNAME").expect("'DB_USERNAME' must be set!");
@@ -27,25 +29,41 @@ async fn initialise_schema(pool: &MySqlPool) -> Result<(), Error> {
     Ok(())
 }
 
-#[allow(unused)]
-pub async fn save_flow(pool: &MySqlPool) -> Result<(), Error> {Ok(())}
+pub async fn save_flow(
+    pool: &MySqlPool,
+    flow: DataModel,
+) -> Result<(), Error> {
+    initialise_schema(pool).await?;
 
-pub async fn do_test_connection() {
-    let res: Result<Pool<MySql>, Error> = task::block_on(connect());
+    let result = sqlx::query(
+        "INSERT INTO flows (
+            source_ip, destination_ip, source_port, destination_port, protocol, total_bytes, total_packet_count,
+            start_time, end_time
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")
+        .bind(flow.src_ip)
+        .bind(flow.dst_ip)
+        .bind(flow.src_port)
+        .bind(flow.dst_port)
+        .bind(flow.protocol)
+        .bind(flow.total_bytes)
+        .bind(flow.total_packet_count)
+        .bind(flow::system_time_to_date_time(flow.start_time))
+        .bind(match flow.end_time {
+            Some(time) => flow::system_time_to_date_time(time),
+            None => String::from("NULL"),
+        })
+        .execute(pool)
+        .await;
 
-    match res {
-        Err(err) => {
-            println!("Cannot connect to database [{}]", err.to_string());
+    match result {
+        Err(e) => {
+            println!("Error inserting flow: {:#?}!", flow);
+            println!("Error message: [{}].\n", e.to_string());
         }
-        Ok(pool) => {
-            println!("Connected to database successfully!");
-
-            // Initialize the schema
-            if let Err(err) = initialise_schema(&pool).await {
-                println!("Failed to initialize schema: {}", err);
-            } else {
-                println!("Schema initialized successfully.");
-            }
+        Ok(res) => {
+            println!("Flow has been inserted! Rows affected: {}", res.rows_affected());
         }
     }
+    
+    Ok(())
 }
