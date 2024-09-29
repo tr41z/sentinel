@@ -21,7 +21,7 @@ pub async fn connect() -> Result<Pool<MySql>, Error> {
 
 async fn initialise_schema(pool: &MySqlPool) -> Result<(), Error> {
     // Load schema.sql file
-    let schema: String = fs::read_to_string("/Users/michael/Desktop/Coding/FYP/sentinel/src-tauri/src/database/schema.sql")
+    let schema: String = fs::read_to_string("/Users/michael/Desktop/Coding/FYP/sentinel/src-tauri/src/database/migrations/schema.sql")
         .expect("Failed to read 'schema.sql'");
 
     pool.execute(schema.as_str()).await?;
