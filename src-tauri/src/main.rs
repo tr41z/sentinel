@@ -27,7 +27,7 @@ fn main() {
             main_window.show().unwrap();
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![start_sniffer]) // NOTE: Need to invoke on front-end side
+        .invoke_handler(tauri::generate_handler![start_sniffer]) // NOTE: Need to invoke on front-end side when the app starts
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
