@@ -38,7 +38,7 @@ impl Flow {
         self.last_update_time = last_update_time;
     }
 
-    // NOTE: TO BE REMOVED LATER
+    // NOTE: TO BE REMOVED LATER WHEN CAPTURED ON FRONTEND
     pub fn pretty_print(&self, prefix: &str) {
         println!(
             "{} ||| {}:{} -> {}:{} | Size: {} bytes | Packet Count: {} | Protocol: {} | Start Time: {} | Last Updated: {}",
@@ -52,7 +52,7 @@ impl Flow {
         )
     }
 
-    // NOTE: TO BE REMOVED LATER
+    // NOTE: TO BE REMOVED LATER WHEN CAPTURED ON FRONTEND
     pub fn flow_termination_print(&self) {
         println!(
             "FLOW ||| {}:{} -> {}:{} TERMINATED | Start Time: {} | Last Time Updated: {} | End Time: {} | DURATION: {:?}",

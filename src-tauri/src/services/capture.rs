@@ -24,7 +24,7 @@ use super::packet_handler::handle_packet_flow;
 //     static ref flows_map: Arc<Mutex<HashMap<FlowKey, Flow>>> = Arc::new(Mutex::new(HashMap::new()));
 // }
 
-/* FIXME: Using HashMap (and possibly Mutex) for flow aggregation and updates. (line 20) */
+/* PERF: Using HashMap (and possibly Mutex) for flow aggregation and updates. (line 23) */
 pub fn capture_packets(interface: NetworkInterface) {
     let db: Pool<MySql> = match task::block_on(database::db::connect()) {
         Ok(pool) => pool,

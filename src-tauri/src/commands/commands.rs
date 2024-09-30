@@ -8,7 +8,6 @@ use crate::services::capture::capture_packets;
 
 // All interfaces
 pub fn start_sniffer() {
-    // PERF: apply threads for each interface (or many threads for one interface)
     let interfaces: Vec<NetworkInterface> = datalink::interfaces();
     let mut handles: Vec<JoinHandle<()>> = vec![];
 
