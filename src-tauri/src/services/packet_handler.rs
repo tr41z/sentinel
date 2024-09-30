@@ -24,18 +24,6 @@ pub async fn handle_packet_flow(
     // Cleanup terminated flows before handling new packets
     flows_map.retain(|_, flow| !flow.finished);
 
-    let flow: Flow = Flow::new(
-        src_ip,
-        dst_ip,
-        src_port,
-        dst_port,
-        protocol.0,
-        size as u64,
-        SystemTime::now(),
-        SystemTime::now(),
-        None,
-    );
-
     let flow_key: FlowKey = FlowKey::new(src_ip, dst_ip, src_port, dst_port, protocol.0);
 
     match flows_map.get_mut(&flow_key) {
@@ -65,8 +53,20 @@ pub async fn handle_packet_flow(
             }
         }
         None => {
-            flows_map.insert(flow_key, flow);
-            flow.pretty_print("New Flow")
+            let new_flow: Flow = Flow::new(
+                src_ip,
+                dst_ip,
+                src_port,
+                dst_port,
+                protocol.0,
+                size as u64,
+                SystemTime::now(),
+                SystemTime::now(),
+                None,
+            );
+
+            flows_map.insert(flow_key, new_flow);
+            new_flow.pretty_print("New Flow");
         }
     };
 }
@@ -88,9 +88,9 @@ fn terminate_flows(flow: &mut Flow) {
     }
 }
 
-fn duration_to_str(duration: Result<Duration, SystemTimeError>) -> String {
+fn duration_to_str(duration: Result<Duration, SystemTimeError>) -> u64 {
     match duration {
-        Ok(duration) => format!("{}", duration.as_secs()),
-        Err(_) => String::from("Error in converting duration to string!")
+        Ok(duration) => duration.as_secs(),
+        Err(_) => 0
     }
 }

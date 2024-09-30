@@ -7,9 +7,10 @@ pub struct DataModel {
     pub protocol: u8,
     pub total_bytes: u64,
     pub total_packet_count: u32,
+    pub rate: f64,
     pub start_time: SystemTime,
     pub end_time: Option<SystemTime>,
-    pub duration: String
+    pub duration: u64
 }
 
 impl DataModel {
@@ -21,7 +22,7 @@ impl DataModel {
         total_packet_count: u32,
         start_time: SystemTime,
         end_time: Option<SystemTime>,
-        duration: String
+        duration: u64
     ) -> Self {
         return Self {
            src_ip, dst_ip,
@@ -29,8 +30,13 @@ impl DataModel {
            protocol,
            total_bytes,
            total_packet_count,
+           rate: DataModel::calculate_rate(total_bytes as f64, duration as f64),
            start_time, end_time,
            duration
         }
+    }
+
+    fn calculate_rate(size: f64, duration: f64) -> f64 {
+        size / duration
     }
 }
