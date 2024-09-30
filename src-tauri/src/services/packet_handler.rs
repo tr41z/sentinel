@@ -8,6 +8,7 @@ use sqlx::{MySql, Pool};
 use crate::utils::flow::{Flow, FlowKey};
 
 use crate::database::{self};
+use crate::database::model::DataModel;
 
 // WARNING: EVERYTHING IN THAT FUNCTION IS LOOPED
 pub async fn handle_packet_flow(
@@ -22,7 +23,7 @@ pub async fn handle_packet_flow(
     db: &Pool<MySql>
 ) {
     // Cleanup terminated flows before handling new packets
-    flows_map.retain(|_, flow| !flow.finished);
+    flows_map.retain(|_, flow: &mut Flow| !flow.finished);
 
     let flow_key: FlowKey = FlowKey::new(src_ip, dst_ip, src_port, dst_port, protocol.0);
 
@@ -36,7 +37,7 @@ pub async fn handle_packet_flow(
                 flow.update(size as u64, SystemTime::now());
                 flow.pretty_print("Flow Updated");
             } else {
-                let data_model = database::model::DataModel::new(
+                let data_model: DataModel = database::model::DataModel::new(
                      flow.src_ip, flow.dst_ip,
                      flow.src_port, flow.dst_port, 
                      flow.protocol, 
