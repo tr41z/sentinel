@@ -38,13 +38,13 @@ pub async fn handle_packet_flow(
                 flow.pretty_print("Flow Updated");
             } else {
                 let data_model: DataModel = database::model::DataModel::new(
-                     flow.src_ip, flow.dst_ip,
-                     flow.src_port, flow.dst_port, 
-                     flow.protocol, 
-                     flow.total_bytes, 
-                     flow.packet_count, 
-                     flow.start_time, flow.end_time,
-                     duration_to_str(flow.end_time.unwrap().duration_since(flow.start_time))
+                    flow.src_ip, flow.dst_ip,
+                    flow.src_port, flow.dst_port, 
+                    flow.protocol, 
+                    flow.total_bytes, 
+                    flow.packet_count, 
+                    flow.start_time, flow.end_time,
+                    duration_to_str(flow.end_time.unwrap().duration_since(flow.start_time))
                 );
 
                 match database::db::save_flow(db, data_model).await {
