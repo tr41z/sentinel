@@ -7,8 +7,12 @@ CREATE TABLE IF NOT EXISTS flows (
     protocol INT,
     total_bytes INT,
     total_packet_count INT,
+
     rate FLOAT,
+    source_load INT,
+    destination_load INT,
+
     start_time DATETIME,
-    end_time DATETIME,
+    last_updated_time DATETIME,
     duration TEXT
 );

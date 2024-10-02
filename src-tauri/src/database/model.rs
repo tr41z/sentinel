@@ -2,14 +2,22 @@ use std::{net::Ipv4Addr, time::SystemTime};
 
 #[derive(Debug, sqlx::FromRow)]
 pub struct DataModel {
-    pub src_ip: Ipv4Addr, pub dst_ip: Ipv4Addr,
-    pub src_port: u16, pub dst_port: u16,
+    pub src_ip: Ipv4Addr, 
+    pub dst_ip: Ipv4Addr,
+    pub src_port: u16, 
+    pub dst_port: u16,
     pub protocol: u8,
     pub total_bytes: u64,
     pub total_packet_count: u32,
+
+    // Model input
     pub rate: f64,
+    pub sload: u64,
+    pub dload: u64,
+    
+    // Time
     pub start_time: SystemTime,
-    pub end_time: Option<SystemTime>,
+    pub last_update_time: SystemTime,
     pub duration: u64
 }
 
@@ -20,19 +28,27 @@ impl DataModel {
         protocol: u8,
         total_bytes: u64,
         total_packet_count: u32,
+
+        sload: u64,
+        dload: u64,
+
         start_time: SystemTime,
-        end_time: Option<SystemTime>,
+        last_update_time: SystemTime,
         duration: u64
     ) -> Self {
         return Self {
-           src_ip, dst_ip,
-           src_port, dst_port,
-           protocol,
-           total_bytes,
-           total_packet_count,
-           rate: DataModel::calculate_rate(total_bytes as f64, duration as f64),
-           start_time, end_time,
-           duration
+            src_ip, dst_ip,
+            src_port, dst_port,
+            protocol,
+            total_bytes,
+            total_packet_count,
+
+            rate: DataModel::calculate_rate(total_bytes as f64, duration as f64),
+            sload,
+            dload,
+
+            start_time, last_update_time,
+            duration
         }
     }
 

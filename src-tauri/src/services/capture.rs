@@ -8,6 +8,7 @@ use pnet::packet::Packet;
 
 use std::collections::HashMap;
 use std::net::Ipv4Addr;
+use std::sync::{Arc, Mutex};
 
 use sqlx::{Pool, MySql};
 
@@ -19,19 +20,13 @@ use crate::utils::flow::{Flow, FlowKey};
 
 use super::packet_handler::handle_packet_flow;
 
-// NOTE: Adding Arc<Mutex<HashMap<FlowKey, Flow>>> later to eliminate risk of data races
-// lazy_static::lazy_static! {
-//     static ref flows_map: Arc<Mutex<HashMap<FlowKey, Flow>>> = Arc::new(Mutex::new(HashMap::new()));
-// }
-
-/* PERF: Using HashMap (and possibly Mutex) for flow aggregation and updates. (line 23) */
 pub fn capture_packets(interface: NetworkInterface) {
     let db: Pool<MySql> = match task::block_on(database::db::connect()) {
         Ok(pool) => pool,
         Err(e) => panic!("Failed to connect to the database: {}", e),
     };
 
-    let mut flows_map: HashMap<FlowKey, Flow> = HashMap::new();
+    let flows_map: Arc<Mutex<HashMap<FlowKey, Flow>>> = Arc::new(Mutex::new(HashMap::new()));
 
     let (_, mut rx) = match datalink::channel(&interface, Default::default()) {
         Ok(Ethernet(tx, rx)) => (tx, rx),
@@ -49,6 +44,7 @@ pub fn capture_packets(interface: NetworkInterface) {
                         let dst_ip: Ipv4Addr = ip_packet.get_destination();
                         let protocol: IpNextHeaderProtocol = ip_packet.get_next_level_protocol();
                         let size: u16 = ip_packet.get_total_length();
+                        let ttl: u8 = ip_packet.get_ttl();
 
                         // Extracting source port and destination port from packets
                         let (src_port, dst_port) = match protocol {
@@ -69,6 +65,8 @@ pub fn capture_packets(interface: NetworkInterface) {
                             _ => continue,
                         };
 
+                        let flows_map: Arc<Mutex<HashMap<FlowKey, Flow>>> = Arc::clone(&flows_map);
+
                         task::block_on(handle_packet_flow(
                             // FlowKey attributes
                             src_ip,
@@ -79,9 +77,10 @@ pub fn capture_packets(interface: NetworkInterface) {
                             
                             // Flow + FlowKey attributes
                             size,
+                            ttl,
                             
                             // Flows map
-                            &mut flows_map,
+                            flows_map,
                             &db
                         ));
                     }
