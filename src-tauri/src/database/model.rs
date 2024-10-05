@@ -13,11 +13,13 @@ pub struct DataModel {
 
     // Model input
     pub rate: f64,
-    pub sload: u64,
-    pub dload: u64,
+    pub sbytes: u64,
+    pub dbytes: u64,
     pub sttl: u8,
     pub dttl: u8,
     pub smean: u64,
+    pub sload: f64,
+    pub dload: f64,
     
     // Time
     pub start_time: SystemTime,
@@ -34,9 +36,11 @@ impl DataModel {
         protocol: u8,
         total_bytes: u64,
         total_packet_count: u32,
+        source_packet_count: u32,
 
-        sload: u64,
-        dload: u64,
+        sbytes: u64,
+        dbytes: u64,
+
         sttl: u8,
         dttl: u8,
 
@@ -52,11 +56,13 @@ impl DataModel {
             total_packet_count,
 
             rate: DataModel::calculate_rate(total_bytes as f64, duration as f64),
-            sload,
-            dload,
+            sbytes,
+            dbytes,
             sttl,
             dttl,
-            smean: DataModel::calculate_smean(sload as u64, total_packet_count as u64),
+            sload: DataModel::calculate_load(sbytes as f64, duration as f64),
+            dload: DataModel::calculate_rate(dbytes as f64, duration as f64),
+            smean: DataModel::calculate_smean(DataModel::calculate_load(sbytes as f64, duration as f64) as u64, source_packet_count as u64),
 
             start_time, last_update_time,
             duration
@@ -69,5 +75,9 @@ impl DataModel {
 
     fn calculate_smean(size: u64, total_packet_count: u64) -> u64 {
         size / total_packet_count
+    }
+
+    fn calculate_load(bytes: f64, duration: f64) -> f64 {
+        bytes / duration
     }
 }

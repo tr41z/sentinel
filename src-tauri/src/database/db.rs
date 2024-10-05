@@ -38,11 +38,11 @@ pub async fn save_flow(
     let result = sqlx::query(
         "INSERT INTO flows (
             source_ip, source_port, destination_ip, destination_port, protocol, 
-            total_bytes, total_packet_count, rate, 
+            total_bytes, total_packet_count, rate, source_bytes, destination_bytes,
             source_load, destination_load, source_ttl, destination_ttl, source_packet_mean_size,
             start_time, last_updated_time,
             duration
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
         .bind(flow.src_ip)
         .bind(flow.src_port)
         .bind(flow.dst_ip)
@@ -51,6 +51,8 @@ pub async fn save_flow(
         .bind(flow.total_bytes)
         .bind(flow.total_packet_count)
         .bind(flow.rate)
+        .bind(flow.sbytes)
+        .bind(flow.dbytes)
         .bind(flow.sload)
         .bind(flow.dload)
         .bind(flow.sttl)

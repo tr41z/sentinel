@@ -9,8 +9,11 @@ CREATE TABLE IF NOT EXISTS flows (
     total_packet_count INT,
 
     rate FLOAT,
-    source_load INT,
-    destination_load INT,
+    source_bytes INT,
+    destination_bytes INT,
+    source_load FLOAT,
+    destination_load FLOAT,
+
     source_ttl INT,
     destination_ttl INT,
     source_packet_mean_size INT,

@@ -12,10 +12,11 @@ pub struct Flow {
     pub protocol: u8,
     pub total_bytes: u64,
     pub packet_count: u32,
+    pub source_packet_count: u32,
 
     // Model input
-    pub sload: u64, // source -> dest load (bytes)
-    pub dload: u64, // dest -> source load (bytes)
+    pub sbytes: u64, // source -> dest load (bytes)
+    pub dbytes: u64, // dest -> source load (bytes)
     pub sttl: Option<u8>, // source -> dest first assigned ttl
     pub dttl: Option<u8>, // dest -> source first assigned ttl
     // NOTE: ADD ct_state_ttl, smean, sbytes, ct_dst_src_ltm, ct_srv_dst, dbytes
@@ -46,9 +47,10 @@ impl Flow {
             protocol,
             total_bytes: size,
             packet_count: 1,
+            source_packet_count: 0,
 
-            sload: 0,
-            dload: 0,
+            sbytes: 0,
+            dbytes: 0,
 
             sttl: None,
             dttl: None,
@@ -65,13 +67,14 @@ impl Flow {
 
         // Update flow based on direction
         if src_ip == self.src_ip && dst_ip == self.dst_ip {
-            self.sload += size as u64;
+            self.sbytes += size as u64;
+            self.source_packet_count += 1;
             
             if self.sttl.is_none() {
                 self.sttl = Some(ttl);
             }
         } else {
-            self.dload += size as u64;
+            self.dbytes += size as u64;
             
             if self.dttl.is_none() {
                 self.dttl = Some(ttl);
@@ -99,12 +102,12 @@ impl Flow {
     // NOTE: TO BE REMOVED LATER WHEN CAPTURED ON FRONTEND
     pub fn flow_termination_print(&self) {
         println!(
-            "FLOW ||| {}:{} -> {}:{} TERMINATED | SLOAD: {} | DLOAD: {} | SIZE: {} | START: {} | LAST: {} | DURATION: {:?}",
+            "FLOW ||| {}:{} -> {}:{} TERMINATED | SBYTES: {} | DBYTES: {} | SIZE: {} | START: {} | LAST: {} | DURATION: {:?}",
             self.src_ip, self.src_port,
             self.dst_ip, self.dst_port,
 
-            self.sload,
-            self.dload,
+            self.sbytes,
+            self.dbytes,
             self.total_bytes,
             system_time_to_date_time(self.start_time),
             system_time_to_date_time(self.last_update_time),

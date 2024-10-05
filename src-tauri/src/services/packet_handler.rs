@@ -59,10 +59,11 @@ pub async fn handle_packet_flow(
 
             // Initialize the load based on direction
             if src_ip == new_flow.src_ip && dst_ip == new_flow.dst_ip {
-                new_flow.sload += size as u64; // Update source to destination load
+                new_flow.sbytes += size as u64; // Update source to destination load
+                new_flow.source_packet_count += 1;
                 new_flow.sttl = Some(ttl);
             } else {
-                new_flow.dload += size as u64; // Update destination to source load
+                new_flow.dbytes += size as u64; // Update destination to source load
                 new_flow.dttl = Some(ttl);
             }
 
@@ -88,8 +89,9 @@ async fn terminate_flows(flow: &mut Flow, db: &Pool<MySql>) {
                 flow.protocol, 
                 flow.total_bytes, 
                 flow.packet_count, 
-                flow.sload,
-                flow.dload,
+                flow.source_packet_count,
+                flow.sbytes,
+                flow.dbytes,
                 match flow.sttl {Some(ttl) => ttl, None => 0},
                 match flow.dttl {Some(ttl) => ttl, None => 0},
                 flow.start_time, flow.last_update_time,
