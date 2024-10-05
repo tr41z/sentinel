@@ -78,7 +78,7 @@ async fn terminate_flows(flow: &mut Flow, db: &Pool<MySql>) {
     let now: SystemTime = SystemTime::now();
     
     if let Ok(duration) = now.duration_since(flow.last_update_time) {
-        if duration.as_secs() >= 5 {
+        if duration.as_secs() >= 120 {
             flow.finished = true;
             flow.flow_termination_print();
 
