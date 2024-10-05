@@ -1,48 +1,54 @@
 use sqlx::{Error, Executor, MySql, MySqlPool, Pool};
-
 use dotenv::dotenv;
 use std::{env, fs};
-
 use crate::utils::flow;
 
 use super::model::DataModel;
 
 pub async fn connect() -> Result<Pool<MySql>, Error> {
     dotenv().ok();
+    let connection_string = build_connection_string()?;
+    MySqlPool::connect(&connection_string).await
+}
 
-    let username: String = env::var("DB_USERNAME").expect("'DB_USERNAME' must be set!");
-    let password: String = env::var("DB_PASSWORD").expect("'DB_PASSWORD' must be set!");
-    let db_name: String = env::var("DB_NAME").expect("'DB_NAME' must be set!");
-    let db_url: String = env::var("DB_URL").expect("'DB_URL' must be set!");
+fn build_connection_string() -> Result<String, Error> {
+    let username = env::var("DB_USERNAME").map_err(|e| {
+        sqlx::Error::Configuration(Box::new(e))
+    })?;
 
-    let connection_string: String = format!("mysql://{}:{}@{}/{}", username, password, db_url, db_name);
-    return MySqlPool::connect(&connection_string).await;
+    let password = env::var("DB_PASSWORD").map_err(|e| {
+        sqlx::Error::Configuration(Box::new(e))
+    })?;
+
+    let db_name = env::var("DB_NAME").map_err(|e| {
+        sqlx::Error::Configuration(Box::new(e))
+    })?;
+
+    let db_url = env::var("DB_URL").map_err(|e| {
+        sqlx::Error::Configuration(Box::new(e))
+    })?;
+
+    Ok(format!("mysql://{}:{}@{}/{}", username, password, db_url, db_name))
 }
 
 async fn initialise_schema(pool: &MySqlPool) -> Result<(), Error> {
-    // Load schema.sql file
-    let schema: String = fs::read_to_string("/Users/michael/Desktop/Coding/FYP/sentinel/src-tauri/src/database/migrations/schema.sql")
-        .expect("Failed to read 'schema.sql'");
-
+    let schema = fs::read_to_string("/Users/michael/Desktop/Coding/FYP/sentinel/src-tauri/src/database/migrations/schema.sql")
+        .map_err(|e| Error::Io(e))?;
     pool.execute(schema.as_str()).await?;
-
     Ok(())
 }
 
-pub async fn save_flow(
-    pool: &MySqlPool,
-    flow: DataModel,
-) -> Result<(), Error> {
+pub async fn save_flow(pool: &MySqlPool, flow: DataModel) -> Result<(), Error> {
     initialise_schema(pool).await?;
 
-    let result = sqlx::query(
-        "INSERT INTO flows (
+    let query = "INSERT INTO flows (
             source_ip, source_port, destination_ip, destination_port, protocol, 
             total_bytes, total_packet_count, rate, source_bytes, destination_bytes,
             source_load, destination_load, source_ttl, destination_ttl, source_packet_mean_size,
-            start_time, last_updated_time,
-            duration
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+            start_time, last_updated_time, duration
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    let result = sqlx::query(query)
         .bind(flow.src_ip)
         .bind(flow.src_port)
         .bind(flow.dst_ip)
@@ -60,17 +66,17 @@ pub async fn save_flow(
         .bind(flow.smean)
         .bind(flow::system_time_to_date_time(flow.start_time))
         .bind(flow::system_time_to_date_time(flow.last_update_time))
-        .bind(flow.duration.clone())
+        .bind(flow.duration)
         .execute(pool)
         .await;
 
     match result {
         Err(e) => {
-            println!("Error inserting flow: {:#?}!", flow);
-            println!("Error message: [{}].\n", e.to_string());
+            eprintln!("Error inserting flow: {:#?}!", flow);
+            eprintln!("Error message: [{}].", e.to_string());
         }
         Ok(res) => {
-            println!("Flow has been inserted! Rows affected: {}", res.rows_affected());
+            println!("Flow inserted successfully! Rows affected: {}", res.rows_affected());
         }
     }
     

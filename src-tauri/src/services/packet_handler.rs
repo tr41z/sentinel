@@ -25,7 +25,7 @@ pub async fn handle_packet_flow(
     db: &Pool<MySql>
 ) {
     // Lock the flows_map before accessing
-    let mut flows_map = flows_map.lock().unwrap();
+    let mut flows_map: std::sync::MutexGuard<'_, HashMap<FlowKey, Flow>> = flows_map.lock().unwrap();
 
     // Cleanup terminated flows before handling new packets
     flows_map.retain(|_, flow: &mut Flow| !flow.finished);
@@ -78,7 +78,7 @@ async fn terminate_flows(flow: &mut Flow, db: &Pool<MySql>) {
     let now: SystemTime = SystemTime::now();
     
     if let Ok(duration) = now.duration_since(flow.last_update_time) {
-        if duration.as_secs() >= 120 {
+        if duration.as_secs() >= 5 {
             flow.finished = true;
             flow.flow_termination_print();
 

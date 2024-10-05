@@ -10,16 +10,17 @@ pub struct DataModel {
     pub protocol: u8,
     pub total_bytes: u64,
     pub total_packet_count: u32,
+    pub dttl: u8,
 
     // Model input
     pub rate: f64,
     pub sbytes: u64,
     pub dbytes: u64,
     pub sttl: u8,
-    pub dttl: u8,
     pub smean: u64,
     pub sload: f64,
     pub dload: f64,
+    // NOTE: ADD ct_state_ttl, ct_dst_src_ltm, ct_srv_dst
     
     // Time
     pub start_time: SystemTime,
