@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS flows (
     destination_load INT,
     source_ttl INT,
     destination_ttl INT,
+    source_packet_mean_size INT,
 
     start_time DATETIME,
     last_updated_time DATETIME,

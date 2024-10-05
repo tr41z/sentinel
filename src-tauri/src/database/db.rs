@@ -39,10 +39,10 @@ pub async fn save_flow(
         "INSERT INTO flows (
             source_ip, source_port, destination_ip, destination_port, protocol, 
             total_bytes, total_packet_count, rate, 
-            source_load, destination_load, source_ttl, destination_ttl,
+            source_load, destination_load, source_ttl, destination_ttl, source_packet_mean_size,
             start_time, last_updated_time,
             duration
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
         .bind(flow.src_ip)
         .bind(flow.src_port)
         .bind(flow.dst_ip)
@@ -55,6 +55,7 @@ pub async fn save_flow(
         .bind(flow.dload)
         .bind(flow.sttl)
         .bind(flow.dttl)
+        .bind(flow.smean)
         .bind(flow::system_time_to_date_time(flow.start_time))
         .bind(flow::system_time_to_date_time(flow.last_update_time))
         .bind(flow.duration.clone())
