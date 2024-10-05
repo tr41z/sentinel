@@ -1,4 +1,4 @@
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, MutexGuard};
 use std::time::{Duration, SystemTime, SystemTimeError};
 
 use std::{collections::HashMap, net::Ipv4Addr};
@@ -25,7 +25,7 @@ pub async fn handle_packet_flow(
     db: &Pool<MySql>
 ) {
     // Lock the flows_map before accessing
-    let mut flows_map: std::sync::MutexGuard<'_, HashMap<FlowKey, Flow>> = flows_map.lock().unwrap();
+    let mut flows_map: MutexGuard<'_, HashMap<FlowKey, Flow>> = flows_map.lock().unwrap();
 
     // Cleanup terminated flows before handling new packets
     flows_map.retain(|_, flow: &mut Flow| !flow.finished);
@@ -73,7 +73,7 @@ pub async fn handle_packet_flow(
     };
 }
 
-// Terminate flows that were inactive for more than 60 seconds and save them to the database
+// Terminate flows that were inactive
 async fn terminate_flows(flow: &mut Flow, db: &Pool<MySql>) {
     let now: SystemTime = SystemTime::now();
     
