@@ -90,6 +90,8 @@ async fn terminate_flows(flow: &mut Flow, db: &Pool<MySql>) {
                 flow.packet_count, 
                 flow.sload,
                 flow.dload,
+                match flow.sttl {Some(ttl) => ttl, None => 0},
+                match flow.dttl {Some(ttl) => ttl, None => 0},
                 flow.start_time, flow.last_update_time,
                 duration_to_str(flow.last_update_time.duration_since(flow.start_time))
             );

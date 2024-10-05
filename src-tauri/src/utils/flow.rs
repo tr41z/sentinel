@@ -16,9 +16,9 @@ pub struct Flow {
     // Model input
     pub sload: u64, // source -> dest load (bytes)
     pub dload: u64, // dest -> source load (bytes)
-    pub sttl: Option<u8>, // source -> dest ttl, set once \
-    //                                                     ------- USED FOR ct_state_ttl
-    pub dttl: Option<u8>, // dest -> source ttl, set once /
+    pub sttl: Option<u8>, // source -> dest first assigned ttl
+    pub dttl: Option<u8>, // dest -> source first assigned ttl
+    // NOTE: ADD ct_state_ttl, smean, sbytes, ct_dst_src_ltm, ct_srv_dst, dbytes
 
     // Time
     pub start_time: SystemTime, 

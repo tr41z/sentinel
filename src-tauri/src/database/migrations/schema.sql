@@ -11,6 +11,8 @@ CREATE TABLE IF NOT EXISTS flows (
     rate FLOAT,
     source_load INT,
     destination_load INT,
+    source_ttl INT,
+    destination_ttl INT,
 
     start_time DATETIME,
     last_updated_time DATETIME,
