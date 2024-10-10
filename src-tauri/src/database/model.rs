@@ -63,7 +63,7 @@ impl DataModel {
             dttl,
             sload: DataModel::calculate_load(sbytes as f64, duration as f64),
             dload: DataModel::calculate_rate(dbytes as f64, duration as f64),
-            smean: DataModel::calculate_smean(DataModel::calculate_load(sbytes as f64, duration as f64) as u64, source_packet_count as u64),
+            smean: DataModel::calculate_smean(sbytes, source_packet_count as u64),
 
             start_time, last_update_time,
             duration
@@ -71,14 +71,20 @@ impl DataModel {
     }
 
     fn calculate_rate(size: f64, duration: f64) -> f64 {
-        size / duration
+        if duration == 0.0 { 0.0 } else {
+            size / duration
+        }
     }
 
     fn calculate_smean(size: u64, total_packet_count: u64) -> u64 {
-        size / total_packet_count
+        if total_packet_count == 0 { 0 } else {
+            size / total_packet_count
+        }
     }
 
     fn calculate_load(bytes: f64, duration: f64) -> f64 {
-        bytes / duration
+        if duration == 0.0 { 0.0 } else {
+            bytes / duration
+        }
     }
 }
