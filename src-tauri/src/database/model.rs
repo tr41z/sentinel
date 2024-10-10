@@ -25,7 +25,7 @@ pub struct DataModel {
     // Time
     pub start_time: SystemTime,
     pub last_update_time: SystemTime,
-    pub duration: u64
+    pub duration: f32
 }
 
 impl DataModel {
@@ -47,7 +47,7 @@ impl DataModel {
 
         start_time: SystemTime,
         last_update_time: SystemTime,
-        duration: u64
+        duration: f32
     ) -> Self {
         return Self {
             src_ip, dst_ip,

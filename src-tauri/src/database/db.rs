@@ -42,9 +42,9 @@ pub async fn save_flow(pool: &MySqlPool, flow: DataModel) -> Result<(), Error> {
     initialise_schema(pool).await?;
 
     let query = "INSERT INTO flows (
-            source_ip, source_port, destination_ip, destination_port, protocol, 
-            total_bytes, total_packet_count, rate, source_bytes, destination_bytes,
-            source_load, destination_load, source_ttl, destination_ttl, source_packet_mean_size,
+            src_ip, src_port, dst_ip, dst_port, protocol, 
+            total_bytes, total_packet_count, rate, sbytes, dbytes,
+            sload, dload, sttl, dttl, smean,
             start_time, last_updated_time, duration
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 

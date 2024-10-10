@@ -1,5 +1,5 @@
 use std::sync::{Arc, Mutex, MutexGuard};
-use std::time::{Duration, SystemTime, SystemTimeError};
+use std::time::{Duration, SystemTime};
 
 use std::{collections::HashMap, net::Ipv4Addr};
 
@@ -78,9 +78,21 @@ async fn terminate_flows(flow: &mut Flow, db: &Pool<MySql>) {
     let now: SystemTime = SystemTime::now();
     
     if let Ok(duration) = now.duration_since(flow.last_update_time) {
-        if duration.as_secs() >= 120 {
+        if duration.as_secs_f64() >= 120.0 {
             flow.finished = true;
             flow.flow_termination_print();
+
+            // Calculate duration between start_time and last_update_time
+            let flow_duration_result = flow.last_update_time.duration_since(flow.start_time);
+
+            // Convert the duration from Result to f32 seconds
+            let flow_duration_in_secs: f32 = match flow_duration_result {
+                Ok(flow_duration) => duration_to_secs(flow_duration),
+                Err(_) => {
+                    eprintln!("Failed to calculate flow duration, using 0 as fallback");
+                    0.0 // Fallback value in case of an error
+                }
+            };
 
             // Save the terminated flow to the database
             let data_model: DataModel = database::model::DataModel::new(
@@ -95,7 +107,7 @@ async fn terminate_flows(flow: &mut Flow, db: &Pool<MySql>) {
                 match flow.sttl {Some(ttl) => ttl, None => 0},
                 match flow.dttl {Some(ttl) => ttl, None => 0},
                 flow.start_time, flow.last_update_time,
-                duration_to_str(flow.last_update_time.duration_since(flow.start_time))
+                flow_duration_in_secs
             );
 
             match database::db::save_flow(db, data_model).await {
@@ -106,18 +118,6 @@ async fn terminate_flows(flow: &mut Flow, db: &Pool<MySql>) {
     }
 }
 
-fn duration_to_str(duration: Result<Duration, SystemTimeError>) -> u64 {
-    match duration {
-        Ok(duration) => {
-            if duration.as_secs() != 0 {
-                duration.as_secs()
-            } else {
-                return 1;
-            }
-        },
-        Err(e) => {
-            eprintln!("Duration calculation failed: {:?}", e);
-            1
-        }
-    }
+fn duration_to_secs(duration: Duration) -> f32 {
+    duration.as_secs_f32()
 }
