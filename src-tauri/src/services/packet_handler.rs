@@ -73,31 +73,32 @@ pub async fn handle_packet_flow(
     };
 }
 
-// Terminate flows that were inactive
+// Terminate flows that were inactive or have been active for 300 seconds
 async fn terminate_flows(flow: &mut Flow, db: &Pool<MySql>) {
     let now: SystemTime = SystemTime::now();
-    
-    if let Ok(duration) = now.duration_since(flow.last_update_time) {
-        if duration.as_secs_f64() >= 120.0 {
+
+    // Check for inactive flows (inactive for 120 seconds)
+    if let Ok(duration_since_last_update) = now.duration_since(flow.last_update_time) {
+        if duration_since_last_update.as_secs_f64() >= 120.0 {
             flow.finished = true;
             flow.flow_termination_print();
 
-            // Save terminated flow to the database (for inactive flow >= 120 seconds)
+            // Save terminated flow to the database (for inactive flow)
             save_flow_to_db(flow, db).await;
+            return;
         }
-    } else if let Ok(duration) = now.duration_since(flow.start_time) {
-        if duration.as_secs_f32() >= 300.0 {
+    }
+
+    // Check if flow has been active for 300 seconds or more
+    if let Ok(duration_since_start) = now.duration_since(flow.start_time) {
+        if duration_since_start.as_secs_f32() >= 300.0 {
             flow.finished = true;
             flow.flow_termination_print();
 
-            // Save terminated flow to the database (for active flow >= 300 seconds)
+            // Save terminated flow to the database (for active flow > 300 seconds)
             save_flow_to_db(flow, db).await;
         }
     }
-}
-
-fn duration_to_secs(duration: Duration) -> f32 {
-    duration.as_secs_f32()
 }
 
 // Helper function to save terminated flow to the database
@@ -135,4 +136,8 @@ async fn save_flow_to_db(flow: &mut Flow, db: &Pool<MySql>) {
         Ok(saved_flow) => println!("Flow saved successfully: {:#?}", saved_flow),
         Err(e) => eprintln!("Failed to save flow: {:?}", e),
     };
+}
+
+fn duration_to_secs(duration: Duration) -> f32 {
+    duration.as_secs_f32()
 }
