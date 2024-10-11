@@ -82,42 +82,57 @@ async fn terminate_flows(flow: &mut Flow, db: &Pool<MySql>) {
             flow.finished = true;
             flow.flow_termination_print();
 
-            // Calculate duration between start_time and last_update_time
-            let flow_duration_result = flow.last_update_time.duration_since(flow.start_time);
+            // Save terminated flow to the database (for inactive flow >= 120 seconds)
+            save_flow_to_db(flow, db).await;
+        }
+    } else if let Ok(duration) = now.duration_since(flow.start_time) {
+        if duration.as_secs_f32() >= 300.0 {
+            flow.finished = true;
+            flow.flow_termination_print();
 
-            // Convert the duration from Result to f32 seconds
-            let flow_duration_in_secs: f32 = match flow_duration_result {
-                Ok(flow_duration) => duration_to_secs(flow_duration),
-                Err(_) => {
-                    eprintln!("Failed to calculate flow duration, using 0 as fallback");
-                    0.0 // Fallback value in case of an error
-                }
-            };
-
-            // Save the terminated flow to the database
-            let data_model: DataModel = database::model::DataModel::new(
-                flow.src_ip, flow.dst_ip,
-                flow.src_port, flow.dst_port, 
-                flow.protocol, 
-                flow.total_bytes, 
-                flow.packet_count, 
-                flow.source_packet_count,
-                flow.sbytes,
-                flow.dbytes,
-                match flow.sttl {Some(ttl) => ttl, None => 0},
-                match flow.dttl {Some(ttl) => ttl, None => 0},
-                flow.start_time, flow.last_update_time,
-                flow_duration_in_secs
-            );
-
-            match database::db::save_flow(db, data_model).await {
-                Ok(saved_flow) => println!("Flow saved successfully: {:#?}", saved_flow),
-                Err(e) => eprintln!("Failed to save flow: {:?}", e),
-            };
+            // Save terminated flow to the database (for active flow >= 300 seconds)
+            save_flow_to_db(flow, db).await;
         }
     }
 }
 
 fn duration_to_secs(duration: Duration) -> f32 {
     duration.as_secs_f32()
+}
+
+// Helper function to save terminated flow to the database
+async fn save_flow_to_db(flow: &mut Flow, db: &Pool<MySql>) {
+    // Calculate duration between start_time and last_update_time
+    let flow_duration_result = flow.last_update_time.duration_since(flow.start_time);
+
+    // Convert the duration from Result to f32 seconds
+    let flow_duration_in_secs: f32 = match flow_duration_result {
+        Ok(flow_duration) => duration_to_secs(flow_duration),
+        Err(_) => {
+            eprintln!("Failed to calculate flow duration, using 0 as fallback");
+            0.0 // Fallback value in case of an error
+        }
+    };
+
+    // Prepare DataModel to save to the database
+    let data_model: DataModel = database::model::DataModel::new(
+        flow.src_ip, flow.dst_ip,
+        flow.src_port, flow.dst_port, 
+        flow.protocol, 
+        flow.total_bytes, 
+        flow.packet_count, 
+        flow.source_packet_count,
+        flow.sbytes,
+        flow.dbytes,
+        match flow.sttl {Some(ttl) => ttl, None => 0},
+        match flow.dttl {Some(ttl) => ttl, None => 0},
+        flow.start_time, flow.last_update_time,
+        flow_duration_in_secs
+    );
+
+    // Save the flow to the database
+    match database::db::save_flow(db, data_model).await {
+        Ok(saved_flow) => println!("Flow saved successfully: {:#?}", saved_flow),
+        Err(e) => eprintln!("Failed to save flow: {:?}", e),
+    };
 }
