@@ -84,7 +84,7 @@ async fn terminate_flows(flow: &mut Flow, db: &Pool<MySql>) {
             flow.flow_termination_print();
 
             // Save terminated flow to the database (for inactive flow)
-            save_flow_to_db(flow, db).await;
+            save_flow_to_db(flow, db, None).await;
             return;
         }
     }
@@ -96,24 +96,25 @@ async fn terminate_flows(flow: &mut Flow, db: &Pool<MySql>) {
             flow.flow_termination_print();
 
             // Save terminated flow to the database (for active flow > 300 seconds)
-            save_flow_to_db(flow, db).await;
+            save_flow_to_db(flow, db, Some(300.0)).await;
         }
     }
 }
 
+
 // Helper function to save terminated flow to the database
-async fn save_flow_to_db(flow: &mut Flow, db: &Pool<MySql>) {
+async fn save_flow_to_db(flow: &mut Flow, db: &Pool<MySql>, forced_duration: Option<f32>) {
     // Calculate duration between start_time and last_update_time
     let flow_duration_result = flow.last_update_time.duration_since(flow.start_time);
 
-    // Convert the duration from Result to f32 seconds
-    let flow_duration_in_secs: f32 = match flow_duration_result {
+    // Convert the duration from Result to f32 seconds, or use the forced duration if provided
+    let flow_duration_in_secs: f32 = forced_duration.unwrap_or_else(|| match flow_duration_result {
         Ok(flow_duration) => duration_to_secs(flow_duration),
         Err(_) => {
             eprintln!("Failed to calculate flow duration, using 0 as fallback");
             0.0 // Fallback value in case of an error
         }
-    };
+    });
 
     // Prepare DataModel to save to the database
     let data_model: DataModel = database::model::DataModel::new(
