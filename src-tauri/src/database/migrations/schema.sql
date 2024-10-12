@@ -5,12 +5,20 @@ CREATE TABLE IF NOT EXISTS flows (
     dst_ip VARCHAR(45),
     dst_port INT,
     protocol INT,
+    total_bytes INT,
+    total_packet_count INT,
 
-    max_fwd_packet_length INT,
-    fwd_packet_length_mean	 FLOAT,
-    init_win_bytes_forward INT,
+    rate FLOAT,
+    sload FLOAT,
+    dload FLOAT,
+    sbytes INT,
+    duration FLOAT,
+    smean INT,
+    dbytes INT,
+    dmean INT,
+    dpkts INT,
+    spkts INT,
 
     start_time DATETIME,
-    last_updated_time DATETIME,
-    duration FLOAT
+    last_updated_time DATETIME
 );
