@@ -43,8 +43,10 @@ pub async fn save_flow(pool: &MySqlPool, flow: DataModel) -> Result<(), Error> {
 
     let query = "INSERT INTO flows (
             src_ip, src_port, dst_ip, dst_port, protocol, 
-            start_time, last_updated_time, duration
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            total_bytes, total_packet_count, rate, sload, dload,
+            sbytes, duration, smean, dbytes, dmean, dpkts, spkts,
+            start_time, last_updated_time
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     let result = sqlx::query(query)
         .bind(flow.src_ip)
@@ -52,9 +54,20 @@ pub async fn save_flow(pool: &MySqlPool, flow: DataModel) -> Result<(), Error> {
         .bind(flow.dst_ip)
         .bind(flow.dst_port)
         .bind(flow.protocol)
+        .bind(flow.total_bytes)
+        .bind(flow.total_packet_count)
+        .bind(flow.rate)
+        .bind(flow.sload)
+        .bind(flow.dload)
+        .bind(flow.sbytes)
+        .bind(flow.duration)
+        .bind(flow.smean)
+        .bind(flow.dbytes)
+        .bind(flow.dmean)
+        .bind(flow.dpkts)
+        .bind(flow.spkts)
         .bind(flow::system_time_to_date_time(flow.start_time))
         .bind(flow::system_time_to_date_time(flow.last_update_time))
-        .bind(flow.duration)
         .execute(pool)
         .await;
 

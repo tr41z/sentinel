@@ -45,6 +45,7 @@ pub fn capture_packets(interface: NetworkInterface) {
                         let dst_ip: Ipv4Addr = ip_packet.get_destination();
                         let protocol: IpNextHeaderProtocol = ip_packet.get_next_level_protocol();
                         let size: u16 = ip_packet.get_total_length();
+                        let ttl: u8 = ip_packet.get_ttl();
 
                         // Extracting source port and destination port from packets
                         let (src_port, dst_port) = match protocol {
@@ -77,6 +78,7 @@ pub fn capture_packets(interface: NetworkInterface) {
                             
                             // Flow + FlowKey attributes
                             size,
+                            ttl,
                             
                             // Flows map
                             flows_map,

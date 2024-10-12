@@ -8,11 +8,24 @@ pub struct DataModel {
     pub src_port: u16, 
     pub dst_port: u16,
     pub protocol: u8,
+    pub total_bytes: u64,
+    pub total_packet_count: u32,
+
+    // Model input
+    pub rate: f64,
+    pub sload: f64,
+    pub dload: f64,
+    pub sbytes: u64,
+    pub duration: f32,
+    pub smean: u64,
+    pub dbytes: u64,
+    pub dmean: u64,
+    pub dpkts: u32,
+    pub spkts: u32,
     
     // Time
     pub start_time: SystemTime,
-    pub last_update_time: SystemTime,
-    pub duration: f32
+    pub last_update_time: SystemTime
 }
 
 impl DataModel {
@@ -22,6 +35,13 @@ impl DataModel {
         src_port: u16, 
         dst_port: u16,
         protocol: u8,
+        total_bytes: u64,
+        total_packet_count: u32,
+        source_packet_count: u32,
+        destination_packet_count: u32,
+
+        sbytes: u64,
+        dbytes: u64,
 
         start_time: SystemTime,
         last_update_time: SystemTime,
@@ -31,9 +51,41 @@ impl DataModel {
             src_ip, dst_ip,
             src_port, dst_port,
             protocol,
+            total_bytes,
+            total_packet_count,
+
+            spkts: source_packet_count,
+            dpkts: destination_packet_count,
+
+            rate: DataModel::calculate_rate(total_bytes as f64, duration as f64),
+            sbytes,
+            dbytes,
+
+            sload: DataModel::calculate_load(sbytes as f64, duration as f64),
+            dload: DataModel::calculate_rate(dbytes as f64, duration as f64),
+            smean: DataModel::calculate_mean(sbytes, source_packet_count as u64),
+            dmean: DataModel::calculate_mean(dbytes, destination_packet_count as u64),
 
             start_time, last_update_time,
             duration
+        }
+    }
+
+    fn calculate_rate(size: f64, duration: f64) -> f64 {
+        if duration == 0.0 { 0.0 } else {
+            size / duration
+        }
+    }
+
+    fn calculate_mean(size: u64, total_packet_count: u64) -> u64 {
+        if total_packet_count == 0 { 0 } else {
+            size / total_packet_count
+        }
+    }
+
+    fn calculate_load(bytes: f64, duration: f64) -> f64 {
+        if duration == 0.0 { 0.0 } else {
+            bytes / duration
         }
     }
 }

@@ -10,10 +10,16 @@ pub struct Flow {
     pub src_port: u16, 
     pub dst_port: u16,
     pub protocol: u8,
+    pub total_bytes: u64,
+    pub packet_count: u32,
+    pub source_packet_count: u32,
+    pub destination_packet_count: u32,
 
     // Model input
-    pub max_fwd_packet_length: u64,
-
+    pub sbytes: u64, // source -> dest load (bytes)
+    pub dbytes: u64, // dest -> source load (bytes)
+    pub sttl: Option<u8>, // source -> dest first assigned ttl
+    pub dttl: Option<u8>, // dest -> source first assigned ttl
 
     // Time
     pub start_time: SystemTime, 
@@ -28,6 +34,7 @@ impl Flow {
         src_port: u16, 
         dst_port: u16,
         protocol: u8,
+        size: u64,
 
         start_time: SystemTime, 
         last_update_time: SystemTime, 
@@ -38,8 +45,16 @@ impl Flow {
             src_port, 
             dst_port,
             protocol,
+            total_bytes: size,
+            packet_count: 1,
+            source_packet_count: 0,
+            destination_packet_count: 0,
 
-            max_fwd_packet_length: 0,
+            sbytes: 0,
+            dbytes: 0,
+
+            sttl: None,
+            dttl: None,
 
             start_time, 
             last_update_time, 
@@ -47,16 +62,25 @@ impl Flow {
         }
     }
 
-    pub fn update(&mut self, size: u64, last_update_time: SystemTime, src_ip: Ipv4Addr, dst_ip: Ipv4Addr) {
+    pub fn update(&mut self, size: u64, last_update_time: SystemTime, src_ip: Ipv4Addr, dst_ip: Ipv4Addr, ttl: u8) {
+        self.packet_count += 1;
+        self.total_bytes += size;
+
         // Update flow based on direction
         if src_ip == self.src_ip && dst_ip == self.dst_ip {
-
-            // Update max forward packet length
-            if size as u64 > self.max_fwd_packet_length {
-                self.max_fwd_packet_length = size as u64; 
+            self.sbytes += size as u64;
+            self.source_packet_count += 1;
+            
+            if self.sttl.is_none() {
+                self.sttl = Some(ttl);
             }
         } else {
-
+            self.dbytes += size as u64;
+            self.destination_packet_count += 1;
+            
+            if self.dttl.is_none() {
+                self.dttl = Some(ttl);
+            }
         }
 
         self.last_update_time = last_update_time;
@@ -65,10 +89,13 @@ impl Flow {
     // NOTE: TO BE REMOVED LATER WHEN CAPTURED ON FRONTEND
     pub fn pretty_print(&self, prefix: &str) {
         println!(
-            "{} ||| {}:{} -> {}:{} | Protocol: {} | Start Time: {} | Last Updated: {}",
+            "{} ||| {}:{} -> {}:{} | Size: {} bytes | STTL: {:?} | DTTL: {:?} | Packet Count: {} | Protocol: {} | Start Time: {} | Last Updated: {}",
             prefix,
             self.src_ip, self.src_port,
             self.dst_ip, self.dst_port,
+            self.total_bytes,
+            Some(self.sttl), Some(self.dttl),
+            self.packet_count,
             self.protocol,
             system_time_to_date_time(self.start_time), system_time_to_date_time(self.last_update_time)
         )
@@ -77,9 +104,13 @@ impl Flow {
     // NOTE: TO BE REMOVED LATER WHEN CAPTURED ON FRONTEND
     pub fn flow_termination_print(&self) {
         println!(
-            "FLOW ||| {}:{} -> {}:{} TERMINATED | START: {} | LAST: {} | DURATION: {:?}",
+            "FLOW ||| {}:{} -> {}:{} TERMINATED | SBYTES: {} | DBYTES: {} | SIZE: {} | START: {} | LAST: {} | DURATION: {:?}",
             self.src_ip, self.src_port,
             self.dst_ip, self.dst_port,
+
+            self.sbytes,
+            self.dbytes,
+            self.total_bytes,
             system_time_to_date_time(self.start_time),
             system_time_to_date_time(self.last_update_time),
             (self.last_update_time.duration_since(self.start_time))

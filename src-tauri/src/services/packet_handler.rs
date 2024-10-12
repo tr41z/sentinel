@@ -19,6 +19,7 @@ pub async fn handle_packet_flow(
     dst_port: u16,
     protocol: IpNextHeaderProtocol,
     size: u16,
+    ttl: u8,
 
     flows_map: Arc<Mutex<HashMap<FlowKey, Flow>>>,
     db: &Pool<MySql>
@@ -40,20 +41,32 @@ pub async fn handle_packet_flow(
         Some(flow) => {
             // Update flow only if it's not finished
             if !flow.finished {
-                flow.update(size as u64, SystemTime::now(), src_ip, dst_ip);
+                flow.update(size as u64, SystemTime::now(), src_ip, dst_ip, ttl);
                 flow.pretty_print("Flow Updated");
             } 
         }
         None => {
-            let new_flow: Flow = Flow::new(
+            let mut new_flow: Flow = Flow::new(
                 src_ip,
                 dst_ip,
                 src_port,
                 dst_port,
                 protocol.0,
+                size as u64,
                 SystemTime::now(),
                 SystemTime::now(),
             );
+
+            // Initialize the load based on direction
+            if src_ip == new_flow.src_ip && dst_ip == new_flow.dst_ip {
+                new_flow.sbytes += size as u64; // Update source to destination load
+                new_flow.source_packet_count += 1;
+                new_flow.sttl = Some(ttl);
+            } else {
+                new_flow.dbytes += size as u64; // Update destination to source load
+                new_flow.destination_packet_count += 1;
+                new_flow.dttl = Some(ttl);
+            }
 
             flows_map.insert(flow_key, new_flow);
             new_flow.pretty_print("New Flow");
@@ -109,6 +122,12 @@ async fn save_flow_to_db(flow: &mut Flow, db: &Pool<MySql>, forced_duration: Opt
         flow.src_ip, flow.dst_ip,
         flow.src_port, flow.dst_port, 
         flow.protocol, 
+        flow.total_bytes, 
+        flow.packet_count, 
+        flow.source_packet_count,
+        flow.destination_packet_count,
+        flow.sbytes,
+        flow.dbytes,
         flow.start_time, flow.last_update_time,
         flow_duration_in_secs
     );

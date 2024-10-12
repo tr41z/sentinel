@@ -6,6 +6,10 @@ CREATE TABLE IF NOT EXISTS flows (
     dst_port INT,
     protocol INT,
 
+    max_fwd_packet_length INT,
+    fwd_packet_length_mean	 FLOAT,
+    init_win_bytes_forward INT,
+
     start_time DATETIME,
     last_updated_time DATETIME,
     duration FLOAT
