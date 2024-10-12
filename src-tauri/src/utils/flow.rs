@@ -13,6 +13,7 @@ pub struct Flow {
     pub total_bytes: u64,
     pub packet_count: u32,
     pub source_packet_count: u32,
+    pub destination_packet_count: u32,
 
     // Model input
     pub sbytes: u64, // source -> dest load (bytes)
@@ -47,6 +48,7 @@ impl Flow {
             total_bytes: size,
             packet_count: 1,
             source_packet_count: 0,
+            destination_packet_count: 0,
 
             sbytes: 0,
             dbytes: 0,
@@ -74,6 +76,7 @@ impl Flow {
             }
         } else {
             self.dbytes += size as u64;
+            self.destination_packet_count += 1;
             
             if self.dttl.is_none() {
                 self.dttl = Some(ttl);

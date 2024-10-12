@@ -10,22 +10,22 @@ pub struct DataModel {
     pub protocol: u8,
     pub total_bytes: u64,
     pub total_packet_count: u32,
-    pub dttl: u8,
 
     // Model input
     pub rate: f64,
-    pub sbytes: u64,
-    pub dbytes: u64,
-    pub sttl: u8,
-    pub smean: u64,
     pub sload: f64,
     pub dload: f64,
-    // NOTE: ADD ct_state_ttl, ct_dst_src_ltm, ct_srv_dst
+    pub sbytes: u64,
+    pub duration: f32,
+    pub smean: u64,
+    pub dbytes: u64,
+    pub dmean: u64,
+    pub dpkts: u32,
+    pub spkts: u32,
     
     // Time
     pub start_time: SystemTime,
-    pub last_update_time: SystemTime,
-    pub duration: f32
+    pub last_update_time: SystemTime
 }
 
 impl DataModel {
@@ -38,12 +38,10 @@ impl DataModel {
         total_bytes: u64,
         total_packet_count: u32,
         source_packet_count: u32,
+        destination_packet_count: u32,
 
         sbytes: u64,
         dbytes: u64,
-
-        sttl: u8,
-        dttl: u8,
 
         start_time: SystemTime,
         last_update_time: SystemTime,
@@ -56,14 +54,17 @@ impl DataModel {
             total_bytes,
             total_packet_count,
 
+            spkts: source_packet_count,
+            dpkts: destination_packet_count,
+
             rate: DataModel::calculate_rate(total_bytes as f64, duration as f64),
             sbytes,
             dbytes,
-            sttl,
-            dttl,
+
             sload: DataModel::calculate_load(sbytes as f64, duration as f64),
             dload: DataModel::calculate_rate(dbytes as f64, duration as f64),
-            smean: DataModel::calculate_smean(sbytes, source_packet_count as u64),
+            smean: DataModel::calculate_mean(sbytes, source_packet_count as u64),
+            dmean: DataModel::calculate_mean(dbytes, destination_packet_count as u64),
 
             start_time, last_update_time,
             duration
@@ -76,7 +77,7 @@ impl DataModel {
         }
     }
 
-    fn calculate_smean(size: u64, total_packet_count: u64) -> u64 {
+    fn calculate_mean(size: u64, total_packet_count: u64) -> u64 {
         if total_packet_count == 0 { 0 } else {
             size / total_packet_count
         }

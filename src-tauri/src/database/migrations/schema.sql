@@ -9,16 +9,16 @@ CREATE TABLE IF NOT EXISTS flows (
     total_packet_count INT,
 
     rate FLOAT,
-    sbytes INT,
-    dbytes INT,
     sload FLOAT,
     dload FLOAT,
-
-    sttl INT,
-    dttl INT,
+    sbytes INT,
+    duration FLOAT,
     smean INT,
+    dbytes INT,
+    dmean INT,
+    dpkts INT,
+    spkts INT,
 
     start_time DATETIME,
-    last_updated_time DATETIME,
-    duration TEXT
+    last_updated_time DATETIME
 );

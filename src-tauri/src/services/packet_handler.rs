@@ -64,6 +64,7 @@ pub async fn handle_packet_flow(
                 new_flow.sttl = Some(ttl);
             } else {
                 new_flow.dbytes += size as u64; // Update destination to source load
+                new_flow.destination_packet_count += 1;
                 new_flow.dttl = Some(ttl);
             }
 
@@ -79,7 +80,7 @@ async fn terminate_flows(flow: &mut Flow, db: &Pool<MySql>) {
 
     // Check for inactive flows (inactive for 120 seconds)
     if let Ok(duration_since_last_update) = now.duration_since(flow.last_update_time) {
-        if duration_since_last_update.as_secs_f64() >= 120.0 {
+        if duration_since_last_update.as_secs_f64() >= 5.0 {
             flow.finished = true;
             flow.flow_termination_print();
 
@@ -124,10 +125,9 @@ async fn save_flow_to_db(flow: &mut Flow, db: &Pool<MySql>, forced_duration: Opt
         flow.total_bytes, 
         flow.packet_count, 
         flow.source_packet_count,
+        flow.destination_packet_count,
         flow.sbytes,
         flow.dbytes,
-        match flow.sttl {Some(ttl) => ttl, None => 0},
-        match flow.dttl {Some(ttl) => ttl, None => 0},
         flow.start_time, flow.last_update_time,
         flow_duration_in_secs
     );
