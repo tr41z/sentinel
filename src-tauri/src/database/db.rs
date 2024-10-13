@@ -41,12 +41,13 @@ async fn initialise_schema(pool: &MySqlPool) -> Result<(), Error> {
 pub async fn save_flow(pool: &MySqlPool, flow: DataModel) -> Result<(), Error> {
     initialise_schema(pool).await?;
 
-    let query = "INSERT INTO flows (
+    // NOTE: ADD `sloss` and `dloss`
+    let query: &str = "INSERT INTO flows (
             src_ip, src_port, dst_ip, dst_port, protocol, 
-            total_bytes, total_packet_count, rate, sload, dload,
-            sbytes, duration, smean, dbytes, dmean, dpkts, spkts,
-            start_time, last_updated_time
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            total_bytes, total_packet_count,
+            dmean, sbytes, smean, dload, sload, dbytes, dpkts, spkts,
+            start_time, last_updated_time, dur
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     let result = sqlx::query(query)
         .bind(flow.src_ip)
@@ -56,18 +57,21 @@ pub async fn save_flow(pool: &MySqlPool, flow: DataModel) -> Result<(), Error> {
         .bind(flow.protocol)
         .bind(flow.total_bytes)
         .bind(flow.total_packet_count)
-        .bind(flow.rate)
-        .bind(flow.sload)
-        .bind(flow.dload)
-        .bind(flow.sbytes)
-        .bind(flow.duration)
-        .bind(flow.smean)
-        .bind(flow.dbytes)
+
         .bind(flow.dmean)
+        .bind(flow.sbytes)
+        .bind(flow.smean)
+        .bind(flow.dload)
+        .bind(flow.sload)
+        .bind(flow.dbytes)
         .bind(flow.dpkts)
+        // .bind(flow.dloss)
+        // .bind(flow.sloss)
         .bind(flow.spkts)
+
         .bind(flow::system_time_to_date_time(flow.start_time))
         .bind(flow::system_time_to_date_time(flow.last_update_time))
+        .bind(flow.duration)
         .execute(pool)
         .await;
 

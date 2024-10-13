@@ -80,7 +80,7 @@ async fn terminate_flows(flow: &mut Flow, db: &Pool<MySql>) {
 
     // Check for inactive flows (inactive for 120 seconds)
     if let Ok(duration_since_last_update) = now.duration_since(flow.last_update_time) {
-        if duration_since_last_update.as_secs_f64() >= 120.0 {
+        if duration_since_last_update.as_secs_f64() >= 5.0 {
             flow.finished = true;
             flow.flow_termination_print();
 

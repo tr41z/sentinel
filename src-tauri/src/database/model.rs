@@ -12,20 +12,21 @@ pub struct DataModel {
     pub total_packet_count: u32,
 
     // Model input
-    pub rate: f64,
-    pub sload: f64,
-    pub dload: f64,
-    pub sbytes: u64,
-    pub duration: f32,
-    pub smean: u64,
-    pub dbytes: u64,
     pub dmean: u64,
+    pub sbytes: u64,
+    pub smean: u64,
+    pub dload: f64,
+    pub sload: f64,
+    pub dbytes: u64,
     pub dpkts: u32,
+    // dloss
+    // sloss
     pub spkts: u32,
     
     // Time
     pub start_time: SystemTime,
-    pub last_update_time: SystemTime
+    pub last_update_time: SystemTime,
+    pub duration: f32
 }
 
 impl DataModel {
@@ -54,17 +55,16 @@ impl DataModel {
             total_bytes,
             total_packet_count,
 
-            spkts: source_packet_count,
-            dpkts: destination_packet_count,
-
-            rate: DataModel::calculate_rate(total_bytes as f64, duration as f64),
-            sbytes,
-            dbytes,
-
-            sload: DataModel::calculate_load(sbytes as f64, duration as f64),
-            dload: DataModel::calculate_rate(dbytes as f64, duration as f64),
-            smean: DataModel::calculate_mean(sbytes, source_packet_count as u64),
             dmean: DataModel::calculate_mean(dbytes, destination_packet_count as u64),
+            sbytes,
+            smean: DataModel::calculate_mean(sbytes, source_packet_count as u64),
+            dload: DataModel::calculate_rate(dbytes as f64, duration as f64),
+            dbytes,
+            // dloss
+            dpkts: destination_packet_count,
+            sload: DataModel::calculate_load(sbytes as f64, duration as f64),
+            spkts: source_packet_count,
+            // sloss
 
             start_time, last_update_time,
             duration
