@@ -14,12 +14,14 @@ pub struct Flow {
     pub packet_count: u32,
     pub source_packet_count: u32,
     pub destination_packet_count: u32,
+    pub sttl: Option<u8>, // source -> dest first assigned ttl
+    pub dttl: Option<u8>, // dest -> source first assigned ttl
 
     // Model input
     pub sbytes: u64, // source -> dest load (bytes)
     pub dbytes: u64, // dest -> source load (bytes)
-    pub sttl: Option<u8>, // source -> dest first assigned ttl
-    pub dttl: Option<u8>, // dest -> source first assigned ttl
+    pub sloss: u32, // Source packets retransmitted or dropped
+    pub dloss: u32, // Destination packets retransmitted or dropped
 
     // Time
     pub start_time: SystemTime, 
@@ -49,12 +51,13 @@ impl Flow {
             packet_count: 1,
             source_packet_count: 0,
             destination_packet_count: 0,
+            sttl: None,
+            dttl: None,
 
             sbytes: 0,
             dbytes: 0,
-
-            sttl: None,
-            dttl: None,
+            sloss: 0,
+            dloss: 0,
 
             start_time, 
             last_update_time, 
