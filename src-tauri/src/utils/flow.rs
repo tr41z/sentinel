@@ -20,8 +20,6 @@ pub struct Flow {
     // Model input
     pub sbytes: u64, // source -> dest load (bytes)
     pub dbytes: u64, // dest -> source load (bytes)
-    pub sloss: u32, // Source packets retransmitted or dropped
-    pub dloss: u32, // Destination packets retransmitted or dropped
 
     // Time
     pub start_time: SystemTime, 
@@ -56,8 +54,6 @@ impl Flow {
 
             sbytes: 0,
             dbytes: 0,
-            sloss: 0,
-            dloss: 0,
 
             start_time, 
             last_update_time, 
