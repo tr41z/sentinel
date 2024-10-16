@@ -1,5 +1,6 @@
 use async_std::task;
 
+use pnet::datalink::{self, NetworkInterface};
 use pnet::packet::ethernet::EthernetPacket;
 use pnet::packet::ip::{IpNextHeaderProtocol, IpNextHeaderProtocols};
 use pnet::packet::ipv4::Ipv4Packet;
@@ -8,18 +9,46 @@ use pnet::packet::udp::UdpPacket;
 use pnet::packet::Packet;
 
 use std::collections::HashMap;
-use std::net::Ipv4Addr;
+use std::net::{IpAddr, Ipv4Addr};
 use std::sync::{Arc, Mutex};
 
-use sqlx::{Pool, MySql};
+use lazy_static::lazy_static;
 
-use pnet::datalink::{self, NetworkInterface};
+use sqlx::{Pool, MySql};
 
 use crate::database;
 use crate::services::capture::datalink::Channel::Ethernet;
 use crate::utils::flow::{Flow, FlowKey};
 
 use super::packet_handler::handle_packet_flow;
+
+lazy_static! {
+    static ref LOCAL_IP: Mutex<Option<Ipv4Addr>> = Mutex::new(None);
+}
+
+// Function to get the local IP address dynamically
+fn get_local_ip(interface: &NetworkInterface) -> Option<Ipv4Addr> {
+    // Check if the local IP is already cached
+    let mut local_ip = LOCAL_IP.lock().unwrap();
+    
+    if local_ip.is_none() {
+        // Iterate through the interface's IP addresses and return the first valid IPv4 address
+        for ip_network in &interface.ips {
+            if ip_network.ip().is_ipv4() {
+                if let IpAddr::V4(ipv4_addr) = ip_network.ip() {
+                    // Skip loopback addresses like 127.0.0.1
+                    if ipv4_addr != Ipv4Addr::LOCALHOST {
+                        *local_ip = Some(ipv4_addr);
+                        return Some(ipv4_addr);
+                    }
+                }
+            }
+        }
+    }
+    
+    // Return the cached IP if it exists
+    *local_ip
+}
 
 pub fn capture_packets(interface: NetworkInterface) {
     let db: Pool<MySql> = match task::block_on(database::db::connect()) {
@@ -32,15 +61,18 @@ pub fn capture_packets(interface: NetworkInterface) {
     let (_, mut rx) = match datalink::channel(&interface, Default::default()) {
         Ok(Ethernet(tx, rx)) => (tx, rx),
         Ok(_) => panic!("Unhandled channel type: {}", &interface),
-        Err(e) => panic!("An error occured when creating the datalink channel: {}", e),
+        Err(e) => panic!("An error occurred when creating the datalink channel: {}", e),
     };
+
+    // Get the local IP address for the chosen interface
+    let local_ip = get_local_ip(&interface).expect("Failed to retrieve local IP address");
 
     loop {
         match rx.next() {
             Ok(packet) => {
                 if let Some(ethernet_packet) = EthernetPacket::new(packet) {
                     if let Some(ip_packet) = Ipv4Packet::new(ethernet_packet.payload()) {
-                        // Extracting ip packets attributes
+                        // Extracting IP packets attributes
                         let src_ip: Ipv4Addr = ip_packet.get_source();
                         let dst_ip: Ipv4Addr = ip_packet.get_destination();
                         let protocol: IpNextHeaderProtocol = ip_packet.get_next_level_protocol();
@@ -82,7 +114,10 @@ pub fn capture_packets(interface: NetworkInterface) {
                             
                             // Flows map
                             flows_map,
-                            &db
+                            &db,
+                            
+                            // Dynamically extracted local IP
+                            local_ip
                         ));
                     }
                 }

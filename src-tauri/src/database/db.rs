@@ -1,6 +1,9 @@
 use sqlx::{Error, Executor, MySql, MySqlPool, Pool};
+
 use dotenv::dotenv;
+
 use std::{env, fs};
+
 use crate::utils::flow;
 
 use super::model::DataModel;

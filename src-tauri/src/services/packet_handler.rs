@@ -4,10 +4,10 @@ use std::time::{Duration, SystemTime};
 use std::{collections::HashMap, net::Ipv4Addr};
 
 use pnet::packet::ip::IpNextHeaderProtocol;
+
 use sqlx::{MySql, Pool};
 
 use crate::utils::flow::{Flow, FlowKey};
-
 use crate::database::{self};
 use crate::database::model::DataModel;
 
@@ -22,7 +22,8 @@ pub async fn handle_packet_flow(
     ttl: u8,
 
     flows_map: Arc<Mutex<HashMap<FlowKey, Flow>>>,
-    db: &Pool<MySql>
+    db: &Pool<MySql>,
+    local_ip: Ipv4Addr,
 ) {
     // Lock the flows_map before accessing
     let mut flows_map: MutexGuard<'_, HashMap<FlowKey, Flow>> = flows_map.lock().unwrap();
@@ -32,20 +33,41 @@ pub async fn handle_packet_flow(
 
     // Terminate inactive flows synchronously
     for (_, flow) in flows_map.iter_mut() {
-        terminate_flows(flow, db).await; 
+        terminate_flows(flow, db).await;
     }
 
     let flow_key: FlowKey = FlowKey::new(src_ip, dst_ip, src_port, dst_port, protocol.0);
 
+    // Handle packets depending on direction and flow state
+    if src_ip == local_ip {
+        // Check if reverse packet belongs to an existing flow initiated by another IP
+        let reverse_flow_key = FlowKey::new(dst_ip, src_ip, dst_port, src_port, protocol.0);
+        if let Some(flow) = flows_map.get_mut(&reverse_flow_key) {
+            // Update flow for reverse direction
+            flow.update(size as u64, SystemTime::now(), src_ip, dst_ip, ttl);
+            flow.dbytes += size as u64;  // Add to destination bytes
+            flow.destination_packet_count += 1;  // Count the reverse packet
+            flow.pretty_print("Reverse Flow Updated");
+            return;
+        } else {
+            // No flow exists, discard reverse packet if there's no matching forward flow
+            return;
+        }
+    }
+
+    // Handle forward packets originating from another IP
     match flows_map.get_mut(&flow_key) {
         Some(flow) => {
             // Update flow only if it's not finished
             if !flow.finished {
                 flow.update(size as u64, SystemTime::now(), src_ip, dst_ip, ttl);
-                flow.pretty_print("Flow Updated");
-            } 
+                flow.sbytes += size as u64;  // Add to source bytes
+                flow.source_packet_count += 1;  // Count the forward packet
+                flow.pretty_print("Forward Flow Updated");
+            }
         }
         None => {
+            // Create a new flow if it doesn't exist
             let mut new_flow: Flow = Flow::new(
                 src_ip,
                 dst_ip,
@@ -57,21 +79,15 @@ pub async fn handle_packet_flow(
                 SystemTime::now(),
             );
 
-            // Initialize the load based on direction
-            if src_ip == new_flow.src_ip && dst_ip == new_flow.dst_ip {
-                new_flow.sbytes += size as u64; // Update source to destination load
-                new_flow.source_packet_count += 1;
-                new_flow.sttl = Some(ttl);
-            } else {
-                new_flow.dbytes += size as u64; // Update destination to source load
-                new_flow.destination_packet_count += 1;
-                new_flow.dttl = Some(ttl);
-            }
+            // Initialize the load based on direction (forward packet)
+            new_flow.sbytes += size as u64;
+            new_flow.source_packet_count += 1;
+            new_flow.sttl = Some(ttl);
 
             flows_map.insert(flow_key, new_flow);
             new_flow.pretty_print("New Flow");
         }
-    };
+    }
 }
 
 // Terminate flows that were inactive or have been active for 300 seconds
