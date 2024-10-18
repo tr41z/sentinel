@@ -146,7 +146,7 @@ async fn save_flow_to_db(flow: &mut Flow, db: &Pool<MySql>, forced_duration: Opt
         flow.dbytes,
         match  flow.dttl { Some(dttl) => dttl, None => 0 },
         flow.start_time, flow.last_update_time,
-        flow_duration_in_secs
+        if flow_duration_in_secs < 0.00001 { 0.0 } else { flow_duration_in_secs }
     );
 
     // Save the flow to the database
