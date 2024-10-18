@@ -118,7 +118,7 @@ async fn save_flow_to_db(flow: &mut Flow, db: &Pool<Sqlite>, forced_duration: Op
         flow.dbytes,
         match flow.dttl { Some(dttl) => dttl, None => 0 },
         flow.start_time, flow.last_update_time,
-        if flow_duration_in_secs < 0.00001 { 0.0 } else { flow_duration_in_secs }
+        flow_duration_in_secs
     );
 
     match database::db::save_flow(db, data_model).await {

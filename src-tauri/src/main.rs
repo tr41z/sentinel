@@ -1,9 +1,8 @@
-// Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "console")]
-// #![cfg_attr(not(debug_assertions), windows_subsystem = "window")]
 use tauri::{AppHandle, Manager};
-
 use std::env;
+use std::process::Command;
+use std::thread;
 
 mod commands;
 mod services;
@@ -17,17 +16,27 @@ fn main() {
     // Initialize logger
     env_logger::init();
 
+    // Run the sniffer immediately
     commands::commands::start_sniffer();
 
     // Initialize the Tauri app
     tauri::Builder::default()
-        .setup(|app: &mut tauri::App| {
+        .setup(|app| {
+            // Start the main executable in a separate thread
+            let _handle = thread::spawn(move || {
+                Command::new("/Users/michael/Desktop/Coding/FYP/sentinel_api/main")
+                    .spawn()
+                    .expect("Failed to start the main executable");
+            });
+
+            // Show the main window
             let app_handle: AppHandle = app.handle();
-            let main_window: tauri::Window = app_handle.get_window("main").unwrap();
+            let main_window = app_handle.get_window("main").unwrap();
             main_window.show().unwrap();
+
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![start_sniffer]) // NOTE: Need to invoke on front-end side when the app starts
+        .invoke_handler(tauri::generate_handler![start_sniffer]) // NOTE: Invoke on front-end
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -36,4 +45,3 @@ fn main() {
 fn start_sniffer() {
     commands::commands::start_sniffer();
 }
-
