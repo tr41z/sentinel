@@ -79,7 +79,7 @@ async fn terminate_flows(flow: &mut Flow, db: &Pool<Sqlite>) {
     let now: SystemTime = SystemTime::now();
 
     if let Ok(duration_since_last_update) = now.duration_since(flow.last_update_time) {
-        if duration_since_last_update.as_secs_f64() >= 120.0 {
+        if duration_since_last_update.as_secs_f64() >= 10.0 {
             flow.finished = true;
             flow.flow_termination_print();
             save_flow_to_db(flow, db, None).await;
