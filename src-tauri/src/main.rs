@@ -24,7 +24,7 @@ fn main() {
         .setup(|app| {
             // Start the main executable in a separate thread
             let _handle = thread::spawn(move || {
-                Command::new("/Users/michael/Desktop/Coding/FYP/sentinel_api/main")
+                Command::new("/Users/michael/Desktop/Coding/FYP/sentinel_api/main") // NOTE: switch to dynamic
                     .spawn()
                     .expect("Failed to start the main executable");
             });
@@ -36,7 +36,7 @@ fn main() {
 
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![start_sniffer]) // NOTE: Invoke on front-end
+        .invoke_handler(tauri::generate_handler![start_sniffer]) // NOTE: invoke on front-end
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
