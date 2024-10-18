@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS flows (
-    id SERIAL PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     src_ip VARCHAR(45), 
     src_port INT,
     dst_ip VARCHAR(45),
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS flows (
     dttl INT,
     spkts INT,
 
-    start_time DATETIME,
-    last_updated_time DATETIME,
+    start_time INTEGER,
+    last_updated_time INTEGER,  
     dur FLOAT
 );

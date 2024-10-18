@@ -20,9 +20,11 @@ pnet = "0.35.0"
 lazy_static = "1.5.0"
 tokio = "1.40.0"
 chrono = "0.4.38"
-sqlx = {version = "0.8.2", default-features = false, features = ["runtime-async-std", "macros", "mysql", "time"] }
+sqlx = {version = "0.8.2", default-features = false, features = ["runtime-async-std", "macros", "sqlite", "time"] }
 async-std = "1.13.0"
 dotenv = "0.15.0"
+dirs = "5.0.1"
+home = "0.5.9"
 
 [features]
 # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!

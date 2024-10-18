@@ -14,7 +14,7 @@ use std::sync::{Arc, Mutex};
 
 use lazy_static::lazy_static;
 
-use sqlx::{Pool, MySql};
+use sqlx::{Pool, Sqlite};
 
 use crate::database;
 use crate::services::capture::datalink::Channel::Ethernet;
@@ -51,7 +51,7 @@ fn get_local_ip(interface: &NetworkInterface) -> Option<Ipv4Addr> {
 }
 
 pub fn capture_packets(interface: NetworkInterface) {
-    let db: Pool<MySql> = match task::block_on(database::db::connect()) {
+    let db: Pool<Sqlite> = match task::block_on(database::db::connect()) {
         Ok(pool) => pool,
         Err(e) => panic!("Failed to connect to the database: {}", e),
     };
