@@ -24,7 +24,7 @@ fn main() {
         .setup(|app| {
             // Start the main executable in a separate thread
             let _handle = thread::spawn(move || {
-                Command::new("/Users/michael/Desktop/Coding/FYP/sentinel_api/main") // NOTE: switch to dynamic
+                Command::new("/Users/michael/Desktop/Coding/FYP/sentinel_api/main") // NOTE: switch to dynamic path
                     .spawn()
                     .expect("Failed to start the main executable");
             });
