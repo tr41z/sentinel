@@ -1,5 +1,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "console")]
 use tauri::{AppHandle, Manager};
+
 use std::env;
 use std::process::Command;
 use std::thread;

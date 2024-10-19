@@ -1,11 +1,10 @@
 use sqlx::{Error, Executor, Pool, Sqlite, SqlitePool};
-use dotenv::dotenv;
+
 use std::{env, fs, time::SystemTime};
 
 use super::model::DataModel;
 
 pub async fn connect() -> Result<Pool<Sqlite>, Error> {
-    dotenv().ok();
     let connection_string = build_connection_string()?;
     
     // Log the connection string
