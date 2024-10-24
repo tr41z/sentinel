@@ -157,7 +157,7 @@ pub async fn get_all_flows(pool: &SqlitePool) -> Result<Vec<DataModel>, Error> {
 fn system_time_to_timestamp(time: SystemTime) -> i64 {
     time.duration_since(SystemTime::UNIX_EPOCH)
         .map(|dur| dur.as_secs() as i64)
-        .unwrap_or(0) // Fallback to 0 in case of error
+        .unwrap_or(0) // fallback to 0 in case of error
 }
 
 fn timestamp_to_system_time(timestamp: i64) -> SystemTime {

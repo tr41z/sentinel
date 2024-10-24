@@ -1,4 +1,4 @@
-#![cfg_attr(not(debug_assertions), windows_subsystem = "console")]
+#![cfg_attr(not(debug_assertions), windows_subsystem = "window")]
 use database::model::DataModel;
 use tauri::{AppHandle, Manager};
 
@@ -38,7 +38,7 @@ fn main() {
 
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![fetch_flows]) // NOTE: invoke on front-end
+        .invoke_handler(tauri::generate_handler![fetch_flows]) // NOTE: invoke on front-end (on start and periodically)
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -46,7 +46,7 @@ fn main() {
 #[tauri::command]
 async fn fetch_flows() -> Result<Vec<DataModel>, String> {
     match commands::commands::get_flows().await {
-        Ok(flows) => Ok(flows),  // Return flows on success
-        Err(e) => Err(format!("Failed to fetch flows: {}", e)), // Handle errors
+        Ok(flows) => Ok(flows),  // return flows on success
+        Err(e) => Err(format!("Failed to fetch flows: {}", e)), // handle errors
     }
 }

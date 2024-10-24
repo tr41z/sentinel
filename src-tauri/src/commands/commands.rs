@@ -23,7 +23,7 @@ pub fn start_sniffer() {
 
 // Retrieve all flows (async)
 pub async fn get_flows() -> Result<Vec<DataModel>, sqlx::Error> {
-    let pool = connect().await?;  // Connect to the database
-    let flows = get_all_flows(&pool).await?;  // Fetch flows from the database
+    let pool = connect().await?;  // connect to the database
+    let flows = get_all_flows(&pool).await?;  // fetch flows from the database
     Ok(flows)
 }
