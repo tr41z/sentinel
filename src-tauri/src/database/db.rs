@@ -1,4 +1,4 @@
-use sqlx::{Error, Executor, Pool, Sqlite, SqlitePool, Row};
+use sqlx::{pool::PoolOptions, Error, Executor, Pool, Row, Sqlite, SqlitePool};
 
 use std::{env, fs, net::Ipv4Addr, str::FromStr, time::SystemTime};
 
@@ -6,47 +6,49 @@ use super::model::DataModel;
 
 pub async fn connect() -> Result<Pool<Sqlite>, Error> {
     let connection_string = build_connection_string()?;
-    
+
     // Log the connection string
     println!("Connecting to database at: {}", connection_string);
-    
-    SqlitePool::connect(&connection_string).await
+
+    // Use PoolOptions to configure the pool
+    let pool = PoolOptions::new()
+        .max_connections(10)  // Increase the number of available connections
+        .connect(&connection_string)
+        .await?;
+
+    Ok(pool)
 }
 
-fn build_connection_string() -> Result<String, Error> {
+fn build_connection_string() -> Result<String, sqlx::Error> {
     // Get the user's home directory
     let home_dir = home::home_dir().ok_or_else(|| {
         sqlx::Error::Configuration(Box::new(std::io::Error::new(
             std::io::ErrorKind::Other,
-            "Unable to determine home directory"
+            "Unable to determine home directory",
         )))
     })?;
 
     // Create the hidden .sentinel directory in the home directory
     let sentinel_dir = home_dir.join(".sentinel");
-    fs::create_dir_all(&sentinel_dir).map_err(|e| {
-        sqlx::Error::Io(e)
-    })?;
+    fs::create_dir_all(&sentinel_dir).map_err(|e| sqlx::Error::Io(e))?;
 
     // Create the full path to the SQLite database file in the .sentinel directory
     let db_path = sentinel_dir.join("app_data.db");
     let db_path_str = db_path.to_str().ok_or_else(|| {
         sqlx::Error::Configuration(Box::new(std::io::Error::new(
             std::io::ErrorKind::Other,
-            "Invalid database path"
+            "Invalid database path",
         )))
     })?;
 
     // Ensure the database file exists
     if !db_path.exists() {
-        fs::File::create(&db_path).map_err(|e| {
-            sqlx::Error::Io(e)
-        })?;
+        fs::File::create(&db_path).map_err(|e| sqlx::Error::Io(e))?;
         println!("Created database file at: {}", db_path_str);
     }
 
-    // SQLite connection string
-    Ok(format!("sqlite://{}", db_path_str))
+    // SQLite connection string with WAL mode enabled
+    Ok(format!("sqlite://{}?mode=rwc&cache=shared", db_path_str))
 }
 
 async fn initialise_schema(pool: &SqlitePool) -> Result<(), Error> {
