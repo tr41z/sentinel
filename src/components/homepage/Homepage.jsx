@@ -8,7 +8,7 @@ const Homepage = () => {
   async function loadFlows() {
     try {
       const fetchedFlows = await invoke("fetch_flows");
-      setFlows(fetchedFlows); // Store the fetched flows in state
+      setFlows(fetchedFlows); // store the fetched flows in state
     } catch (err) {
       console.error("Error fetching flows:", err);
       setError("Failed to load flows");
@@ -18,6 +18,7 @@ const Homepage = () => {
   return (
     <div>
       <button onClick={loadFlows}>Load Flows</button>
+      <p>Flows: {flows.length}</p>
       {error && <p>{error}</p>} {/* Display error message if any */}
       <ul>
         {flows.map((flow, index) => (
