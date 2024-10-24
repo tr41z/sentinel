@@ -116,8 +116,7 @@ pub fn capture_packets(interface: NetworkInterface) {
                             flows_map,
                             &db,
                             
-                            // Dynamically extracted local IP
-                            local_ip
+                            local_ip // dynamically extracted local IP
                         ));
                     }
                 }

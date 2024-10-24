@@ -1,6 +1,8 @@
 use std::{net::Ipv4Addr, time::SystemTime};
 
-#[derive(Debug, sqlx::FromRow)]
+use serde::Serialize;
+
+#[derive(Debug, sqlx::FromRow, Serialize)]
 pub struct DataModel {
     // Data for visualisation in frontend
     pub src_ip: Ipv4Addr, 

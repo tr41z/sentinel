@@ -4,6 +4,8 @@ use std::thread::JoinHandle;
 use pnet::datalink;
 use pnet::datalink::NetworkInterface;
 
+use crate::database::db::{get_all_flows, connect};
+use crate::database::model::DataModel;
 use crate::services::capture::capture_packets;
 
 // All interfaces
@@ -17,4 +19,11 @@ pub fn start_sniffer() {
         });
         handles.push(handle);
     }
+}
+
+// Retrieve all flows (async)
+pub async fn get_flows() -> Result<Vec<DataModel>, sqlx::Error> {
+    let pool = connect().await?;  // Connect to the database
+    let flows = get_all_flows(&pool).await?;  // Fetch flows from the database
+    Ok(flows)
 }

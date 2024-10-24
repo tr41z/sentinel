@@ -1,6 +1,6 @@
-use sqlx::{Error, Executor, Pool, Sqlite, SqlitePool};
+use sqlx::{Error, Executor, Pool, Sqlite, SqlitePool, Row};
 
-use std::{env, fs, time::SystemTime};
+use std::{env, fs, net::Ipv4Addr, str::FromStr, time::SystemTime};
 
 use super::model::DataModel;
 
@@ -109,9 +109,55 @@ pub async fn save_flow(pool: &SqlitePool, flow: DataModel) -> Result<(), Error> 
     Ok(())
 }
 
+pub async fn get_all_flows(pool: &SqlitePool) -> Result<Vec<DataModel>, Error> {
+    let query = r#"
+        SELECT 
+            src_ip, src_port, dst_ip, dst_port, protocol, 
+            total_bytes, total_packet_count,
+            sbytes, smean, dmean, dbytes, dload, sload, dpkts, rate, dttl, spkts,
+            start_time, last_updated_time, dur
+        FROM flows
+    "#;
+
+    let rows = sqlx::query(query)
+        .fetch_all(pool)
+        .await?;
+
+    let flows: Vec<DataModel> = rows.into_iter().map(|row| {
+        DataModel {
+            src_ip: Ipv4Addr::from_str(row.get::<String, _>("src_ip").as_str()).unwrap(),
+            src_port: row.get("src_port"),
+            dst_ip: Ipv4Addr::from_str(row.get::<String, _>("dst_ip").as_str()).unwrap(),
+            dst_port: row.get("dst_port"),
+            protocol: row.get("protocol"),
+            total_bytes: row.get::<i64, _>("total_bytes") as u64,
+            total_packet_count: row.get("total_packet_count"),
+            sbytes: row.get::<i64, _>("sbytes") as u64,
+            smean: row.get::<i64, _>("smean") as u64,
+            dmean: row.get::<i64, _>("dmean") as u64,
+            dbytes: row.get::<i64, _>("dbytes") as u64,
+            dload: row.get("dload"),
+            sload: row.get("sload"),
+            dpkts: row.get("dpkts"),
+            rate: row.get("rate"),
+            dttl: row.get("dttl"),
+            spkts: row.get("spkts"),
+            start_time: timestamp_to_system_time(row.get("start_time")),
+            last_update_time: timestamp_to_system_time(row.get("last_updated_time")),
+            duration: row.get("dur"),
+        }
+    }).collect();
+
+    Ok(flows)
+}
+
 // Helper function to convert SystemTime to Unix timestamp (i64)
 fn system_time_to_timestamp(time: SystemTime) -> i64 {
     time.duration_since(SystemTime::UNIX_EPOCH)
         .map(|dur| dur.as_secs() as i64)
         .unwrap_or(0) // Fallback to 0 in case of error
+}
+
+fn timestamp_to_system_time(timestamp: i64) -> SystemTime {
+    SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(timestamp as u64)
 }
