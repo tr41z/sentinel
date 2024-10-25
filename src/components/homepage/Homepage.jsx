@@ -17,12 +17,12 @@ const Homepage = () => {
 
   return (
     <div>
-      <button onClick={loadFlows}>Load Flows</button>
-      <p>Flows: {flows.length}</p>
+      <button onClick={loadFlows} className="text-black bg-white rounded-lg">Load Flows</button>
+      <p className="text-white">Flows: {flows.length}</p>
       {error && <p>{error}</p>} {/* Display error message if any */}
       <ul>
         {flows.map((flow, index) => (
-          <li key={index}>
+          <li key={index} className="text-red-200">
             {flow.src_ip} → {flow.dst_ip} ({flow.protocol})
           </li>
         ))}
