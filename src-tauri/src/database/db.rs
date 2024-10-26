@@ -12,7 +12,7 @@ pub async fn connect() -> Result<Pool<Sqlite>, Error> {
 
     // Use PoolOptions to configure the pool
     let pool = PoolOptions::new()
-        .max_connections(10)  // Increase the number of available connections
+        .max_connections(20)  // Increase the number of available connections
         .connect(&connection_string)
         .await?;
 

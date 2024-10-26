@@ -13,7 +13,7 @@ import { useLocation } from "react-router-dom";
 // This sidebar component is for both mobile and desktop
 function Sidebar({ children, expanded, setExpanded }) {
   return (
-    <div className="relative">
+    <div className="relative z-50">
       <div
         className={`fixed inset-0 -z-10 block bg-gray-400  ${
           expanded ? "block sm:hidden" : "hidden"

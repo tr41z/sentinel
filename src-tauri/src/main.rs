@@ -1,5 +1,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "window")]
+use database::db::connect;
 use database::model::DataModel;
+
 use tauri::{AppHandle, Manager};
 
 use std::env;
@@ -45,8 +47,11 @@ fn main() {
 
 #[tauri::command]
 async fn fetch_flows() -> Result<Vec<DataModel>, String> {
-    match commands::commands::get_flows().await {
-        Ok(flows) => Ok(flows),  // return flows on success
-        Err(e) => Err(format!("Failed to fetch flows: {}", e)), // handle errors
+    match connect().await {
+        Ok(pool) => match commands::commands::get_flows(pool).await {
+            Ok(flows) => Ok(flows),  // return flows on success
+            Err(e) => Err(format!("Failed to fetch flows: {}", e)), // handle errors
+        },
+        Err(e) => Err(format!("Failed to connect to the database: {}", e)), // handle connection errors
     }
 }

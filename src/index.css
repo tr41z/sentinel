@@ -2,7 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-
+body, html {
+  height: 100%;
+  width: 100%;
+  font-family: 'Roboto', sans-serif;
+  background: linear-gradient(90deg, rgb(255, 255, 255) 0%, rgb(240, 240, 240) 50%, rgba(230,230,230,1) 100%);
+}
 
 .sub-menu {
   overflow: hidden;
