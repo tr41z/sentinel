@@ -2,12 +2,12 @@ import React from 'react'
 import Sidebar from '../components/sidebar/Sidebar';
 import Homepage from '../components/homepage/Homepage';
 
-const Home = () => {
+const Home = ({ flows }) => {
   return (
-    <div className="flex h-screen">
+    <div className="flex h-[100%]">
       {/* Main Content Section */}
       <div className="flex-1">
-        <Homepage />
+        <Homepage flows={flows}/>
       </div>
     </div>
   );

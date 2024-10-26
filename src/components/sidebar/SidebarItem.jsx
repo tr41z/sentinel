@@ -2,19 +2,21 @@ import { Link } from "react-router-dom"; // Import Link from react-router-dom
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
 
-function HoveredSubMenuItem({ icon, text, active }) {
+function HoveredSubMenuItem({ icon, text, active, to }) {
   return (
-    <div
-      className={`my-2 rounded-md p-2 ${
-        active ? "bg-gray-300" : "hover:bg-main"
-      }`}
-    >
-      <div className="flex items-center justify-center">
-        <span className="text-black h-6 w-6">{icon}</span>
-        <span className="text-gray-600 ml-3 w-28 text-start">{text}</span>
-        <div className="bg-gray-600 h-1" />
+    <Link to={to}>
+      <div
+        className={`my-2 rounded-md p-2 ${
+          active ? "bg-gray-300" : "hover:bg-purple-50"
+        }`}
+      >
+        <div className="flex items-center justify-center">
+          <span className="text-black h-6 w-6">{icon}</span>
+          <span className="text-gray-600 ml-3 w-28 text-start">{text}</span>
+          <div className="bg-gray-600 h-1" />
+        </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -94,6 +96,7 @@ export default function SidebarItem({
                         key={index}
                         text={item.text}
                         icon={item.icon}
+                        to={item.to}
                       />
                     ))}
               </div>
