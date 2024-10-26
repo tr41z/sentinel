@@ -22,7 +22,7 @@ const Homepage = () => {
       {error && <p>{error}</p>} {/* Display error message if any */}
       <ul>
         {flows.map((flow, index) => (
-          <li key={index} className="text-red-200">
+          <li key={index} className="text-rust">
             {flow.src_ip} → {flow.dst_ip} ({flow.protocol})
           </li>
         ))}
