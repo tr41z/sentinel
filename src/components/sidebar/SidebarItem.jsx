@@ -57,7 +57,9 @@ export default function SidebarItem({
             `}
             onClick={() => setExpandSubMenu((curr) => expanded && !curr)}
           >
-            <span className="h-6 w-6">{icon}</span>
+            <span className={`h-6 w-6 ${active ? "text-white" : ""}`}>
+              {icon}
+            </span>
             <span
               className={`overflow-hidden text-start transition-all ${
                 expanded ? "ml-3 w-44" : "w-0"
