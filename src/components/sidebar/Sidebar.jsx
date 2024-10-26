@@ -5,6 +5,7 @@ import {
   CogIcon,
   UserIcon,
   EllipsisVerticalIcon,
+  WifiIcon,
 } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import SidebarItem from "./SidebarItem";
@@ -83,18 +84,18 @@ export default function MakeSidebar() {
       to: "/",
     },
     {
-      icon: <UserIcon />,
-      text: "Profile",
+      icon: <WifiIcon />,
+      text: "Inspector",
       subMenu: [
         {
-          icon: <UserIcon />,
-          text: "View Profile",
-          to: "/profile/view", 
+          icon: <WifiIcon />,
+          text: "Inspect Packets",
+          to: "/inspector/view",
         },
         {
           icon: <CogIcon />,
-          text: "Settings",
-          to: "/profile/settings", 
+          text: "Configure",
+          to: "/inspector/config",
         },
       ],
     },
