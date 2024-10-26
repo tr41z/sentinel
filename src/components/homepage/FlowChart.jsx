@@ -14,6 +14,7 @@ const FlowChart = ({
   httpCount,
   tcpCount,
   udpCount,
+  otherCount,
 }) => {
   const [showInfo, setShowInfo] = useState(false);
 
@@ -22,10 +23,11 @@ const FlowChart = ({
     { name: "UDP", pc: udpCount},
     { name: "HTTP", pc: httpCount},
     { name: "DNS", pc: dnsCount},
+    { name: "Other", pc: otherCount},
   ];
 
   return (
-    <div className="relative flex flex-col py-5 rounded-lg items-center justify-center border border-amber-600 shadow-lg bg-white p-4">
+    <div className="relative flex flex-col py-5 rounded-lg items-center justify-center border border-main shadow-lg bg-white p-4">
       <div className="flex items-center mb-2">
         <h2 className="text-xl text-[#343a40] uppercase font-light tracking-tight">
           Network Protocol Flow
@@ -35,14 +37,15 @@ const FlowChart = ({
           onMouseEnter={() => setShowInfo(true)}
           onMouseLeave={() => setShowInfo(false)}
         >
-          <IoMdInformationCircleOutline size={20}/>
+          <IoMdInformationCircleOutline size={20} />
           {showInfo && (
             <div
               className={`absolute left-[130px] transform -translate-x-1/2 mt-1 w-64 bg-white border border-gray-300 rounded-md shadow-md p-2 transition-opacity duration-300 ease-in-out 
               opacity-100 translate-y-0`}
             >
               <p className="text-sm text-gray-600">
-                This chart shows the count of packets for various network protocols
+                This chart shows the count of packets for various network
+                protocols
               </p>
             </div>
           )}
@@ -56,8 +59,8 @@ const FlowChart = ({
       >
         <defs>
           <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#DEA584" stopOpacity={0.8} />
-            <stop offset="95%" stopColor="#DEA584" stopOpacity={0} />
+            <stop offset="5%" stopColor="#560bad" stopOpacity={0.8} />
+            <stop offset="95%" stopColor="#560bad" stopOpacity={0} />
           </linearGradient>
           <linearGradient id="colorPv" x1="0" y1="0" x2="0" y2="1">
             <stop offset="5%" stopColor="#ffd60a" stopOpacity={0.8} />
@@ -87,7 +90,7 @@ const FlowChart = ({
         <Area
           type="monotone"
           dataKey="pc"
-          stroke="#DEA584"
+          stroke="#560bad"
           fillOpacity={1}
           fill="url(#colorUv)"
           name="Packet Count"

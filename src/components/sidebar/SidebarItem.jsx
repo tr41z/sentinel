@@ -6,13 +6,13 @@ function HoveredSubMenuItem({ icon, text, active }) {
   return (
     <div
       className={`my-2 rounded-md p-2 ${
-        active ? "bg-gray-300" : "hover:bg-rust"
+        active ? "bg-gray-300" : "hover:bg-main"
       }`}
     >
       <div className="flex items-center justify-center">
-        <span className="text-primary-500 h-6 w-6">{icon}</span>
-        <span className="text-primary-500 ml-3 w-28 text-start">{text}</span>
-        <div className="bg-primary-200 h-1" />
+        <span className="text-black h-6 w-6">{icon}</span>
+        <span className="text-gray-600 ml-3 w-28 text-start">{text}</span>
+        <div className="bg-gray-600 h-1" />
       </div>
     </div>
   );
@@ -24,7 +24,7 @@ export default function SidebarItem({
   text,
   expanded = false,
   subMenu = null,
-  to, 
+  to,
 }) {
   const [expandSubMenu, setExpandSubMenu] = useState(false);
 
@@ -47,11 +47,11 @@ export default function SidebarItem({
             className={`
               group relative my-1 flex w-full cursor-pointer
               items-center rounded-md px-3
-              py-2 font-medium transition-colors
+              py-2 font-medium
               ${
                 active && !subMenu
-                  ? "text-primary-500 bg-gradient-to-tr from-rust to-orange-200"
-                  : "text-gray-600 hover:bg-orange-50"
+                  ? "bg-gradient-to-tr from-main to-purple-400"
+                  : "text-gray-600 hover:bg-purple-50"
               }
               ${!expanded && "hidden sm:flex"}
             `}
@@ -61,7 +61,9 @@ export default function SidebarItem({
             <span
               className={`overflow-hidden text-start transition-all ${
                 expanded ? "ml-3 w-44" : "w-0"
-              }`}
+              }
+              ${active ? "text-white" : "text-black"}
+              `}
             >
               {text}
             </span>
@@ -78,7 +80,7 @@ export default function SidebarItem({
               <div
                 className={`
                   text-primary-500 invisible absolute left-full ml-6 -translate-x-3
-                  rounded-md bg-orange-100 px-2
+                  rounded-md bg-purple-100 px-2
                   py-1 text-sm opacity-20 transition-all
                   group-hover:visible group-hover:translate-x-0 group-hover:opacity-100
                 `}

@@ -2,13 +2,13 @@
 export default {
   content: [
     "./src/**/*.{html,js,jsx,ts,tsx}",
-    "./public/index.html", 
-    "./src-tauri/**/*.rs", 
+    "./public/index.html",
+    "./src-tauri/**/*.rs",
   ],
   theme: {
     extend: {
       colors: {
-        rust: "#DEA584",
+        main: "#560bad",
       },
     },
   },

@@ -10,6 +10,7 @@ const Homepage = () => {
   const [dnsCount, setDnsCount] = useState(0);
   const [tcpCount, setTcpCount] = useState(0);
   const [udpCount, setUdpCount] = useState(0);
+  const [otherCount, setOtherCount] = useState(0);
 
   async function loadFlows() {
     try {
@@ -20,12 +21,15 @@ const Homepage = () => {
       let newDnsCount = 0;
       let newTcpCount = 0;
       let newUdpCount = 0;
+      let newOtherCount = 0;
 
       fetchedFlows.forEach((flow) => {
         if (flow.src_port == "443") {
           newHttpCount += 1;
         } else if (flow.src_port == "53") {
           newDnsCount += 1;
+        } else {
+          newOtherCount += 1;
         }
 
         if (flow.protocol == '6') {
@@ -40,6 +44,7 @@ const Homepage = () => {
       setDnsCount(newDnsCount);
       setTcpCount(newTcpCount);
       setUdpCount(newUdpCount);
+      setOtherCount(newOtherCount);
 
     } catch (err) {
       console.error("Error fetching flows:", err);
@@ -59,9 +64,9 @@ const Homepage = () => {
       <FlowChart
         httpCount={httpCount}
         dnsCount={dnsCount}
-        // icmpCount={icmpCount}
         tcpCount={tcpCount}
         udpCount={udpCount}
+        otherCount={otherCount}
       />
     </div>
   );

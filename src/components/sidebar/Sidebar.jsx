@@ -27,7 +27,7 @@ function Sidebar({ children, expanded, setExpanded }) {
         <nav className="flex h-full flex-col border-r bg-white shadow-sm">
           <div className="flex items-center justify-between p-4 pb-2">
             <p
-              className={`text-lg font-light text-rust tracking-widest ${
+              className={`text-lg font-light text-main tracking-widest ${
                 expanded ? "w-32" : "hidden"
               }`}
             >
@@ -49,7 +49,7 @@ function Sidebar({ children, expanded, setExpanded }) {
           <ul className="flex-1 px-3">{children}</ul>
           <div className="flex border-t p-3">
             <img
-              src="https://ui-avatars.com/api/?background=DEA584&color=black&bold=true&name=John+Doe"
+              src="https://ui-avatars.com/api/?background=560bad&color=ebebeb&bold=true&name=John+Doe"
               alt=""
               className="h-10 w-10 rounded-md"
             />
