@@ -89,7 +89,7 @@ export default function MakeSidebar() {
       subMenu: [
         {
           icon: <WifiIcon />,
-          text: "Inspect Packets",
+          text: "Inspect Flows",
           to: "/inspector/view",
         },
         {

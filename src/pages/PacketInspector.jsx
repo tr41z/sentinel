@@ -8,6 +8,8 @@ const PacketInspector = ({ flows }) => {
       <div className="flex flex-row font-bold">
         <div className="flex-1">Source IP</div>
         <div className="flex-1">Source Port</div>
+        <div className="flex-1">Destination IP</div>
+        <div className="flex-1">Destination Port</div>
       </div>
 
       {/* Display each flow item in a row below the labels */}
@@ -16,6 +18,8 @@ const PacketInspector = ({ flows }) => {
           {" "}
           <InspectorElement item={flow.src_ip} />
           <InspectorElement item={flow.src_port} />
+          <InspectorElement item={flow.dst_ip} />
+          <InspectorElement item={flow.dst_port} />
         </div>
       ))}
     </div>
