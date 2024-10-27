@@ -1,12 +1,25 @@
-import React from 'react'
-import InspectorElement from '../components/packet/InspectorElement'
+import React from "react";
+import InspectorElement from "../components/packet/InspectorElement";
 
 const PacketInspector = ({ flows }) => {
   return (
     <div>
-      <InspectorElement flows={flows}/>
-    </div>
-  )
-}
+      {/* Display labels only once at the top */}
+      <div className="flex flex-row font-bold">
+        <div className="flex-1">Source IP</div>
+        <div className="flex-1">Source Port</div>
+      </div>
 
-export default PacketInspector
+      {/* Display each flow item in a row below the labels */}
+      {flows.map((flow) => (
+        <div className="flex flex-row" key={flow.id}>
+          {" "}
+          <InspectorElement item={flow.src_ip} />
+          <InspectorElement item={flow.src_port} />
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default PacketInspector;

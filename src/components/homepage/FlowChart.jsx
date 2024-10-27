@@ -33,7 +33,7 @@ const FlowChart = ({
           Network Protocol Flow
         </h2>
         <div
-          className="absolute left-5 bottom-5 text-gray-600 cursor-pointer"
+          className="absolute left-3 bottom-3 text-gray-600 cursor-pointer"
           onMouseEnter={() => setShowInfo(true)}
           onMouseLeave={() => setShowInfo(false)}
         >
