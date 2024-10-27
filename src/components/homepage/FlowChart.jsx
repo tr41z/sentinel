@@ -44,7 +44,7 @@ const FlowChart = ({
               opacity-100 translate-y-0`}
             >
               <p className="text-sm text-gray-600">
-                This chart shows the count of packets for various network
+                This chart shows the count of network flows for various network
                 protocols
               </p>
             </div>

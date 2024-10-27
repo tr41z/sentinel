@@ -51,8 +51,7 @@ pub async fn handle_packet_flow(
         Some(flow) => {
             if !flow.finished {
                 flow.update(size as u64, SystemTime::now(), src_ip, dst_ip, ttl);
-                flow.sbytes += size as u64;
-                flow.source_packet_count += 1;
+                flow.packet_count += 1;
                 flow.pretty_print("Forward Flow Updated");
             }
         }
@@ -114,7 +113,7 @@ async fn save_flow_to_db(flow: &mut Flow, db: &Pool<Sqlite>, forced_duration: Op
         flow.src_port, flow.dst_port, 
         flow.protocol, 
         flow.total_bytes, 
-        flow.packet_count, 
+        flow.source_packet_count + flow.destination_packet_count, 
         flow.source_packet_count,
         flow.destination_packet_count,
         flow.sbytes,
