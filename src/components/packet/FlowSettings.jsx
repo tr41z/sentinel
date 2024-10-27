@@ -1,6 +1,6 @@
 import React from 'react'
 
-const PacketSettings = () => {
+const FlowSettings = () => {
   return (
     <div>
       PACKET SETTINGS
@@ -8,4 +8,4 @@ const PacketSettings = () => {
   )
 }
 
-export default PacketSettings
+export default FlowSettings;

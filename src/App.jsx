@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Sidebar from "./components/sidebar/Sidebar";
 import Home from "./pages/Home";
 import Settings from "./pages/Settings";
 import { invoke } from "@tauri-apps/api";
-import PacketSettings from "./components/packet/PacketSettings";
-import PacketInspector from "./pages/PacketInspector";
+import FlowSettings from "./components/packet/FlowSettings";
+import FlowInspector from "./pages/FlowInspector";
 
 const App = () => {
   const [flows, setFlows] = useState([]);
@@ -32,8 +32,11 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Home flows={flows} />} />
             <Route path="/settings" element={<Settings />} />
-            <Route path="/inspector/view" element={<PacketInspector flows={flows}/>} />
-            <Route path="/inspector/config" element={<PacketSettings />} />
+            <Route
+              path="/inspector/view"
+              element={<FlowInspector flows={flows} />}
+            />
+            <Route path="/inspector/config" element={<FlowSettings />} />
           </Routes>
         </div>
       </div>

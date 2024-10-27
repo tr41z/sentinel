@@ -1,7 +1,7 @@
 import React from "react";
 import InspectorElement from "../components/packet/InspectorElement";
 
-const PacketInspector = ({ flows }) => {
+const FlowInspector = ({ flows }) => {
   return (
     <div className="p-4">
       {/* Display labels only once at the top */}
@@ -36,4 +36,4 @@ const handleFlowClick = (flow) => {
   console.log("Flow clicked:", flow);
 };
 
-export default PacketInspector;
+export default FlowInspector;
