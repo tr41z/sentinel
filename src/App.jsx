@@ -4,7 +4,7 @@ import Sidebar from "./components/sidebar/Sidebar";
 import Home from "./pages/Home";
 import Settings from "./pages/Settings";
 import { invoke } from "@tauri-apps/api";
-import FlowSettings from "./components/packet/FlowSettings";
+import FlowSettings from "./components/flow/FlowSettings";
 import FlowInspector from "./pages/FlowInspector";
 
 const App = () => {

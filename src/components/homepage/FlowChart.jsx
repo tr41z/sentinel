@@ -89,7 +89,7 @@ const FlowChart = ({
           stroke="#560bad"
           fillOpacity={1}
           fill="url(#colorUv)"
-          name="Packet Count"
+          name="Flow Count"
         />
       </AreaChart>
     </div>

@@ -3,7 +3,7 @@ import React from 'react'
 const FlowSettings = () => {
   return (
     <div>
-      PACKET SETTINGS
+      FLOW SETTINGS
     </div>
   )
 }

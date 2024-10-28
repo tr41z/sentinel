@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import InspectorElement from "../components/packet/InspectorElement";
-import FlowDetails from "../components/packet/FlowDetails";
+import InspectorElement from "../components/flow/InspectorElement";
+import FlowDetails from "../components/flow/FlowDetails";
 
 const FlowInspector = ({ flows }) => {
   const [isOpen, setIsOpen] = useState(false);
