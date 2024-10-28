@@ -1,7 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import InspectorElement from "../components/packet/InspectorElement";
+import FlowDetails from "../components/packet/FlowDetails";
 
 const FlowInspector = ({ flows }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedFlow, setSelectedFlow] = useState([]);
+
+  // Sample function to handle click event
+  const handleFlowClick = (flow) => {
+    setIsOpen(true);
+    setSelectedFlow(flow);
+  };
+
   return (
     <div className="p-4">
       {/* Display labels only once at the top */}
@@ -27,13 +37,10 @@ const FlowInspector = ({ flows }) => {
           </div>
         </button>
       ))}
+
+      {selectedFlow && <FlowDetails flow={selectedFlow} isOpened={isOpen}/>}
     </div>
   );
-};
-
-// Sample function to handle click event
-const handleFlowClick = (flow) => {
-  console.log("Flow clicked:", flow);
 };
 
 export default FlowInspector;

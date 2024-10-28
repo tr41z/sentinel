@@ -62,10 +62,6 @@ const FlowChart = ({
             <stop offset="5%" stopColor="#560bad" stopOpacity={0.8} />
             <stop offset="95%" stopColor="#560bad" stopOpacity={0} />
           </linearGradient>
-          <linearGradient id="colorPv" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#ffd60a" stopOpacity={0.8} />
-            <stop offset="95%" stopColor="#ffd60a" stopOpacity={0} />
-          </linearGradient>
         </defs>
         <XAxis
           dataKey="name"

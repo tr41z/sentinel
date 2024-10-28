@@ -40,7 +40,7 @@ fn main() {
 
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![fetch_flows]) // NOTE: invoke on front-end (on start and periodically)
+        .invoke_handler(tauri::generate_handler![fetch_flows])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
