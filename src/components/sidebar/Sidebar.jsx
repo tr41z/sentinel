@@ -3,7 +3,6 @@ import {
   ArrowLeftIcon,
   HomeIcon,
   CogIcon,
-  UserIcon,
   EllipsisVerticalIcon,
   WifiIcon,
 } from "@heroicons/react/24/outline";
