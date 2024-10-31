@@ -5,6 +5,8 @@ import FlowDetails from "../components/flow/FlowDetails";
 const FlowInspector = ({ flows }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedFlow, setSelectedFlow] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [flowsPerPage, setflowsPerPage] = useState(100);
 
   // Sample function to handle click event
   const handleFlowClick = (flow) => {
@@ -14,7 +16,7 @@ const FlowInspector = ({ flows }) => {
 
   return (
     <div className="p-4">
-      {/* Display labels only once at the top */}
+      {/* Display labels at the top */}
       <div className="grid grid-cols-4 font-bold mb-2 border-b-2 border-[#560bad]">
         <div className="flex-1">Source IP</div>
         <div className="flex-1">Source Port</div>
