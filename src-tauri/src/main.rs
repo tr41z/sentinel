@@ -36,7 +36,7 @@ fn main() {
 
             // Start the main executable in a separate thread
             let _handle = thread::spawn(move || {
-                Command::new(exec_path) // NOTE: switch to dynamic path
+                Command::new(exec_path)
                     .spawn()
                     .expect("Failed to start the main executable");
             });
