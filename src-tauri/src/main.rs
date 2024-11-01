@@ -2,6 +2,8 @@
 use database::db::connect;
 use database::model::DataModel;
 
+use sqlx::Error;
+
 use tauri::{AppHandle, Manager};
 
 use std::env;
@@ -26,9 +28,15 @@ fn main() {
     // Initialize the Tauri app
     tauri::Builder::default()
         .setup(|app| {
+            // Get the current directory
+            let current_dir = env::current_dir().map_err(|e| Error::Io(e))?;
+            
+            // Create the relative path to the exec file
+            let exec_path = current_dir.join("bin/main");
+
             // Start the main executable in a separate thread
             let _handle = thread::spawn(move || {
-                Command::new("/Users/michael/Desktop/Coding/FYP/sentinel_api/main") // NOTE: switch to dynamic path
+                Command::new(exec_path) // NOTE: switch to dynamic path
                     .spawn()
                     .expect("Failed to start the main executable");
             });
