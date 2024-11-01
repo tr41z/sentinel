@@ -5,6 +5,8 @@ import {
   CogIcon,
   EllipsisVerticalIcon,
   WifiIcon,
+  BellAlertIcon,
+  CodeBracketIcon,
 } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import SidebarItem from "./SidebarItem";
@@ -83,7 +85,7 @@ export default function MakeSidebar() {
       to: "/",
     },
     {
-      icon: <WifiIcon />,
+      icon: <CodeBracketIcon />,
       text: "Inspector",
       subMenu: [
         {
@@ -92,9 +94,9 @@ export default function MakeSidebar() {
           to: "/inspector/view",
         },
         {
-          icon: <CogIcon />,
-          text: "Configure",
-          to: "/inspector/config",
+          icon: <BellAlertIcon />,
+          text: "Alerts",
+          to: "/inspector/alerts",
         },
       ],
     },

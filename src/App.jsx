@@ -4,7 +4,7 @@ import Sidebar from "./components/sidebar/Sidebar";
 import Home from "./pages/Home";
 import Settings from "./pages/Settings";
 import { invoke } from "@tauri-apps/api";
-import FlowSettings from "./components/flow/FlowSettings";
+import AttackAlerts from "./components/flow/AttackAlerts";
 import FlowInspector from "./pages/FlowInspector";
 
 const App = () => {
@@ -36,7 +36,7 @@ const App = () => {
               path="/inspector/view"
               element={<FlowInspector flows={flows} />}
             />
-            <Route path="/inspector/config" element={<FlowSettings />} />
+            <Route path="/inspector/alerts" element={<AttackAlerts />} />
           </Routes>
         </div>
       </div>
