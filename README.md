@@ -1,3 +1,5 @@
+##### *Project is still in development phase*
+
 # Sentinel
 
 ![License](https://img.shields.io/github/license/tr41z/sentinel) ![Rust](https://img.shields.io/badge/Language-Rust-orange) ![Python](https://img.shields.io/badge/Language-Python-blue)
