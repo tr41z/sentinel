@@ -1,6 +1,6 @@
 # Sentinel
 
-![License](https://img.shields.io/github/license/tr41z/sentinel) ![Rust](https://img.shields.io/badge/Language-Rust-orange) ![Python](https://img.shields.io/badge/Language-Python-blue)
+ ![Rust](https://img.shields.io/badge/Language-Rust-orange) ![Python](https://img.shields.io/badge/Language-Python-blue)
 
 **Sentinel** is a powerful tool for visualizing network flow data with real-time machine learning capabilities to detect reconnaissance (recon) attacks. Sentinel is designed for users to monitor network traffic, identify potential threats, and gain insights into network behavior through an intuitive interface.
 
