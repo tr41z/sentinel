@@ -10,9 +10,8 @@ pub async fn connect() -> Result<Pool<Sqlite>, Error> {
     // Log the connection string
     println!("Connecting to database at: {}", connection_string);
 
-    // Use PoolOptions to configure the pool
     let pool = PoolOptions::new()
-        .max_connections(20)  // Increase the number of available connections
+        .max_connections(20) 
         .connect(&connection_string)
         .await?;
 

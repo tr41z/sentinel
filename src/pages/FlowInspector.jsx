@@ -5,10 +5,11 @@ import FlowDetails from "../components/flow/FlowDetails";
 const FlowInspector = ({ flows }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedFlow, setSelectedFlow] = useState([]);
+  // NOTE: Need pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [flowsPerPage, setflowsPerPage] = useState(100);
 
-  // Sample function to handle click event
+  // Sample function to handle click event for now
   const handleFlowClick = (flow) => {
     setIsOpen(true);
     setSelectedFlow(flow);
@@ -16,7 +17,6 @@ const FlowInspector = ({ flows }) => {
 
   return (
     <div className="p-4">
-      {/* Display labels at the top */}
       <div className="grid grid-cols-4 font-bold mb-2 border-b-2 border-[#560bad]">
         <div className="flex-1">Source IP</div>
         <div className="flex-1">Source Port</div>
@@ -24,7 +24,6 @@ const FlowInspector = ({ flows }) => {
         <div className="flex-1">Destination Port</div>
       </div>
 
-      {/* Display each flow item in a row below the labels */}
       {flows.map((flow) => (
         <button
           key={flow.id}

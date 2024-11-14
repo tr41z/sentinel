@@ -5,7 +5,6 @@ import Homepage from '../components/homepage/Homepage';
 const Home = ({ flows }) => {
   return (
     <div className="flex h-[100%]">
-      {/* Main Content Section */}
       <div className="flex-1">
         <Homepage flows={flows}/>
       </div>

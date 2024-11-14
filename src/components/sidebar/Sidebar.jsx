@@ -12,7 +12,6 @@ import { useState } from "react";
 import SidebarItem from "./SidebarItem";
 import { useLocation } from "react-router-dom"; 
 
-// This sidebar component is for both mobile and desktop
 function Sidebar({ children, expanded, setExpanded }) {
   return (
     <div className="relative z-50">
