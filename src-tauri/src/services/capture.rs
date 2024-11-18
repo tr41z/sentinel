@@ -78,6 +78,12 @@ pub fn capture_packets(interface: NetworkInterface) {
                         let protocol: IpNextHeaderProtocol = ip_packet.get_next_level_protocol();
                         let size: u16 = ip_packet.get_total_length();
                         let ttl: u8 = ip_packet.get_ttl();
+                        let checksum: u16 = ip_packet.get_checksum();
+                        let dscp: u8 = ip_packet.get_dscp();
+                        let ecn: u8 = ip_packet.get_ecn();
+                        let flags: u8 = ip_packet.get_flags();
+                        let fragm_offset: u16 = ip_packet.get_fragment_offset();
+                        let header_len: u8 = ip_packet.get_header_length();
 
                         // Extracting source port and destination port from packets
                         let (src_port, dst_port) = match protocol {
@@ -101,22 +107,22 @@ pub fn capture_packets(interface: NetworkInterface) {
                         let flows_map: Arc<Mutex<HashMap<FlowKey, Flow>>> = Arc::clone(&flows_map);
 
                         task::block_on(handle_packet_flow(
-                            // FlowKey attributes
                             src_ip,
                             dst_ip,
                             src_port,
                             dst_port,
                             protocol,
-                            
-                            // Flow + FlowKey attributes
                             size,
                             ttl,
-                            
-                            // Flows map
+                            checksum,
+                            dscp,
+                            ecn,
+                            flags,
+                            fragm_offset,
+                            header_len,   
                             flows_map,
                             &db,
-                            
-                            local_ip // dynamically extracted local IP
+                            local_ip
                         ));
                     }
                 }

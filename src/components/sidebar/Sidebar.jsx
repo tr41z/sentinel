@@ -48,25 +48,6 @@ function Sidebar({ children, expanded, setExpanded }) {
             </div>
           </div>
           <ul className="flex-1 px-3">{children}</ul>
-          <div className="flex border-t p-3">
-            <img
-              src="https://ui-avatars.com/api/?background=560bad&color=ebebeb&bold=true&name=John+Doe"
-              alt=""
-              className="h-10 w-10 rounded-md"
-            />
-            <div
-              className={`
-              flex items-center justify-between
-              overflow-hidden transition-all ${expanded ? "ml-3 w-52" : "w-0"}
-          `}
-            >
-              <div className="leading-4">
-                <h4 className="font-semibold">John Doe</h4>
-                <span className="text-xs text-gray-600">johndoe@gmail.com</span>
-              </div>
-              <EllipsisVerticalIcon className="h-6 w-6" />
-            </div>
-          </div>
         </nav>
       </aside>
     </div>

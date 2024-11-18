@@ -69,9 +69,10 @@ pub async fn save_flow(pool: &SqlitePool, flow: DataModel) -> Result<(), Error> 
         INSERT INTO flows (
             src_ip, src_port, dst_ip, dst_port, protocol, 
             total_bytes, total_packet_count,
-            sbytes, smean, dmean, dbytes, dload, sload, dpkts, rate, dttl, spkts,
+            sbytes, smean, dmean, dbytes, dload, sload, dpkts, rate, dttl, sttl, spkts,
+            checksum, dscp, ecn, flags, fragm_offset, header_len,
             start_time, last_updated_time, dur
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"#;
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"#;
 
     let result = sqlx::query(query)
         .bind(flow.src_ip.to_string())
@@ -90,7 +91,14 @@ pub async fn save_flow(pool: &SqlitePool, flow: DataModel) -> Result<(), Error> 
         .bind(flow.dpkts)
         .bind(flow.rate)
         .bind(flow.dttl)
+        .bind(flow.sttl)
         .bind(flow.spkts)
+        .bind(flow.checksum)
+        .bind(flow.dscp)
+        .bind(flow.ecn)
+        .bind(flow.flags)
+        .bind(flow.fragm_offset)
+        .bind(flow.header_len)
         .bind(system_time_to_timestamp(flow.start_time))
         .bind(system_time_to_timestamp(flow.last_update_time))
         .bind(flow.duration)
@@ -115,7 +123,8 @@ pub async fn get_all_flows(pool: &SqlitePool) -> Result<Vec<DataModel>, Error> {
         SELECT 
             src_ip, src_port, dst_ip, dst_port, protocol, 
             total_bytes, total_packet_count,
-            sbytes, smean, dmean, dbytes, dload, sload, dpkts, rate, dttl, spkts,
+            sbytes, smean, dmean, dbytes, dload, sload, dpkts, rate, dttl, sttl, spkts,
+            checksum, dscp, ecn, flags, fragm_offset, header_len, 
             start_time, last_updated_time, dur
         FROM flows
     "#;
@@ -142,7 +151,14 @@ pub async fn get_all_flows(pool: &SqlitePool) -> Result<Vec<DataModel>, Error> {
             dpkts: row.get("dpkts"),
             rate: row.get("rate"),
             dttl: row.get("dttl"),
+            sttl: row.get("sttl"),
             spkts: row.get("spkts"),
+            checksum: row.try_get("checksum").unwrap_or_default(),
+            dscp: row.get("dscp"),
+            ecn: row.get("ecn"),
+            flags: row.get("flags"),
+            fragm_offset: row.get("fragm_offset"),
+            header_len: row.get("header_len"),
             start_time: timestamp_to_system_time(row.get("start_time")),
             last_update_time: timestamp_to_system_time(row.get("last_updated_time")),
             duration: row.get("dur"),
