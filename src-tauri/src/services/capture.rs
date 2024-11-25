@@ -29,7 +29,7 @@ lazy_static! {
 // Function to get the local IP address dynamically
 fn get_local_ip(interface: &NetworkInterface) -> Option<Ipv4Addr> {
     // Check if the local IP is already cached
-    let mut local_ip = LOCAL_IP.lock().unwrap();
+    let mut local_ip: std::sync::MutexGuard<'_, Option<Ipv4Addr>> = LOCAL_IP.lock().unwrap();
     
     if local_ip.is_none() {
         // Iterate through the interface's IP addresses and return the first valid IPv4 address
@@ -65,7 +65,7 @@ pub fn capture_packets(interface: NetworkInterface) {
     };
 
     // Get the local IP address for the chosen interface
-    let local_ip = get_local_ip(&interface).expect("Failed to retrieve local IP address");
+    let local_ip: Ipv4Addr = get_local_ip(&interface).expect("Failed to retrieve local IP address");
 
     loop {
         match rx.next() {

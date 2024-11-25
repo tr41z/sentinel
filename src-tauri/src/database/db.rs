@@ -20,7 +20,7 @@ pub async fn connect() -> Result<Pool<Sqlite>, Error> {
 
 fn build_connection_string() -> Result<String, sqlx::Error> {
     // Get the user's home directory
-    let home_dir = home::home_dir().ok_or_else(|| {
+    let home_dir: std::path::PathBuf = home::home_dir().ok_or_else(|| {
         sqlx::Error::Configuration(Box::new(std::io::Error::new(
             std::io::ErrorKind::Other,
             "Unable to determine home directory",
@@ -28,12 +28,12 @@ fn build_connection_string() -> Result<String, sqlx::Error> {
     })?;
 
     // Create the hidden .sentinel directory in the home directory
-    let sentinel_dir = home_dir.join(".sentinel");
+    let sentinel_dir: std::path::PathBuf = home_dir.join(".sentinel");
     fs::create_dir_all(&sentinel_dir).map_err(|e| sqlx::Error::Io(e))?;
 
     // Create the full path to the SQLite database file in the .sentinel directory
-    let db_path = sentinel_dir.join("app_data.db");
-    let db_path_str = db_path.to_str().ok_or_else(|| {
+    let db_path: std::path::PathBuf = sentinel_dir.join("app_data.db");
+    let db_path_str: &str = db_path.to_str().ok_or_else(|| {
         sqlx::Error::Configuration(Box::new(std::io::Error::new(
             std::io::ErrorKind::Other,
             "Invalid database path",
@@ -42,7 +42,7 @@ fn build_connection_string() -> Result<String, sqlx::Error> {
 
     // Ensure the database file exists
     if !db_path.exists() {
-        fs::File::create(&db_path).map_err(|e| sqlx::Error::Io(e))?;
+        fs::File::create(&db_path).map_err(|e: std::io::Error| sqlx::Error::Io(e))?;
         println!("Created database file at: {}", db_path_str);
     }
 
@@ -52,12 +52,12 @@ fn build_connection_string() -> Result<String, sqlx::Error> {
 
 async fn initialise_schema(pool: &SqlitePool) -> Result<(), Error> {
     // Get the current directory
-    let current_dir = env::current_dir().map_err(|e| Error::Io(e))?;
+    let current_dir: std::path::PathBuf = env::current_dir().map_err(|e| Error::Io(e))?;
     // Create the relative path to the schema.sql file
-    let schema_path = current_dir.join("src/database/migrations/schema.sql");
+    let schema_path: std::path::PathBuf = current_dir.join("src/database/migrations/schema.sql");
 
-    let schema = fs::read_to_string(schema_path)
-        .map_err(|e| Error::Io(e))?;
+    let schema: String = fs::read_to_string(schema_path)
+        .map_err(|e: std::io::Error| Error::Io(e))?;
     pool.execute(schema.as_str()).await?;
     Ok(())
 }
@@ -74,7 +74,7 @@ pub async fn save_flow(pool: &SqlitePool, flow: DataModel) -> Result<(), Error> 
             start_time, last_updated_time, dur
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"#;
 
-    let result = sqlx::query(query)
+    let result: Result<sqlx::sqlite::SqliteQueryResult, Error> = sqlx::query(query)
         .bind(flow.src_ip.to_string())
         .bind(flow.src_port)
         .bind(flow.dst_ip.to_string())
@@ -119,7 +119,7 @@ pub async fn save_flow(pool: &SqlitePool, flow: DataModel) -> Result<(), Error> 
 }
 
 pub async fn get_all_flows(pool: &SqlitePool) -> Result<Vec<DataModel>, Error> {
-    let query = r#"
+    let query: &str = r#"
         SELECT 
             src_ip, src_port, dst_ip, dst_port, protocol, 
             total_bytes, total_packet_count,
@@ -129,11 +129,11 @@ pub async fn get_all_flows(pool: &SqlitePool) -> Result<Vec<DataModel>, Error> {
         FROM flows
     "#;
 
-    let rows = sqlx::query(query)
+    let rows: Vec<sqlx::sqlite::SqliteRow> = sqlx::query(query)
         .fetch_all(pool)
         .await?;
 
-    let flows: Vec<DataModel> = rows.into_iter().map(|row| {
+    let flows: Vec<DataModel> = rows.into_iter().map(|row: sqlx::sqlite::SqliteRow| {
         DataModel {
             src_ip: Ipv4Addr::from_str(row.get::<String, _>("src_ip").as_str()).unwrap(),
             src_port: row.get("src_port"),
@@ -169,12 +169,12 @@ pub async fn get_all_flows(pool: &SqlitePool) -> Result<Vec<DataModel>, Error> {
 }
 
 // Helper function to convert SystemTime to Unix timestamp (i64)
-fn system_time_to_timestamp(time: SystemTime) -> i64 {
+pub fn system_time_to_timestamp(time: SystemTime) -> i64 {
     time.duration_since(SystemTime::UNIX_EPOCH)
-        .map(|dur| dur.as_secs() as i64)
+        .map(|dur: std::time::Duration| dur.as_secs() as i64)
         .unwrap_or(0) // fallback to 0 in case of error
 }
 
-fn timestamp_to_system_time(timestamp: i64) -> SystemTime {
+pub fn timestamp_to_system_time(timestamp: i64) -> SystemTime {
     SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(timestamp as u64)
 }
