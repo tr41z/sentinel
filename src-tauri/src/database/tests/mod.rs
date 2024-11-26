@@ -3,6 +3,7 @@ mod tests {
 
     use crate::database::db::{system_time_to_timestamp, timestamp_to_system_time};
 
+    /* TIMESTAMP TO SYSTEM TIME */
     #[test]
     fn timestamp_to_system_time_epoch() {
         let timestamp: i64 = 0;
@@ -22,6 +23,14 @@ mod tests {
     }
 
     #[test]
+    #[should_panic(expected = "overflow when adding duration to instant")]
+    fn timestamp_to_system_time_negative() {
+        let timestamp: i64 = -1;
+        let _ = timestamp_to_system_time(timestamp); // This should panic
+    }
+
+    /* SYSTEM TIME TO TIMESTAMP */
+    #[test]
     fn system_time_to_timestamp_epoch() {
         let time: SystemTime = SystemTime::UNIX_EPOCH;
         let converted_time = system_time_to_timestamp(time);
@@ -35,13 +44,6 @@ mod tests {
         let converted_time = system_time_to_timestamp(time);
 
         assert_eq!(converted_time, i64::MAX);
-    }
-
-    #[test]
-    #[should_panic(expected = "overflow when adding duration to instant")]
-    fn negative_timestamp_to_system_time() {
-        let timestamp: i64 = -1;
-        let _ = timestamp_to_system_time(timestamp); // This should panic
     }
 
     #[test]
