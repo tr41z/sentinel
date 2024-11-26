@@ -4,11 +4,11 @@ use std::{collections::HashMap, net::Ipv4Addr};
 
 use pnet::packet::ip::IpNextHeaderProtocol;
 
-use sqlx::{Sqlite, Pool};
+use sqlx::{Pool, Sqlite};
 
-use crate::utils::flow::{Flow, FlowKey};
-use crate::database::{self};
 use crate::database::model::DataModel;
+use crate::database::{self};
+use crate::utils::flow::{Flow, FlowKey};
 
 // WARNING: EVERYTHING IN THAT FUNCTION IS LOOPED
 pub async fn handle_packet_flow(
@@ -112,34 +112,48 @@ async fn terminate_flows(flow: &mut Flow, db: &Pool<Sqlite>) {
 
 async fn save_flow_to_db(flow: &mut Flow, db: &Pool<Sqlite>, forced_duration: Option<f32>) {
     let flow_duration_result = flow.last_update_time.duration_since(flow.start_time);
-    let flow_duration_in_secs: f32 = forced_duration.unwrap_or_else(|| match flow_duration_result {
-        Ok(flow_duration) => duration_to_secs(flow_duration),
-        Err(_) => {
-            eprintln!("Failed to calculate flow duration, using 0 as fallback");
-            0.0
-        }
-    });
+    let flow_duration_in_secs: f32 =
+        forced_duration.unwrap_or_else(|| match flow_duration_result {
+            Ok(flow_duration) => duration_to_secs(flow_duration),
+            Err(_) => {
+                eprintln!("Failed to calculate flow duration, using 0 as fallback");
+                0.0
+            }
+        });
 
     let data_model: DataModel = database::model::DataModel::new(
-        flow.src_ip, flow.dst_ip,
-        flow.src_port, flow.dst_port, 
-        flow.protocol, 
-        flow.total_bytes, 
-        flow.source_packet_count + flow.destination_packet_count, 
+        flow.src_ip,
+        flow.dst_ip,
+        flow.src_port,
+        flow.dst_port,
+        flow.protocol,
+        flow.total_bytes,
+        flow.source_packet_count + flow.destination_packet_count,
         flow.source_packet_count,
         flow.destination_packet_count,
         flow.sbytes,
         flow.dbytes,
-        match flow.dttl { Some(dttl) => dttl, None => 0 },
-        match flow.sttl { Some (sttl) => sttl, None => 0 },
+        match flow.dttl {
+            Some(dttl) => dttl,
+            None => 0,
+        },
+        match flow.sttl {
+            Some(sttl) => sttl,
+            None => 0,
+        },
         flow.checksum,
         flow.dscp,
         flow.ecn,
         flow.flags,
         flow.fragm_offset,
         flow.header_len,
-        flow.start_time, flow.last_update_time,
-        if flow_duration_in_secs <= 0.001 { 0.0 } else { flow_duration_in_secs }
+        flow.start_time,
+        flow.last_update_time,
+        if flow_duration_in_secs <= 0.001 {
+            0.0
+        } else {
+            flow_duration_in_secs
+        },
     );
 
     match database::db::save_flow(db, data_model).await {

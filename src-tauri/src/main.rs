@@ -11,9 +11,9 @@ use std::process::Command;
 use std::thread;
 
 mod commands;
+mod database;
 mod services;
 mod utils;
-mod database;
 
 fn main() {
     // Set the default log level to info
@@ -30,7 +30,7 @@ fn main() {
         .setup(|app: &mut tauri::App| {
             // Get the current directory
             let current_dir: std::path::PathBuf = env::current_dir().map_err(|e| Error::Io(e))?;
-            
+
             // Create the relative path to the exec file
             let exec_path: std::path::PathBuf = current_dir.join("bin/main");
 
@@ -57,7 +57,7 @@ fn main() {
 async fn fetch_flows() -> Result<Vec<DataModel>, String> {
     match connect().await {
         Ok(pool) => match commands::commands::get_flows(pool).await {
-            Ok(flows) => Ok(flows),  // return flows on success
+            Ok(flows) => Ok(flows), // return flows on success
             Err(e) => Err(format!("Failed to fetch flows: {}", e)), // handle errors
         },
         Err(e) => Err(format!("Failed to connect to the database: {}", e)), // handle connection errors

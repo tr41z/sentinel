@@ -30,7 +30,7 @@ lazy_static! {
 fn get_local_ip(interface: &NetworkInterface) -> Option<Ipv4Addr> {
     // Check if the local IP is already cached
     let mut local_ip: std::sync::MutexGuard<'_, Option<Ipv4Addr>> = LOCAL_IP.lock().unwrap();
-    
+
     if local_ip.is_none() {
         // Iterate through the interface's IP addresses and return the first valid IPv4 address
         for ip_network in &interface.ips {
@@ -45,7 +45,7 @@ fn get_local_ip(interface: &NetworkInterface) -> Option<Ipv4Addr> {
             }
         }
     }
-    
+
     // Return the cached IP if it exists
     *local_ip
 }
@@ -61,7 +61,10 @@ pub fn capture_packets(interface: NetworkInterface) {
     let (_, mut rx) = match datalink::channel(&interface, Default::default()) {
         Ok(Ethernet(tx, rx)) => (tx, rx),
         Ok(_) => panic!("Unhandled channel type: {}", &interface),
-        Err(e) => panic!("An error occurred when creating the datalink channel: {}", e),
+        Err(e) => panic!(
+            "An error occurred when creating the datalink channel: {}",
+            e
+        ),
     };
 
     // Get the local IP address for the chosen interface
@@ -119,10 +122,10 @@ pub fn capture_packets(interface: NetworkInterface) {
                             ecn,
                             flags,
                             fragm_offset,
-                            header_len,   
+                            header_len,
                             flows_map,
                             &db,
-                            local_ip
+                            local_ip,
                         ));
                     }
                 }

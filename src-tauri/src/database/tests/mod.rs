@@ -1,5 +1,5 @@
 mod tests {
-    use std::time::{SystemTime, Duration};
+    use std::time::{Duration, SystemTime};
 
     use crate::database::db::{system_time_to_timestamp, timestamp_to_system_time};
 

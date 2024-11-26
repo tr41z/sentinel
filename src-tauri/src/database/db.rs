@@ -11,7 +11,7 @@ pub async fn connect() -> Result<Pool<Sqlite>, Error> {
     println!("Connecting to database at: {}", connection_string);
 
     let pool = PoolOptions::new()
-        .max_connections(20) 
+        .max_connections(20)
         .connect(&connection_string)
         .await?;
 
@@ -56,8 +56,8 @@ async fn initialise_schema(pool: &SqlitePool) -> Result<(), Error> {
     // Create the relative path to the schema.sql file
     let schema_path: std::path::PathBuf = current_dir.join("src/database/migrations/schema.sql");
 
-    let schema: String = fs::read_to_string(schema_path)
-        .map_err(|e: std::io::Error| Error::Io(e))?;
+    let schema: String =
+        fs::read_to_string(schema_path).map_err(|e: std::io::Error| Error::Io(e))?;
     pool.execute(schema.as_str()).await?;
     Ok(())
 }
@@ -111,10 +111,13 @@ pub async fn save_flow(pool: &SqlitePool, flow: DataModel) -> Result<(), Error> 
             eprintln!("Error message: [{}].", e.to_string());
         }
         Ok(res) => {
-            println!("Flow inserted successfully! Rows affected: {}", res.rows_affected());
+            println!(
+                "Flow inserted successfully! Rows affected: {}",
+                res.rows_affected()
+            );
         }
     }
-    
+
     Ok(())
 }
 
@@ -129,12 +132,11 @@ pub async fn get_all_flows(pool: &SqlitePool) -> Result<Vec<DataModel>, Error> {
         FROM flows
     "#;
 
-    let rows: Vec<sqlx::sqlite::SqliteRow> = sqlx::query(query)
-        .fetch_all(pool)
-        .await?;
+    let rows: Vec<sqlx::sqlite::SqliteRow> = sqlx::query(query).fetch_all(pool).await?;
 
-    let flows: Vec<DataModel> = rows.into_iter().map(|row: sqlx::sqlite::SqliteRow| {
-        DataModel {
+    let flows: Vec<DataModel> = rows
+        .into_iter()
+        .map(|row: sqlx::sqlite::SqliteRow| DataModel {
             src_ip: Ipv4Addr::from_str(row.get::<String, _>("src_ip").as_str()).unwrap(),
             src_port: row.get("src_port"),
             dst_ip: Ipv4Addr::from_str(row.get::<String, _>("dst_ip").as_str()).unwrap(),
@@ -162,8 +164,8 @@ pub async fn get_all_flows(pool: &SqlitePool) -> Result<Vec<DataModel>, Error> {
             start_time: timestamp_to_system_time(row.get("start_time")),
             last_update_time: timestamp_to_system_time(row.get("last_updated_time")),
             duration: row.get("dur"),
-        }
-    }).collect();
+        })
+        .collect();
 
     Ok(flows)
 }
