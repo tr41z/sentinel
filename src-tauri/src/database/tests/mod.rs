@@ -1,31 +1,55 @@
 mod tests {
-    #[test]
-    fn timestamp_to_system_time_successful() {}
+    use std::time::{SystemTime, Duration};
+
+    use crate::database::db::{system_time_to_timestamp, timestamp_to_system_time};
 
     #[test]
-    fn timestamp_to_system_time_failed() {}
+    fn timestamp_to_system_time_epoch() {
+        let timestamp: i64 = 0;
+        let sys_time = timestamp_to_system_time(timestamp);
+        let expected_time = SystemTime::UNIX_EPOCH;
+
+        assert_eq!(sys_time, expected_time);
+    }
 
     #[test]
-    fn system_time_to_timestamp_successful() {}
+    fn timestamp_to_system_time_large_value() {
+        let timestamp: i64 = i64::MAX;
+        let sys_time = timestamp_to_system_time(timestamp);
+        let expected_time = SystemTime::UNIX_EPOCH + Duration::from_secs(i64::MAX as u64);
+
+        assert_eq!(sys_time, expected_time);
+    }
 
     #[test]
-    fn system_time_to_timestamp_failed() {}
+    fn system_time_to_timestamp_epoch() {
+        let time: SystemTime = SystemTime::UNIX_EPOCH;
+        let converted_time = system_time_to_timestamp(time);
+
+        assert_eq!(converted_time, 0);
+    }
 
     #[test]
-    fn calculate_load_successful() {}
+    fn system_time_to_timestamp_large_value() {
+        let time: SystemTime = SystemTime::UNIX_EPOCH + Duration::from_secs(i64::MAX as u64);
+        let converted_time = system_time_to_timestamp(time);
+
+        assert_eq!(converted_time, i64::MAX);
+    }
 
     #[test]
-    fn calculate_load_failed() {}
+    #[should_panic(expected = "overflow when adding duration to instant")]
+    fn negative_timestamp_to_system_time() {
+        let timestamp: i64 = -1;
+        let _ = timestamp_to_system_time(timestamp); // This should panic
+    }
 
     #[test]
-    fn calculate_mean_successful() {}
+    fn system_time_to_timestamp_negative() {
+        let time = SystemTime::UNIX_EPOCH - Duration::from_secs(1);
+        let converted_time = system_time_to_timestamp(time);
 
-    #[test]
-    fn calculate_mean_failed() {}
-
-    #[test]
-    fn calculate_rate_successful() {}
-
-    #[test]
-    fn calculate_rate_failed() {}
+        // Expecting fallback behavior since negatives aren't supported.
+        assert_eq!(converted_time, 0);
+    }
 }
