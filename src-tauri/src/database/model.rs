@@ -65,7 +65,7 @@ impl DataModel {
         last_update_time: SystemTime,
         duration: f32,
     ) -> Self {
-        return Self {
+        Self {
             src_ip,
             dst_ip,
             src_port,
@@ -95,7 +95,7 @@ impl DataModel {
             start_time,
             last_update_time,
             duration,
-        };
+        }
     }
 
     pub fn calculate_rate(size: f64, duration: f64) -> f64 {

@@ -29,7 +29,7 @@ fn build_connection_string() -> Result<String, sqlx::Error> {
 
     // Create the hidden .sentinel directory in the home directory
     let sentinel_dir: std::path::PathBuf = home_dir.join(".sentinel");
-    fs::create_dir_all(&sentinel_dir).map_err(|e| sqlx::Error::Io(e))?;
+    fs::create_dir_all(&sentinel_dir).map_err(sqlx::Error::Io)?;
 
     // Create the full path to the SQLite database file in the .sentinel directory
     let db_path: std::path::PathBuf = sentinel_dir.join("app_data.db");
@@ -52,7 +52,7 @@ fn build_connection_string() -> Result<String, sqlx::Error> {
 
 async fn initialise_schema(pool: &SqlitePool) -> Result<(), Error> {
     // Get the current directory
-    let current_dir: std::path::PathBuf = env::current_dir().map_err(|e| Error::Io(e))?;
+    let current_dir: std::path::PathBuf = env::current_dir().map_err(Error::Io)?;
     // Create the relative path to the schema.sql file
     let schema_path: std::path::PathBuf = current_dir.join("src/database/migrations/schema.sql");
 
@@ -108,7 +108,7 @@ pub async fn save_flow(pool: &SqlitePool, flow: DataModel) -> Result<(), Error> 
     match result {
         Err(e) => {
             eprintln!("Error inserting flow: {:#?}!", flow);
-            eprintln!("Error message: [{}].", e.to_string());
+            eprintln!("Error message: [{}].", e);
         }
         Ok(res) => {
             println!(

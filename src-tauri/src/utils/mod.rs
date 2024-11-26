@@ -94,14 +94,14 @@ pub mod flow {
 
             // Update flow based on direction
             if src_ip == self.src_ip && dst_ip == self.dst_ip {
-                self.sbytes += size as u64;
+                self.sbytes += size;
                 self.source_packet_count += 1;
 
                 if self.sttl.is_none() {
                     self.sttl = Some(ttl);
                 }
             } else {
-                self.dbytes += size as u64;
+                self.dbytes += size;
                 self.destination_packet_count += 1;
 
                 if self.dttl.is_none() {

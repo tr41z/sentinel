@@ -133,14 +133,8 @@ async fn save_flow_to_db(flow: &mut Flow, db: &Pool<Sqlite>, forced_duration: Op
         flow.destination_packet_count,
         flow.sbytes,
         flow.dbytes,
-        match flow.dttl {
-            Some(dttl) => dttl,
-            None => 0,
-        },
-        match flow.sttl {
-            Some(sttl) => sttl,
-            None => 0,
-        },
+        flow.dttl.unwrap_or(0),
+        flow.sttl.unwrap_or(0),
         flow.checksum,
         flow.dscp,
         flow.ecn,
