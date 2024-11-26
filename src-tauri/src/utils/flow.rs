@@ -12,9 +12,9 @@ pub struct Flow {
     pub dst_port: u16,
     pub protocol: u8,
     pub total_bytes: u64,
-    pub packet_count: u32,
-    pub source_packet_count: u32,
-    pub destination_packet_count: u32,
+    pub packet_count: u16,
+    pub source_packet_count: u16,
+    pub destination_packet_count: u16,
     pub sttl: Option<u8>, // source -> dest first assigned ttl
     pub dttl: Option<u8>, // dest -> source first assigned ttl
     pub checksum: u16,
