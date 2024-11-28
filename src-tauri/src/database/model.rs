@@ -99,7 +99,7 @@ impl DataModel {
     }
 
     pub fn calculate_rate(size: f64, duration: f64) -> f64 {
-        if duration == 0.0 {
+        if duration <= 0.0 || size <= 0.0 {
             0.0
         } else {
             size / duration
@@ -107,7 +107,7 @@ impl DataModel {
     }
 
     pub fn calculate_mean(size: u64, total_packet_count: u64) -> u64 {
-        if total_packet_count == 0 {
+        if total_packet_count <= 0 || size <= 0 {
             0
         } else {
             size / total_packet_count
@@ -115,7 +115,7 @@ impl DataModel {
     }
 
     pub fn calculate_load(bytes: f64, duration: f64) -> f64 {
-        if duration == 0.0 {
+        if duration <= 0.0 || bytes <= 0.0 {
             0.0
         } else {
             bytes / duration

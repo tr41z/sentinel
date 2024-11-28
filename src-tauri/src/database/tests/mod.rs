@@ -2,6 +2,7 @@ mod tests {
     use std::time::{Duration, SystemTime};
 
     use crate::database::db::{system_time_to_timestamp, timestamp_to_system_time};
+    use crate::database::model::DataModel;
 
     /* TIMESTAMP TO SYSTEM TIME */
     #[test]
@@ -53,5 +54,69 @@ mod tests {
 
         // Expecting fallback behavior since negatives aren't supported.
         assert_eq!(converted_time, 0);
+    }
+
+    /* CALCULATE RATE */
+    #[test]
+    fn calculate_rate_success() {
+        let size: f64 = 24123.0;
+        let duration: f64 = 13.0;
+
+        let rate: f64 = DataModel::calculate_rate(size, duration);
+        assert_eq!(rate, size / duration);
+    }
+
+    #[test]
+    fn calculate_rate_zero_duration() {
+        let size: f64 = 24123.0;
+        let duration: f64 = 0.0;
+
+        let rate: f64 = DataModel::calculate_rate(size, duration);
+        assert_eq!(rate, 0.0);
+    }
+
+    #[test]
+    fn calculate_rate_zero_size() {
+        let size: f64 = 0.0;
+        let duration: f64 = 12.0;
+
+        let rate: f64 = DataModel::calculate_rate(size, duration);
+        assert_eq!(rate, 0.0);
+    }
+
+    #[test]
+    fn calculate_rate_zero_both() {
+        let size: f64 = 0.0;
+        let duration: f64 = 0.0;
+
+        let rate: f64 = DataModel::calculate_rate(size, duration);
+        assert_eq!(rate, 0.0)
+    }
+
+    #[test]
+    fn calculate_rate_negative_size() {
+        let size: f64 = -20.5;
+        let duration: f64 = 12.0;
+
+        let rate: f64 = DataModel::calculate_rate(size, duration);
+        assert_eq!(rate, 0.0);
+    }
+
+    #[test]
+    fn calculate_rate_negative_duration() {
+        let size: f64 = 20142.0;
+        let duration: f64 = -2.0;
+
+        let rate: f64 = DataModel::calculate_rate(size, duration);
+        assert_eq!(rate, 0.0);
+    }
+
+    #[test]
+    fn calculate_rate_negative_both() {
+        let size: f64 = -29.0;
+        let duration: f64 = -10.0;
+
+        let rate: f64 = DataModel::calculate_rate(size, duration);
+        assert_eq!(rate, 0.0);
     }
 }
