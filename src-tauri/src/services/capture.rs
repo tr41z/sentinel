@@ -80,6 +80,8 @@ pub fn capture_packets(interface: NetworkInterface) {
                         let dst_ip: Ipv4Addr = ip_packet.get_destination();
                         let protocol: IpNextHeaderProtocol = ip_packet.get_next_level_protocol();
                         let size: u16 = ip_packet.get_total_length();
+
+                        // PERF: All variables below need to be normalized (sum || avg || other aggregation)
                         let ttl: u8 = ip_packet.get_ttl();
                         let checksum: u16 = ip_packet.get_checksum();
                         let dscp: u8 = ip_packet.get_dscp();
@@ -87,6 +89,11 @@ pub fn capture_packets(interface: NetworkInterface) {
                         let flags: u8 = ip_packet.get_flags();
                         let fragm_offset: u16 = ip_packet.get_fragment_offset();
                         let header_len: u8 = ip_packet.get_header_length();
+
+                        // Check if the destination IP is valid
+                        if dst_ip.is_broadcast() || dst_ip.is_multicast() || dst_ip != local_ip {
+                            continue; // Skip this packet
+                        }
 
                         // Extracting source port and destination port from packets
                         let (src_port, dst_port) = match protocol {

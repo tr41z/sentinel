@@ -12,24 +12,20 @@ pub mod flow {
         pub src_port: u16,
         pub dst_port: u16,
         pub protocol: u8,
-        pub total_bytes: u64,
-        pub packet_count: u16,
-        pub source_packet_count: u16,
-        pub destination_packet_count: u16,
+        pub total_bytes: u64, // total bytes count during flow
+        pub packet_count: u16, // total packet count during flow
+        pub source_packet_count: u16, // source packet count during flow
+        pub destination_packet_count: u16, // destination packet count during flow
         pub sttl: Option<u8>, // source -> dest first assigned ttl
         pub dttl: Option<u8>, // dest -> source first assigned ttl
-        pub checksum: u16,
+        pub checksum: u16, // checksum value 
         pub dscp: u8,
         pub ecn: u8,
         pub flags: u8,
         pub fragm_offset: u16,
         pub header_len: u8,
-
-        // Model input
         pub sbytes: u64, // source -> dest load (bytes)
         pub dbytes: u64, // dest -> source load (bytes)
-
-        // Time
         pub start_time: SystemTime,
         pub last_update_time: SystemTime,
         pub finished: bool,
@@ -49,7 +45,6 @@ pub mod flow {
             flags: u8,
             fragm_offset: u16,
             header_len: u8,
-
             start_time: SystemTime,
             last_update_time: SystemTime,
         ) -> Self {
@@ -89,21 +84,18 @@ pub mod flow {
             dst_ip: Ipv4Addr,
             ttl: u8,
         ) {
-            self.packet_count += 1;
-            self.total_bytes += size;
+            self.packet_count = self.packet_count.checked_add(1).expect("packet_count overflow");
+            self.total_bytes = self.total_bytes.checked_add(size).expect("total_bytes overflow");
 
-            // Update flow based on direction
             if src_ip == self.src_ip && dst_ip == self.dst_ip {
-                self.sbytes += size;
-                self.source_packet_count += 1;
-
+                self.sbytes = self.sbytes.checked_add(size).expect("sbytes overflow");
+                self.source_packet_count = self.source_packet_count.checked_add(1).expect("source_packet_count overflow");
                 if self.sttl.is_none() {
                     self.sttl = Some(ttl);
                 }
             } else {
-                self.dbytes += size;
-                self.destination_packet_count += 1;
-
+                self.dbytes = self.dbytes.checked_add(size).expect("dbytes overflow");
+                self.destination_packet_count = self.destination_packet_count.checked_add(1).expect("destination_packet_count overflow");
                 if self.dttl.is_none() {
                     self.dttl = Some(ttl);
                 }

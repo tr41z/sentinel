@@ -31,8 +31,6 @@ pub struct DataModel {
     pub flags: u8,
     pub fragm_offset: u16,
     pub header_len: u8,
-
-    // Time
     pub start_time: SystemTime,
     pub last_update_time: SystemTime,
     pub duration: f32,
@@ -49,7 +47,6 @@ impl DataModel {
         total_packet_count: u16,
         source_packet_count: u16,
         destination_packet_count: u16,
-
         sbytes: u64,
         dbytes: u64,
         dttl: u8,
@@ -60,7 +57,6 @@ impl DataModel {
         flags: u8,
         fragm_offset: u16,
         header_len: u8,
-
         start_time: SystemTime,
         last_update_time: SystemTime,
         duration: f32,
@@ -73,7 +69,6 @@ impl DataModel {
             protocol,
             total_bytes,
             total_packet_count,
-
             sbytes,
             smean: DataModel::calculate_mean(sbytes, source_packet_count as u64),
             dmean: DataModel::calculate_mean(dbytes, destination_packet_count as u64),
