@@ -120,7 +120,6 @@ pub async fn get_all_flows(pool: &SqlitePool) -> Result<Vec<DataModel>, Error> {
             src_ip, src_port, dst_ip, dst_port, protocol, 
             total_bytes, total_packet_count,
             sbytes, smean, dmean, dbytes, dload, sload, dpkts, rate, dttl, sttl, spkts,
-            checksum, dscp, ecn, flags, fragm_offset, header_len, 
             start_time, last_updated_time, dur
         FROM flows
     "#;
