@@ -19,12 +19,6 @@ CREATE TABLE IF NOT EXISTS flows (
     dttl INT,
     sttl INT,
     spkts INT,
-    checksum INT, 
-    dscp INT, 
-    ecn INT, 
-    flags INT, 
-    fragm_offset INT, 
-    header_len INT,
 
     start_time INTEGER,
     last_updated_time INTEGER,  

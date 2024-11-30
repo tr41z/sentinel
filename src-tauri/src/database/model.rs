@@ -4,7 +4,6 @@ use serde::Serialize;
 
 #[derive(Debug, sqlx::FromRow, Serialize)]
 pub struct DataModel {
-    // Data for visualisation in frontend
     pub src_ip: Ipv4Addr,
     pub dst_ip: Ipv4Addr,
     pub src_port: u16,
@@ -12,8 +11,6 @@ pub struct DataModel {
     pub protocol: u8,
     pub total_bytes: u64,
     pub total_packet_count: u16,
-
-    // Model input
     pub sbytes: u64,
     pub smean: u64,
     pub dmean: u64,
@@ -25,12 +22,6 @@ pub struct DataModel {
     pub sttl: u8,
     pub dttl: u8,
     pub spkts: u16,
-    pub checksum: u16,
-    pub dscp: u8,
-    pub ecn: u8,
-    pub flags: u8,
-    pub fragm_offset: u16,
-    pub header_len: u8,
     pub start_time: SystemTime,
     pub last_update_time: SystemTime,
     pub duration: f32,
@@ -51,12 +42,6 @@ impl DataModel {
         dbytes: u64,
         dttl: u8,
         sttl: u8,
-        checksum: u16,
-        dscp: u8,
-        ecn: u8,
-        flags: u8,
-        fragm_offset: u16,
-        header_len: u8,
         start_time: SystemTime,
         last_update_time: SystemTime,
         duration: f32,
@@ -80,13 +65,6 @@ impl DataModel {
             dttl,
             sttl,
             spkts: source_packet_count,
-            checksum,
-            dscp,
-            ecn,
-            flags,
-            fragm_offset,
-            header_len,
-
             start_time,
             last_update_time,
             duration,
