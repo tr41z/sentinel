@@ -7,7 +7,7 @@ function HoveredSubMenuItem({ icon, text, active, to }) {
     <Link to={to}>
       <div
         className={`my-2 rounded-md p-2 ${
-          active ? "bg-gray-300" : "hover:bg-purple-50"
+          active ? "bg-gray-300" : "hover:bg-blue-50"
         }`}
       >
         <div className="flex items-center justify-center">
@@ -52,8 +52,8 @@ export default function SidebarItem({
               py-2 font-medium
               ${
                 active && !subMenu
-                  ? "bg-gradient-to-tr from-main to-purple-400"
-                  : "text-gray-600 hover:bg-purple-50"
+                  ? "bg-gradient-to-tl from-main to-blue-900"
+                  : "text-gray-600 hover:bg-blue-50"
               }
               ${!expanded && "hidden sm:flex"}
             `}
@@ -84,7 +84,7 @@ export default function SidebarItem({
               <div
                 className={`
                   text-primary-500 invisible absolute left-full ml-6 -translate-x-3
-                  rounded-md bg-purple-100 px-2
+                  rounded-md bg-blue-100 px-2
                   py-1 text-sm opacity-20 transition-all
                   group-hover:visible group-hover:translate-x-0 group-hover:opacity-100
                 `}

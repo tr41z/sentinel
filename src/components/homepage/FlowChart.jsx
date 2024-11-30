@@ -9,25 +9,19 @@ import {
   YAxis,
 } from "recharts";
 
-const FlowChart = ({
-  dnsCount,
-  httpCount,
-  tcpCount,
-  udpCount,
-  otherCount,
-}) => {
+const FlowChart = ({ dnsCount, httpCount, tcpCount, udpCount, otherCount }) => {
   const [showInfo, setShowInfo] = useState(false);
 
   const data = [
-    { name: "TCP", pc: tcpCount},
-    { name: "UDP", pc: udpCount},
-    { name: "HTTP", pc: httpCount},
-    { name: "DNS", pc: dnsCount},
-    { name: "Other", pc: otherCount},
+    { name: "TCP", pc: tcpCount },
+    { name: "UDP", pc: udpCount },
+    { name: "HTTP", pc: httpCount },
+    { name: "DNS", pc: dnsCount },
+    { name: "Other", pc: otherCount },
   ];
 
   return (
-    <div className="relative flex flex-col py-5 rounded-lg items-center justify-center border border-main shadow-lg bg-white p-4">
+    <div className="relative flex flex-col py-5 items-center justify-center border  bg-gray-100 rounded-lg shadow-md p-4">
       <div className="flex items-center mb-2">
         <h2 className="text-xl text-[#343a40] uppercase font-light tracking-tight">
           Network Protocol Flow
@@ -59,8 +53,8 @@ const FlowChart = ({
       >
         <defs>
           <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#560bad" stopOpacity={0.8} />
-            <stop offset="95%" stopColor="#560bad" stopOpacity={0} />
+            <stop offset="5%" stopColor="#03045e" stopOpacity={0.8} />
+            <stop offset="95%" stopColor="#03045e" stopOpacity={0} />
           </linearGradient>
         </defs>
         <XAxis
@@ -86,7 +80,7 @@ const FlowChart = ({
         <Area
           type="monotone"
           dataKey="pc"
-          stroke="#560bad"
+          stroke="#03045e"
           fillOpacity={1}
           fill="url(#colorUv)"
           name="Flow Count"
