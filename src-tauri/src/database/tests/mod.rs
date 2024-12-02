@@ -119,4 +119,13 @@ mod tests {
         let rate: f64 = DataModel::calculate_rate(size, duration);
         assert_eq!(rate, 0.0);
     }
+
+    #[test]
+    fn calculate_mean_success() {
+        let size: u64 = 10;
+        let total_packet_count: u64 = 3;
+
+        let mean: u64 = DataModel::calculate_mean(size, total_packet_count);
+        assert_eq!(mean, 3);
+    }
 }

@@ -43,15 +43,15 @@ const Homepage = ({ flows }) => {
       <div className="flex h-[350px]">
         <div className="bg-gray-100 p-4 rounded-lg shadow-md mt-3 w-[30%]">
           <h3 className="text-xl text-[#343a40] uppercase font-light mb-4 flex justify-center items-center">
-            System Health
+            Network Statistics
           </h3>
           <div className="space-y-5">
             <div className="flex justify-between text-gray-700">
-              <span>CPU Usage:</span>
+              <span>Some Usage:</span>
               <span className="font-bold">45%</span>
             </div>
             <div className="flex justify-between text-gray-700">
-              <span>Memory Usage:</span>
+              <span>Some Usage:</span>
               <span className="font-bold">70%</span>
             </div>
             <div className="flex justify-between text-gray-700">
@@ -59,16 +59,16 @@ const Homepage = ({ flows }) => {
               <span className="font-bold">60%</span>
             </div>
             <div className="flex justify-between text-gray-700">
-              <span>OPT</span>
-              <span className="font-bold">OPT</span>
+              <span>-</span>
+              <span className="font-bold">-</span>
             </div>
             <div className="flex justify-between text-gray-700">
-              <span>OPT</span>
-              <span className="font-bold">OPT</span>
+              <span>-</span>
+              <span className="font-bold">-</span>
             </div>
             <div className="flex justify-between text-gray-700">
-              <span>OPT</span>
-              <span className="font-bold">OPT</span>
+              <span>-</span>
+              <span className="font-bold">-</span>
             </div>
           </div>
         </div>
