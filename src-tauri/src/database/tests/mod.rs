@@ -128,4 +128,31 @@ mod tests {
         let mean: u64 = DataModel::calculate_mean(size, total_packet_count);
         assert_eq!(mean, 3);
     }
+
+    #[test]
+    fn calculate_mean_zero_packet_count() {
+        let size: u64 = 10;
+        let total_packet_count: u64 = 0;
+
+        let mean: u64 = DataModel::calculate_mean(size, total_packet_count);
+        assert_eq!(mean, 0)
+    }
+
+    #[test]
+    fn calculate_mean_zero_size() {
+        let size: u64 = 0;
+        let total_packet_count: u64 = 10;
+
+        let mean: u64 = DataModel::calculate_mean(size, total_packet_count);
+        assert_eq!(mean, 0)
+    }
+
+    #[test]
+    fn calculate_mean_max() {
+        let size: u64 = u64::MAX;
+        let total_packet_count: u64 = u64::MAX;
+
+        let mean: u64 = DataModel::calculate_mean(size, total_packet_count);
+        assert_eq!(mean, size / total_packet_count);
+    }
 }

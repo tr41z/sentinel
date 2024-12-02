@@ -80,7 +80,7 @@ impl DataModel {
     }
 
     pub fn calculate_mean(size: u64, total_packet_count: u64) -> u64 {
-        if total_packet_count <= 0 || size <= 0 {
+        if total_packet_count == 0 {
             0
         } else {
             size / total_packet_count
