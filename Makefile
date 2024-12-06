@@ -21,32 +21,33 @@ build-exec:
 	@cd ml-mod && pyinstaller --onefile --add-data "models/ml/recondet_model.joblib:models/ml" --hidden-import sklearn --hidden-import sklearn.ensemble._forest --hidden-import numpy --hidden-import scipy main.py
 	@rm -rf ml-mod/build ml-mod/dist ml-mod/main.spec
 
-# C++ Sniffer
-CXX = g++
-CXXFLAGS = -std=c++17 -Wall -g
+# C Sniffer
+CC = gcc
+CFLAGS = -std=c11 -Wall -g
+LDFLAGS = -lpcap -lpthread # Link the pcap and lpthread library
 
 SNIFFER_DIR = sniffer-mod
 SRC_DIR = src
 HEADER_DIR = include
-SOURCES = main.cpp
-OBJECTS = $(SOURCES:.cpp=.o)
-EXEC = sniffer 
+SOURCES = $(wildcard $(SNIFFER_DIR)/$(SRC_DIR)/*.c) # Automatically find all .c files
+OBJECTS = $(SOURCES:.c=.o)
+EXEC = sniffer
 
 # Default target to build
 all: $(EXEC)
 
 # Change directory and link objects to create the executable
-$(EXEC):
-	@cd $(SNIFFER_DIR)/$(SRC_DIR) && $(CXX) $(SOURCES) -I $(SNIFFER_DIR)/$(SRC_DIR)/$(HEADER_DIR) -o ../$(EXEC)
+$(EXEC): $(OBJECTS)
+	$(CC) $(OBJECTS) -I $(SNIFFER_DIR)/$(HEADER_DIR) $(LDFLAGS) -o $(SNIFFER_DIR)/$(EXEC)
 
-# Compile the source files into object files in sniffer directory
-%.o: %.cpp
-	@cd $(SNIFFER_DIR)/$(SRC_DIR) && $(CXX) $(CXXFLAGS) -c $< -o $@
+# Compile the source files into object files in the sniffer directory
+$(SNIFFER_DIR)/$(SRC_DIR)/%.o: $(SNIFFER_DIR)/$(SRC_DIR)/%.c
+	$(CC) $(CFLAGS) -I $(SNIFFER_DIR)/$(HEADER_DIR) -c $< -o $@
 
-# Clean up object files and executable in sniffer directory
+# Clean up object files and executable in the sniffer directory
 clean:
-	@cd $(SNIFFER_DIR) && rm -f $(OBJECTS) $(EXEC)
+	rm -f $(SNIFFER_DIR)/$(SRC_DIR)/*.o $(SNIFFER_DIR)/$(EXEC)
 
-# Run the program from sniffer directory
+# Run the program from the sniffer directory
 run-sniffer: $(EXEC)
 	@cd $(SNIFFER_DIR) && ./$(EXEC)

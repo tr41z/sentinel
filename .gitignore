@@ -31,3 +31,4 @@ ml-mod/.DS_Store
 ml-mod/.env
 ml-mod/exe-command.txt
 ml-mod/main.spec
+sniffer-mod/*/*.o
