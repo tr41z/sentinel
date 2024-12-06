@@ -13,10 +13,6 @@ dist-ssr
 *.local
 
 # Editor directories and files
-.vscode
-.VSCodeCounter
-.vscode/*
-!.vscode/extensions.json
 .idea
 .DS_Store
 *.suo
@@ -26,12 +22,12 @@ dist-ssr
 *.sw?
 package-lock.json
 */Cargo.lock
-ml-module/*/__pycache__
-ml-module/__pycache__
-ml-module/_venv
-ml-module/models/ml/recondet_model.joblib
+ml-mod/*/__pycache__
+ml-mod/__pycache__
+ml-mod/_venv
+ml-mod/models/ml/recondet_model.joblib
 */*DS_Store
-ml-module/.DS_Store
-ml-module/.env
-ml-module/exe-command.txt
-ml-module/main.spec
+ml-mod/.DS_Store
+ml-mod/.env
+ml-mod/exe-command.txt
+ml-mod/main.spec

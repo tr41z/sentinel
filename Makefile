@@ -15,17 +15,17 @@ clippy:
 
 # Python ML Module
 run-ml:
-	@ml/_venv/bin/python3 ml/main.py
+	@ml-mod/_venv/bin/python3 ml/main.py
 
 build-exec:
-	@cd ml && pyinstaller --onefile --add-data "models/ml/recondet_model.joblib:models/ml" --hidden-import sklearn --hidden-import sklearn.ensemble._forest --hidden-import numpy --hidden-import scipy main.py
-	@rm -rf ml/build ml/dist ml/main.spec
+	@cd ml-mod && pyinstaller --onefile --add-data "models/ml/recondet_model.joblib:models/ml" --hidden-import sklearn --hidden-import sklearn.ensemble._forest --hidden-import numpy --hidden-import scipy main.py
+	@rm -rf ml-mod/build ml-mod/dist ml-mod/main.spec
 
 # C++ Sniffer
 CXX = g++
 CXXFLAGS = -std=c++17 -Wall -g
 
-SNIFFER_DIR = sniffer-module
+SNIFFER_DIR = sniffer-mod
 SRC_DIR = src
 HEADER_DIR = include
 SOURCES = main.cpp
@@ -50,5 +50,3 @@ clean:
 # Run the program from sniffer directory
 run-sniffer: $(EXEC)
 	@cd $(SNIFFER_DIR) && ./$(EXEC)
-
-
