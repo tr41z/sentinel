@@ -1,13 +1,11 @@
 #include "include/sniffer.h"
-#include <stdio.h>
+#include <net/ethernet.h>
 #include <string.h>
 
 pcap_t *handle;                  /* Session handle */
 char err_buff[PCAP_ERRBUF_SIZE]; /* Error string */
 struct bpf_program fp;           /* The compiled filter */
-bpf_u_int32 mask;                /* Netmask */
 struct pcap_pkthdr header;       /* The header that pcap returns */
-bpf_u_int32 net;                 /* IP Address */
 const u_char *packet;            /* Actual packet */
 pcap_if_t *interface, *temp;     /* Interfaces */
 
@@ -31,6 +29,20 @@ interPtr find_devices() {
   return NULL;
 }
 
+void packet_handler(u_char *args, const struct pcap_pkthdr *header,
+                    const u_char *packet) {
+
+  /* Finding IP Packets */
+  struct ether_header *eth_header;
+  eth_header = (struct ether_header *)packet;
+  if (ntohs(eth_header->ether_type) != ETHERTYPE_IP) {
+    printf("Not an IP packet. Skipping....\n\n");
+    return;
+  }
+  // Process the packet if successfully captured
+  header_info(header);
+}
+
 void start_sniffer(interPtr dev) {
   if (dev == NULL) {
     fprintf(stderr, "Device pointer is NULL. Cannot start sniffer.\n");
@@ -45,21 +57,6 @@ void start_sniffer(interPtr dev) {
 
   printf("Listening on device: %s\n", dev->name);
 
-  while (1) {
-    packet = pcap_next(handle, &header);
-    if (packet == NULL) {
-      const char *error = pcap_geterr(handle); // Get detailed error message
-      if (error && strlen(error) > 0) {
-        fprintf(stderr, "Failed to capture packet: %s\n", error);
-      } else {
-        fprintf(stderr, "Failed to capture packet. Unknown error.\n");
-      }
-      continue; // Skip to the next iteration
-    }
-
-    // Process the packet if successfully captured
-    header_info(header);
-  }
-
+  pcap_loop(handle, 0, packet_handler, NULL);
   pcap_close(handle); // Close the handle when done.
 }
