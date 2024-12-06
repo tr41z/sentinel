@@ -12,14 +12,14 @@ pub mod flow {
         pub src_port: u16,
         pub dst_port: u16,
         pub protocol: u8,
-        pub total_bytes: u64, // total bytes count during flow
-        pub packet_count: u16, // total packet count during flow
-        pub source_packet_count: u16, // source packet count during flow
+        pub total_bytes: u64,              // total bytes count during flow
+        pub packet_count: u16,             // total packet count during flow
+        pub source_packet_count: u16,      // source packet count during flow
         pub destination_packet_count: u16, // destination packet count during flow
-        pub sttl: Option<u8>, // source -> dest first assigned ttl
-        pub dttl: Option<u8>, // dest -> source first assigned ttl
-        pub sbytes: u64, // source -> dest load (bytes)
-        pub dbytes: u64, // dest -> source load (bytes)
+        pub sttl: Option<u8>,              // source -> dest first assigned ttl
+        pub dttl: Option<u8>,              // dest -> source first assigned ttl
+        pub sbytes: u64,                   // source -> dest load (bytes)
+        pub dbytes: u64,                   // dest -> source load (bytes)
         pub start_time: SystemTime,
         pub last_update_time: SystemTime,
         pub finished: bool,
@@ -64,18 +64,30 @@ pub mod flow {
             dst_ip: Ipv4Addr,
             ttl: u8,
         ) {
-            self.packet_count = self.packet_count.checked_add(1).expect("packet_count overflow");
-            self.total_bytes = self.total_bytes.checked_add(size).expect("total_bytes overflow");
+            self.packet_count = self
+                .packet_count
+                .checked_add(1)
+                .expect("packet_count overflow");
+            self.total_bytes = self
+                .total_bytes
+                .checked_add(size)
+                .expect("total_bytes overflow");
 
             if src_ip == self.src_ip && dst_ip == self.dst_ip {
                 self.sbytes = self.sbytes.checked_add(size).expect("sbytes overflow");
-                self.source_packet_count = self.source_packet_count.checked_add(1).expect("source_packet_count overflow");
+                self.source_packet_count = self
+                    .source_packet_count
+                    .checked_add(1)
+                    .expect("source_packet_count overflow");
                 if self.sttl.is_none() {
                     self.sttl = Some(ttl);
                 }
             } else {
                 self.dbytes = self.dbytes.checked_add(size).expect("dbytes overflow");
-                self.destination_packet_count = self.destination_packet_count.checked_add(1).expect("destination_packet_count overflow");
+                self.destination_packet_count = self
+                    .destination_packet_count
+                    .checked_add(1)
+                    .expect("destination_packet_count overflow");
                 if self.dttl.is_none() {
                     self.dttl = Some(ttl);
                 }

@@ -26,3 +26,12 @@ dist-ssr
 *.sw?
 package-lock.json
 */Cargo.lock
+ml/*/__pycache__
+ml/__pycache__
+ml/_venv
+ml/models/ml/recondet_model.joblib
+*/*DS_Store
+ml/.DS_Store
+ml/.env
+ml/exe-command.txt
+ml/main.spec
