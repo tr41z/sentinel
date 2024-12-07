@@ -24,8 +24,8 @@ build-exec:
 # C Sniffer
 # Compiler and flags
 CC = gcc
-CFLAGS = -std=c11 -Wall -g
-LDFLAGS = -I/opt/homebrew/include -L/opt/homebrew/lib -lpcap -lpthread -lcunit # Link the pcap and lpthread library
+CFLAGS = -std=c11 -Wall -g -I/opt/homebrew/include -I/opt/homebrew/include/CUnit
+LDFLAGS = -L/opt/homebrew/lib -lpcap -lpthread -lcunit # Link the pcap and lpthread libraries
 
 # Directories
 SNIFFER_DIR = sniffer-mod
@@ -53,23 +53,23 @@ $(OBJ_DIR):
 
 # Compile sniffer executable
 $(EXEC): $(OBJECTS) $(OBJ_DIR)
-	$(CC) $(OBJECTS) -I $(SNIFFER_DIR)/$(HEADER_DIR) $(LDFLAGS) -o $(SNIFFER_DIR)/$(EXEC)
+	$(CC) $(OBJECTS) $(CFLAGS) $(LDFLAGS) -o $(SNIFFER_DIR)/$(EXEC)
 
 # Compile test executable
 $(TEST_EXEC): $(TEST_OBJECTS) $(OBJ_DIR) $(OBJ_DIR)/packet.o
-	$(CC) $(TEST_OBJECTS) $(OBJ_DIR)/packet.o -I $(SNIFFER_DIR)/$(HEADER_DIR) -I/opt/homebrew/include $(LDFLAGS) -o $(SNIFFER_DIR)/$(TEST_EXEC)
+	$(CC) $(TEST_OBJECTS) $(OBJ_DIR)/packet.o $(CFLAGS) $(LDFLAGS) -o $(SNIFFER_DIR)/$(TEST_EXEC)
 
 # Compile sniffer source files into object files
 $(OBJ_DIR)/%.o: $(SNIFFER_DIR)/$(SRC_DIR)/%.c | $(OBJ_DIR)
-	$(CC) $(CFLAGS) -I $(SNIFFER_DIR)/$(HEADER_DIR) -I/opt/homebrew/include -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 # Compile test source files into object files
 $(OBJ_DIR)/%.o: $(TESTS_DIR)/%.c | $(OBJ_DIR)
-	$(CC) $(CFLAGS) -I $(SNIFFER_DIR)/$(HEADER_DIR) -I/opt/homebrew/include -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
-# Clean up object files and executables
+# Clean up object files, executables, and the _obj directory
 clean:
-	rm -f $(SNIFFER_DIR)/$(SRC_DIR)/*.o $(OBJ_DIR)/*.o $(SNIFFER_DIR)/$(EXEC) $(SNIFFER_DIR)/$(TEST_EXEC)
+	rm -rf $(OBJ_DIR) $(SNIFFER_DIR)/$(SRC_DIR)/*.o $(SNIFFER_DIR)/$(EXEC) $(SNIFFER_DIR)/$(TEST_EXEC)
 
 # Run the sniffer program
 run-sniffer: $(EXEC)

@@ -63,7 +63,7 @@ void packet_handler(u_char *args, const struct pcap_pkthdr *header,
   printf("IP header length (IHL) in bytes: %d\n", ip_header_len);
 
   u_char protocol = *(ip_header + 9);
-  if (protocol != IPPROTO_TCP ||
+  if (protocol != IPPROTO_TCP &&
       protocol != IPPROTO_UDP) { // refactor to catch actual UDP or TCP and
                                  // aggregate into corresponding `Packet` struct
     printf("Not a TCP or UDP Packet. Skipping...\n");
