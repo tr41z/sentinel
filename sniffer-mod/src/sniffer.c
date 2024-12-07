@@ -1,5 +1,6 @@
 #include "include/sniffer.h"
 #include <net/ethernet.h>
+#include <stdio.h>
 #include <string.h>
 
 pcap_t *handle;                  /* Session handle */
@@ -39,8 +40,73 @@ void packet_handler(u_char *args, const struct pcap_pkthdr *header,
     printf("Not an IP packet. Skipping....\n\n");
     return;
   }
-  // Process the packet if successfully captured
-  header_info(header);
+  /* Pointers to starting point of headers */
+  const u_char *ip_header;
+  const u_char *tcp_header;
+  const u_char *payload;
+  const u_char *udp_header;
+
+  /* Header length in bytes */
+  int ethernet_header_len = 14;
+  int ip_header_len;
+  int tcp_header_len;
+  int payload_len;
+  int udp_header_len;
+
+  /* Find start of IP header */
+  ip_header = packet + ethernet_header_len;
+  /* The second-half of the first byte in ip_header
+  contains the IP header length (IHL). */
+  ip_header_len = ((*ip_header) & 0x0F);
+  /* The IHL is number of 32-bit segments. Multiply
+  by four to get a byte count for pointer arithmetic */
+  ip_header_len = ip_header_len * 4;
+  printf("IP header length (IHL) in bytes: %d\n", ip_header_len);
+
+  u_char protocol = *(ip_header + 9);
+  if (protocol != IPPROTO_TCP ||
+      protocol != IPPROTO_UDP) { // refactor to catch actual UDP or TCP and
+                                 // aggregate into corresponding `Packet` struct
+    printf("Not a TCP or UDP Packet. Skipping...\n");
+  }
+
+  printf("-------------------------------------------------------\n");
+  /* Refactor (put some stuff to functions) */
+  switch (protocol) {
+  case IPPROTO_UDP:
+    udp_header = packet + ethernet_header_len + ip_header_len;
+    udp_header_len = ((*(udp_header + 12)) & 0xF0) >> 4;
+    udp_header_len = udp_header_len * 4;
+    printf("UDP header length in bytes: %d\n", udp_header_len);
+
+    int total_udp_header_size =
+        ethernet_header_len + ip_header_len + udp_header_len;
+    payload_len =
+        header->caplen - (ethernet_header_len + ip_header_len + udp_header_len);
+    printf("Payload size: %d bytes\n", payload_len);
+    payload = packet + total_udp_header_size;
+    printf("Memory address where payload begins: %p\n", payload);
+    printf("-------------------------------------------------------\n");
+
+    break;
+
+  case IPPROTO_TCP:
+    tcp_header = packet + ethernet_header_len + ip_header_len;
+    tcp_header_len = ((*(tcp_header + 12)) & 0xF0) >> 4;
+    tcp_header_len = tcp_header_len * 4;
+    printf("TCP header length in bytes: %d\n", tcp_header_len);
+
+    /* Add up all the header sizes to find payload */
+    int total_tcp_header_size =
+        ethernet_header_len + ip_header_len + tcp_header_len;
+    payload_len =
+        header->caplen - (ethernet_header_len + ip_header_len + tcp_header_len);
+    printf("Payload size: %d bytes\n", payload_len);
+    payload = packet + total_tcp_header_size;
+    printf("Memory address where payload begins: %p\n", payload);
+    printf("-------------------------------------------------------\n");
+    break;
+  }
 }
 
 void start_sniffer(interPtr dev) {
