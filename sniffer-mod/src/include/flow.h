@@ -11,6 +11,8 @@ struct Flow {
   int dst_port;
   int total_bytes;
   PacketProtocol protocol;
+  time_t *startTime;
+  time_t *lastUpdateTime;
 };
 
 struct FlowKey {
@@ -23,8 +25,6 @@ struct FlowKey {
 
 struct FlowsMap {
   FlowKey flow;
-  time_t *startTime;
-  time_t *lastUpdateTime;
   bool terminated;
   /* Custom dtype for adding / terminating flows by `FlowKey`
    * and length of idle state.

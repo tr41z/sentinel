@@ -16,6 +16,7 @@ dist-ssr
 .idea
 .DS_Store
 *.suo
+sniffer-mod/.clangd
 *.ntvs*
 *.njsproj
 *.sln
@@ -32,3 +33,4 @@ ml-mod/.env
 ml-mod/exe-command.txt
 ml-mod/main.spec
 sniffer-mod/*/*.o
+sniffer-mod/*/*/*.o

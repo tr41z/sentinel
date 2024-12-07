@@ -32,7 +32,6 @@ interPtr find_devices() {
 
 void packet_handler(u_char *args, const struct pcap_pkthdr *header,
                     const u_char *packet) {
-
   /* Finding IP Packets */
   struct ether_header *eth_header;
   eth_header = (struct ether_header *)packet;
