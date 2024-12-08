@@ -1,6 +1,8 @@
 #ifndef SNIFFER_H
 #define SNIFFER_H
 
+#define ETHERNET_HEADER_LEN 14
+
 #include <pcap/pcap.h>
 #include <stdio.h>
 
@@ -10,6 +12,7 @@ interPtr find_devices();
 void start_sniffer(interPtr dev);
 void packet_handler(u_char *args, const struct pcap_pkthdr *header,
                     const u_char *packet);
+void handle_ip_header(const u_char *ip_header, const u_char *packet);
 
 static inline void header_info(const struct pcap_pkthdr *header) {
   printf("------------------------------------\n");
