@@ -3,11 +3,22 @@
 #include <stdio.h>
 #include <string.h>
 
-pcap_t *handle;                  /* Session handle */
-char err_buff[PCAP_ERRBUF_SIZE]; /* Error string */
-struct bpf_program fp;           /* The compiled filter */
 struct pcap_pkthdr header;       /* The header that pcap returns */
-const u_char *packet;            /* Actual packet */
+struct ether_header *eth_header; /* Starting point of ethernet header */
+
+const u_char *packet;     /* raw packet */
+const u_char *ip_header;  /* Starting point of ip header */
+const u_char *tcp_header; /* Starting point of tcp header */
+const u_char *udp_header; /* Starting point of udp header */
+const u_char *payload;    /* Starting point of payload in header */
+
+// Header length in bytes
+int ip_header_len;  /* Initialisation of ip header len since its not fixed */
+int tcp_header_len; /* Initialisaion of tcp header len since its not fixed */
+int payload_len;    /* Initialisaion of payload len since its not fixed */
+
+char err_buff[PCAP_ERRBUF_SIZE]; /* Error string */
+pcap_t *handle;                  /* Session handle */
 pcap_if_t *interface, *temp;     /* Interfaces */
 
 interPtr find_devices() {
@@ -21,7 +32,7 @@ interPtr find_devices() {
   for (temp = interface; temp; temp = temp->next) {
     if (strcmp(temp->name, "en0") == 0) {
       printf("Found device: %s\n", temp->name);
-      return temp; // Return en0 if found
+      return temp; /* Return en0 if found */
     }
   }
 
@@ -31,34 +42,23 @@ interPtr find_devices() {
 }
 
 void handle_ip_header(const u_char *ip_header, const u_char *packet) {
-  int version = (*ip_header & 0xF0) >> 4;
-  printf("Version: [%i]\n", version);
-  int total_len = ((*(ip_header + 2) << 8) + *(ip_header + 3));
-  printf("Total length of IP header: %i bytes\n", total_len);
+  uint8_t first = *(ip_header + 11);
+  uint8_t second = *(ip_header + 12);
+  uint8_t third = *(ip_header + 13);
+  uint8_t fourth = *(ip_header + 14);
+
+  printf("Source IP Address: %d.%d.%d.%d\n", first, second, third, fourth);
 }
 
 void packet_handler(u_char *args, const struct pcap_pkthdr *header,
                     const u_char *packet) {
-  /* Finding IP Packets */
-  struct ether_header *eth_header;
   eth_header = (struct ether_header *)packet;
   if (ntohs(eth_header->ether_type) != ETHERTYPE_IP) {
     printf("Not an IP packet. Skipping....\n\n");
     return;
   }
-  /* Pointers to starting point of headers */
-  const u_char *ip_header;
-  const u_char *tcp_header;
-  const u_char *payload;
-  const u_char *udp_header;
 
-  /* Header length in bytes */
-  int ip_header_len = 0;
-  int tcp_header_len = 0;
-  int payload_len = 0;
-  int udp_header_len = 0;
-
-  /* Find start of IP header */
+  // Find start of IP header
   ip_header = packet + ETHERNET_HEADER_LEN;
 
   u_char protocol = *(ip_header + 9);
@@ -69,22 +69,9 @@ void packet_handler(u_char *args, const struct pcap_pkthdr *header,
   printf("-------------------------------------------------------\n");
   handle_ip_header(ip_header, packet);
 
-  /* Refactor (put some stuff to functions) */
   switch (protocol) {
   case IPPROTO_UDP:
     udp_header = packet + ETHERNET_HEADER_LEN + ip_header_len;
-    udp_header_len = ((*(udp_header + 12)) & 0xF0) >> 4;
-    udp_header_len = udp_header_len * 4;
-    printf("UDP header length in bytes: %d\n", udp_header_len);
-
-    int total_udp_header_size =
-        ETHERNET_HEADER_LEN + ip_header_len + udp_header_len;
-    payload_len =
-        header->caplen - (ETHERNET_HEADER_LEN + ip_header_len + udp_header_len);
-    printf("Payload size: %d bytes\n", payload_len);
-    payload = packet + total_udp_header_size;
-    printf("Memory address where payload begins: %p\n", payload);
-    printf("-------------------------------------------------------\n");
 
     break;
 
@@ -94,7 +81,7 @@ void packet_handler(u_char *args, const struct pcap_pkthdr *header,
     tcp_header_len = tcp_header_len * 4;
     printf("TCP header length in bytes: %d\n", tcp_header_len);
 
-    /* Add up all the header sizes to find payload */
+    // Add up all the header sizes to find payload
     int total_tcp_header_size =
         ETHERNET_HEADER_LEN + ip_header_len + tcp_header_len;
     payload_len =
@@ -122,5 +109,5 @@ void start_sniffer(interPtr dev) {
   printf("Listening on device: %s\n", dev->name);
 
   pcap_loop(handle, 0, packet_handler, NULL);
-  pcap_close(handle); // Close the handle when done.
+  pcap_close(handle); /* Close the handle when done */
 }

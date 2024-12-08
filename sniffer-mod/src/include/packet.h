@@ -1,31 +1,34 @@
 #ifndef PACKET_H
 #define PACKET_H
 
+#include "ip.h"
+
 enum PacketProtocol {
   TCP,
   UDP,
 };
 
 typedef struct {
-  char *src_ip;
+  ipv4Ptr *src_ip;
   int src_port;
-  char *dst_ip;
+  ipv4Ptr *dst_ip;
   int dst_port;
   enum PacketProtocol protocol;
-} TcpPacket;
+} TcpPacket; /* TCP packet struct */
 
 typedef struct {
-  char *src_ip;
+  ipv4Ptr *src_ip;
   int src_port;
-  char *dst_ip;
+  ipv4Ptr dst_ip;
   int dst_port;
   enum PacketProtocol protocol;
-} UdpPacket;
+} UdpPacket; /* UDP packet struct */
 
-typedef TcpPacket *tcpPtr;
-typedef UdpPacket *udpPtr;
+typedef TcpPacket *tcpPtr; /* For better readibility */
+typedef UdpPacket *udpPtr; /* For better readibility */
 
-tcpPtr t_new(char *src_ip, int src_port, char *dst_ip, int dst_port);
-void t_free(tcpPtr self);
+tcpPtr t_new(ipv4Ptr src_ip, int src_port, ipv4Ptr dst_ip,
+             int dst_port); /* Create new TCP struct with assigned values */
+void t_free(tcpPtr self);   /* Free the memory of struct and values */
 
 #endif
