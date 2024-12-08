@@ -12,9 +12,15 @@ ipv4Ptr ipv4_new(uint8_t first, uint8_t second, uint8_t third, uint8_t fourth) {
 
   // Assign new values
   ipv4_addr->octets[0] = first;
-  ipv4_addr->octets[8] = second;
-  ipv4_addr->octets[16] = third;
-  ipv4_addr->octets[24] = fourth;
+  ipv4_addr->octets[1] = second;
+  ipv4_addr->octets[2] = third;
+  ipv4_addr->octets[3] = fourth;
 
   return ipv4_addr;
+}
+
+void ipv4_free(ipv4Ptr self) {
+  if (self) {
+    free(self);
+  }
 }

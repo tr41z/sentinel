@@ -1,27 +1,33 @@
 #include "include/packet.h"
+#include "include/ip.h"
 #include <stdlib.h>
 #include <string.h>
 
-tcpPtr t_new(char *src_ip, int src_port, char *dst_ip, int dst_port) {
-  tcpPtr tcpPacket = (tcpPtr)malloc(sizeof(TcpPacket));
+tcpPtr tcp_new(ipv4Ptr src_ip, int src_port, ipv4Ptr dst_ip, int dst_port) {
+  // Allocating memory for new TCP packet
+  tcpPtr tcp_packet = (tcpPtr)malloc(sizeof(TcpPacket));
 
-  if (!tcpPacket) {
+  // Case when memory wasn't allocated properly
+  if (!tcp_packet)
     return NULL;
-  }
 
-  tcpPacket->src_ip = strdup(src_ip);
-  tcpPacket->src_port = src_port;
-  tcpPacket->dst_ip = strdup(dst_ip);
-  tcpPacket->dst_port = dst_port;
-  tcpPacket->protocol = TCP;
-  return tcpPacket;
+  // Assign new values
+  tcp_packet->src_ip = src_ip;
+  tcp_packet->src_port = src_port;
+  tcp_packet->dst_ip = dst_ip;
+  tcp_packet->dst_port = dst_port;
+  tcp_packet->protocol = TCP;
+
+  return tcp_packet; /* Return struct */
 }
 
-void t_free(tcpPtr self) {
+// Free the memory and destroy struct and pointer
+void tcp_free(tcpPtr self) {
   if (self) {
-    free(self->src_ip);
-    free(self->dst_ip);
+    if (self->src_ip)
+      ipv4_free(self->src_ip);
+    if (self->dst_ip)
+      ipv4_free(self->dst_ip);
     free(self);
-    self = NULL;
   }
 }

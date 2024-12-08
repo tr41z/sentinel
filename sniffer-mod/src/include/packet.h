@@ -9,15 +9,15 @@ enum PacketProtocol {
 };
 
 typedef struct {
-  ipv4Ptr *src_ip;
+  ipv4Ptr src_ip;
   int src_port;
-  ipv4Ptr *dst_ip;
+  ipv4Ptr dst_ip;
   int dst_port;
   enum PacketProtocol protocol;
 } TcpPacket; /* TCP packet struct */
 
 typedef struct {
-  ipv4Ptr *src_ip;
+  ipv4Ptr src_ip;
   int src_port;
   ipv4Ptr dst_ip;
   int dst_port;
@@ -27,8 +27,8 @@ typedef struct {
 typedef TcpPacket *tcpPtr; /* For better readibility */
 typedef UdpPacket *udpPtr; /* For better readibility */
 
-tcpPtr t_new(ipv4Ptr src_ip, int src_port, ipv4Ptr dst_ip,
-             int dst_port); /* Create new TCP struct with assigned values */
-void t_free(tcpPtr self);   /* Free the memory of struct and values */
+tcpPtr tcp_new(ipv4Ptr src_ip, int src_port, ipv4Ptr dst_ip,
+               int dst_port); /* Create new TCP struct with assigned values */
+void tcp_free(tcpPtr self);   /* Free the memory of struct and values */
 
 #endif
