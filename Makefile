@@ -7,8 +7,7 @@ test-tauri:
 	@cd src-tauri && cargo test
 
 fmt:
-	@cd src-tauri && cargo fmt
-	@cd src-tauri && cargo test
+	@cd src-tauri && cargo fmt && cargo test
 
 clippy:
 	@cd src-tauri && cargo clippy
@@ -56,8 +55,8 @@ $(EXEC): $(OBJECTS) $(OBJ_DIR)
 	$(CC) $(OBJECTS) $(CFLAGS) $(LDFLAGS) -o $(SNIFFER_DIR)/$(EXEC)
 
 # Compile test executable
-$(TEST_EXEC): $(TEST_OBJECTS) $(OBJ_DIR)/packet.o
-	$(CC) $(TEST_OBJECTS) $(OBJ_DIR)/packet.o $(CFLAGS) $(LDFLAGS) -o $(SNIFFER_DIR)/$(TEST_EXEC)
+$(TEST_EXEC): $(TEST_OBJECTS) $(OBJ_DIR)/packet.o $(OBJ_DIR)/ip.o
+	$(CC) $(TEST_OBJECTS) $(OBJ_DIR)/packet.o $(OBJ_DIR)/ip.o $(CFLAGS) $(LDFLAGS) -o $(SNIFFER_DIR)/$(TEST_EXEC)
 
 # Compile sniffer source files into object files
 $(OBJ_DIR)/%.o: $(SNIFFER_DIR)/$(SRC_DIR)/%.c | $(OBJ_DIR)
@@ -70,6 +69,8 @@ $(OBJ_DIR)/%.o: $(TESTS_DIR)/%.c | $(OBJ_DIR)
 # Clean up object files, executables, and the _obj directory
 clean:
 	rm -rf $(OBJ_DIR) $(SNIFFER_DIR)/$(SRC_DIR)/*.o $(SNIFFER_DIR)/$(TESTS_DIR)/*.o $(SNIFFER_DIR)/$(EXEC) $(SNIFFER_DIR)/$(TEST_EXEC)
+	rm -rf ml-mod/build ml-mod/dist ml-mod/main.spec
+	rm -rf src-tauri/target
 
 # Run the sniffer program
 run-sniffer: $(EXEC)

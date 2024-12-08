@@ -4,6 +4,44 @@
 #include <CUnit/CUnit.h>
 #include <stdint.h>
 
+void test_ipv4_new() {
+  ipv4Ptr new_ipv4_addr = ipv4_new(192, 168, 1, 1);
+  char str_ipv4_addr[20];
+
+  sprintf(str_ipv4_addr, "%d.%d.%d.%d", new_ipv4_addr->octets[0],
+          new_ipv4_addr->octets[1], new_ipv4_addr->octets[2],
+          new_ipv4_addr->octets[3]);
+
+  CU_ASSERT_STRING_EQUAL(str_ipv4_addr, "192.168.1.1");
+}
+
+void test_ipv4_new_edge_case() {
+  ipv4Ptr ipv4_addr;
+
+  ipv4_addr = ipv4_new(0, 0, 0, 0);
+  CU_ASSERT_PTR_NOT_NULL(ipv4_addr);
+
+  ipv4_addr = ipv4_new(255, 255, 255, 255);
+  CU_ASSERT_PTR_NOT_NULL(ipv4_addr);
+}
+
+void test_ipv4_free() {
+  ipv4Ptr src_ip = ipv4_new(192, 168, 10, 102);
+  ipv4Ptr dst_ip = ipv4_new(192, 255, 255, 255);
+
+  CU_ASSERT_PTR_NOT_NULL(src_ip);
+  CU_ASSERT_PTR_NOT_NULL(dst_ip);
+
+  ipv4_free(src_ip);
+  ipv4_free(dst_ip);
+
+  src_ip = NULL;
+  dst_ip = NULL;
+
+  CU_ASSERT_PTR_NULL(src_ip);
+  CU_ASSERT_PTR_NULL(dst_ip);
+}
+
 void test_t_new() {
   char src_ip_str[20];
   char dst_ip_str[20];
@@ -59,24 +97,16 @@ void test_t_free() {
   CU_ASSERT_PTR_NULL(dst_ip);
 }
 
-void test_ipv4_new() {
-  ipv4Ptr new_ipv4_addr = ipv4_new(192, 168, 1, 1);
-  char str_ipv4_addr[20];
-
-  sprintf(str_ipv4_addr, "%d.%d.%d.%d", new_ipv4_addr->octets[0],
-          new_ipv4_addr->octets[1], new_ipv4_addr->octets[2],
-          new_ipv4_addr->octets[3]);
-
-  CU_ASSERT_STRING_EQUAL(str_ipv4_addr, "192.168.1.1");
-}
-
 int main() {
   CU_initialize_registry();
   CU_pSuite suite = CU_add_suite("Sentinel Sniffer Tests", 0, 0);
 
+  CU_add_test(suite, "Testing IPV4 Address Creation", test_ipv4_new);
+  CU_add_test(suite, "Testing IPV4 Address Freeing", test_ipv4_free);
+  CU_add_test(suite, "Testing IPV4 Address Edge Cases",
+              test_ipv4_new_edge_case);
   CU_add_test(suite, "Testing TCP Packet Creation", test_t_new);
   CU_add_test(suite, "Testing TCP Packed Freeing", test_t_free);
-  CU_add_test(suite, "Testing IpV4 Address Creation", test_ipv4_new);
 
   CU_basic_set_mode(CU_BRM_VERBOSE);
 

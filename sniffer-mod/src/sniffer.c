@@ -1,4 +1,5 @@
 #include "include/sniffer.h"
+#include "include/ip.h"
 #include <net/ethernet.h>
 #include <stdio.h>
 #include <string.h>
@@ -21,6 +22,9 @@ char err_buff[PCAP_ERRBUF_SIZE]; /* Error string */
 pcap_t *handle;                  /* Session handle */
 pcap_if_t *interface, *temp;     /* Interfaces */
 
+// Strings for development only
+char src_ip_str[20];
+
 interPtr find_devices() {
   // Find all devices
   if (pcap_findalldevs(&interface, err_buff) == -1) {
@@ -42,12 +46,13 @@ interPtr find_devices() {
 }
 
 void handle_ip_header(const u_char *ip_header, const u_char *packet) {
-  uint8_t first = *(ip_header + 11);
-  uint8_t second = *(ip_header + 12);
-  uint8_t third = *(ip_header + 13);
-  uint8_t fourth = *(ip_header + 14);
+  ipv4Ptr src_ip = ipv4_new(*(ip_header + 12), *(ip_header + 13),
+                            *(ip_header + 14), *(ip_header + 15));
 
-  printf("Source IP Address: %d.%d.%d.%d\n", first, second, third, fourth);
+  sprintf(src_ip_str, "%d.%d.%d.%d", src_ip->octets[0], src_ip->octets[1],
+          src_ip->octets[2], src_ip->octets[3]);
+
+  printf("Source IP Address: [%s]\n", src_ip_str);
 }
 
 void packet_handler(u_char *args, const struct pcap_pkthdr *header,
@@ -79,7 +84,6 @@ void packet_handler(u_char *args, const struct pcap_pkthdr *header,
     tcp_header = packet + ETHERNET_HEADER_LEN + ip_header_len;
     tcp_header_len = ((*(tcp_header + 12)) & 0xF0) >> 4;
     tcp_header_len = tcp_header_len * 4;
-    printf("TCP header length in bytes: %d\n", tcp_header_len);
 
     // Add up all the header sizes to find payload
     int total_tcp_header_size =
