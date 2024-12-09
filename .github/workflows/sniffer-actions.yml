@@ -1,0 +1,33 @@
+name: C Automated Testing
+
+on:
+  pull_request:
+    branches:
+      - main # Trigger on pull requests to the main branch
+
+jobs:
+  run-c-tests:
+    name: C Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository to get the code
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Install dependencies, including build tools, CUnit, and libpcap
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc make libcunit1-dev libpcap-dev
+
+      # Build and run tests
+      - name: Run Tests
+        run: |
+          make run-tests > test_output.log
+
+      # Display test output (optional for better visibility)
+      - name: Display Test Output
+        run: |
+          echo "Test Results:"
+          cat test_output.log || echo "No test output file found"
