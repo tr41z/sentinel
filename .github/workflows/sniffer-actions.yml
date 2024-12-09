@@ -34,7 +34,7 @@ jobs:
 
       - name: Check Test Results
         run: |
-          if grep -q "failed" test_output.log; then
+          if grep -qi "FAILED"  test_output.log; then
             echo "Tests failed. Please check the output."
             exit 1
           else
