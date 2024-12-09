@@ -48,7 +48,7 @@ jobs:
       - name: Install dependencies (Windows only)
         if: runner.os == 'Windows'
         run: |
-          choco install gcc make
+          choco install mingw make
 
       - name: Build the project
         run: |
