@@ -48,7 +48,14 @@ jobs:
       - name: Install dependencies (Windows only)
         if: runner.os == 'Windows'
         run: |
-          choco install mingw make wireshark -y
+          # Install dependencies silently via Chocolatey
+          choco install mingw make wireshark -y --params "/S"
+
+          # Refresh environment variables by importing the Chocolatey profile
+          Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1
+
+          # Manually update PATH for Wireshark and other tools
+          $env:PATH += ";C:\Program Files\Wireshark"
           refreshenv  # Refresh environment variables
 
       - name: Build the project
