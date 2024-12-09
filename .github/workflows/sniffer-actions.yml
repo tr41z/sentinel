@@ -59,6 +59,12 @@ jobs:
 
           Write-Host "Npcap 0.96 installation completed."
 
+          # Manually set the include and lib paths for Npcap
+          $env:INCLUDE_PATH = "C:/Program Files/Npcap/include"
+          $env:LIB_PATH = "C:/Program Files/Npcap/lib"
+          Write-Host "Set INCLUDE_PATH to: $env:INCLUDE_PATH"
+          Write-Host "Set LIB_PATH to: $env:LIB_PATH"
+
       - name: Build the project
         run: |
           make all
