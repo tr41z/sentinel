@@ -1,6 +1,7 @@
 #include "include/packet.h"
 #include <net/ethernet.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 
 struct pcap_pkthdr header;       /* The header that pcap returns */
