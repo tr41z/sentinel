@@ -57,13 +57,11 @@ jobs:
           # Run the installer silently (includes Npcap)
           Start-Process -FilePath "npcap-0.96.exe" -ArgumentList "/S" -NoNewWindow -PassThru | Wait-Process
 
-          Write-Host "Npcap 0.96 installation completed."
+          # Refresh environment variables by importing the Chocolatey profile
+          Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1
+          refreshenv
 
-          # Manually set the include and lib paths for Npcap
-          $env:INCLUDE_PATH = "C:/Program Files/Npcap/include"
-          $env:LIB_PATH = "C:/Program Files/Npcap/lib"
-          Write-Host "Set INCLUDE_PATH to: $env:INCLUDE_PATH"
-          Write-Host "Set LIB_PATH to: $env:LIB_PATH"
+          Write-Host "Npcap 0.96 installation completed."
 
       - name: Build the project
         run: |

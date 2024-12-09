@@ -27,18 +27,18 @@ CFLAGS = -std=c11 -Wall -g
 LDFLAGS = -lpthread -lcunit
 
 # Set include paths and link libraries based on OS
-ifeq ($(OS), Windows_NT)
-	# Windows-specific flags (e.g., Npcap path)
-	CFLAGS += -I$(INCLUDE_PATH)
-	LDFLAGS += -L$(LIB_PATH) -lpcap
+ifeq ($(OS), Windows_NT)   
+		# Windows-specific flags (Npcap path)
+  	CFLAGS += -I"C:/Program Files/Npcap/Include"
+  	LDFLAGS += -L"C:/Program Files/Npcap/Lib" -lPacket -lWpcap
 else ifeq ($(shell uname), Darwin)
-	# macOS-specific flags (e.g., Homebrew paths)
-	CFLAGS += -I/opt/homebrew/include -I/opt/homebrew/include/CUnit
-	LDFLAGS += -L/opt/homebrew/lib -lpcap
+    # macOS-specific flags (e.g., Homebrew paths)
+    CFLAGS += -I/opt/homebrew/include -I/opt/homebrew/include/CUnit
+    LDFLAGS += -L/opt/homebrew/lib -lpcap
 else
-	# Linux-specific flags
-	CFLAGS += -I/usr/include
-	LDFLAGS += -L/usr/lib -lpcap
+    # Linux-specific flags
+    CFLAGS += -I/usr/include
+    LDFLAGS += -L/usr/lib -lpcap
 endif
 
 # Directories
@@ -66,8 +66,7 @@ $(OBJ_DIR):
 	@mkdir -p $(OBJ_DIR)
 
 # Compile sniffer executable
-$(EXEC): $(OBJECTS) $(OBJ_DIR)
-	$(CC) $(OBJECTS) $(CFLAGS) $(LDFLAGS) -o $(SNIFFER_DIR)/$(EXEC)
+$(EXEC): $(OBJECTS) $(OBJ_DIR)	$(CC) $(OBJECTS) $(CFLAGS) $(LDFLAGS) -o $(SNIFFER_DIR)/$(EXEC)
 
 # Compile test executable
 $(TEST_EXEC): $(TEST_OBJECTS) $(OBJ_DIR)/packet.o $(OBJ_DIR)/ip.o
