@@ -2,24 +2,16 @@
 #define PACKET_H
 
 #include "ip.h"
-#include <pcap/pcap.h>
+#include <pcap.h>
 #include <stdint.h>
 #include <sys/types.h>
 
 #define ETHERNET_HEADER_LEN 14
 #define UDP_HEADER_LEN 8
 
-#ifndef u_int
-typedef unsigned int u_int;
-#endif
-
-#ifndef u_short
-typedef unsigned short u_short;
-#endif
-
-#ifndef u_char
-typedef unsigned char u_char;
-#endif
+typedef uint32_t u_int;
+typedef uint16_t u_short;
+typedef uint8_t u_char;
 
 enum PacketProtocol {
   TCP,

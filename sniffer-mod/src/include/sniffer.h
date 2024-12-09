@@ -2,19 +2,11 @@
 #define SNIFFER_H
 
 #include "packet.h"
-#include <pcap/pcap.h>
+#include <pcap.h>
 
-#ifndef u_int
-typedef unsigned int u_int;
-#endif
-
-#ifndef u_short
-typedef unsigned short u_short;
-#endif
-
-#ifndef u_char
-typedef unsigned char u_char;
-#endif
+typedef uint32_t u_int;
+typedef uint16_t u_short;
+typedef uint8_t u_char;
 
 typedef pcap_if_t *interPtr; /* For better readibility */
 
