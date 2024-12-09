@@ -14,17 +14,17 @@ enum PacketProtocol {
 
 typedef struct {
   ipv4Ptr src_ip;
-  int src_port;
+  uint16_t src_port;
   ipv4Ptr dst_ip;
-  int dst_port;
+  uint16_t dst_port;
   enum PacketProtocol protocol;
 } TcpPacket; /* TCP packet struct */
 
 typedef struct {
   ipv4Ptr src_ip;
-  int src_port;
+  uint16_t src_port;
   ipv4Ptr dst_ip;
-  int dst_port;
+  uint16_t dst_port;
   enum PacketProtocol protocol;
 } UdpPacket; /* UDP packet struct */
 
