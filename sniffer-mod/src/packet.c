@@ -1,5 +1,6 @@
 #include "include/packet.h"
 #include <net/ethernet.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -21,7 +22,8 @@ int payload_len;    /* Initialisaion of payload len since its not fixed */
 char src_ip_str[20];
 char dst_ip_str[20];
 
-tcpPtr tcp_new(ipv4Ptr src_ip, int src_port, ipv4Ptr dst_ip, int dst_port) {
+tcpPtr tcp_new(ipv4Ptr src_ip, uint16_t src_port, ipv4Ptr dst_ip,
+               uint16_t dst_port) {
   // Allocating memory for new TCP packet
   tcpPtr tcp_packet = (tcpPtr)malloc(sizeof(TcpPacket));
 

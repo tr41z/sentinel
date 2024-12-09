@@ -1,0 +1,46 @@
+name: Validate Branch Rules
+
+on:
+  pull_request:
+    branches:
+      - dev
+      - release
+      - main
+
+jobs:
+  validate-branch-rules:
+    name: Validate Branch Rules
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validate Branch Rules
+        run: |
+          # Get the source and target branches
+          SOURCE_BRANCH="${{ github.head_ref }}"
+          TARGET_BRANCH="${{ github.base_ref }}"
+
+          echo "Source branch: $SOURCE_BRANCH"
+          echo "Target branch: $TARGET_BRANCH"
+
+          # Define the branch rules
+          if [[ "$SOURCE_BRANCH" == "ai" || "$SOURCE_BRANCH" == "sentinel" || "$SOURCE_BRANCH" == "sniffer" ]]; then
+            if [[ "$TARGET_BRANCH" != "dev" ]]; then
+              echo "Branches 'ai', 'sentinel', and 'sniffer' can only merge into 'dev'."
+              exit 1
+            fi
+          elif [[ "$SOURCE_BRANCH" == "dev" ]]; then
+            if [[ "$TARGET_BRANCH" != "release" ]]; then
+              echo "'dev' can only merge into 'release'."
+              exit 1
+            fi
+          elif [[ "$SOURCE_BRANCH" == "release" ]]; then
+            if [[ "$TARGET_BRANCH" != "main" ]]; then
+              echo "'release' can only merge into 'main'."
+              exit 1
+            fi
+          else
+            echo "No rules defined for source branch '$SOURCE_BRANCH'."
+            exit 1
+          fi
+
+          echo "Branch validation passed!"
