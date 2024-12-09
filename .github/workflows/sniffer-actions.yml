@@ -49,11 +49,12 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           choco install mingw make -y
-          choco install npcap --params "/S" -y || (
+          choco install npcap --params "/S" -y
+          if ($LASTEXITCODE -ne 0) {
             Write-Host "Npcap installation failed via Chocolatey. Trying direct installer."
             Invoke-WebRequest -Uri "https://nmap.org/npcap/dist/npcap-1.70.exe" -OutFile "npcap-1.70.exe"
             Start-Process "npcap-1.70.exe" -ArgumentList "/S" -NoNewWindow -Wait
-          )
+          }
           refreshenv
 
       - name: Build the project
