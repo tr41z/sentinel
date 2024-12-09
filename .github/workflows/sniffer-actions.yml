@@ -48,10 +48,7 @@ jobs:
       - name: Install dependencies (Windows only)
         if: runner.os == 'Windows'
         run: |
-          choco install mingw make -y
-          Invoke-WebRequest -Uri https://nmap.org/npcap/dist/npcap-1.75.exe -OutFile npcap-installer.exe
-          Start-Process -FilePath npcap-installer.exe -ArgumentList '/S' -NoNewWindow -Wait
-          Remove-Item -Path npcap-installer.exe -Force
+          choco install mingw make winpcap -y
           refreshenv
 
       - name: Build the project
