@@ -1,7 +1,6 @@
 #ifndef IP_H
 #define IP_H
 
-#include <stdint.h>
 #include <stdlib.h>
 
 typedef struct {
