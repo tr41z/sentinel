@@ -48,7 +48,8 @@ jobs:
       - name: Install dependencies (Windows only)
         if: runner.os == 'Windows'
         run: |
-          choco install mingw make npcap
+          choco install mingw make npcap -y
+          refreshenv  # Ensure the environment is refreshed and paths are updated
 
       - name: Build the project
         run: |
