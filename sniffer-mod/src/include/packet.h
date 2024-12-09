@@ -3,6 +3,8 @@
 
 #include "ip.h"
 #include <pcap/pcap.h>
+#include <stdint.h>
+#include <sys/types.h>
 
 #define ETHERNET_HEADER_LEN 14
 #define UDP_HEADER_LEN 8
