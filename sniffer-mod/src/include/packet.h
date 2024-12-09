@@ -1,8 +1,15 @@
+#include <stdint.h> // For standard types like uint32_t, uint16_t, uint8_t
+
+typedef uint32_t u_int;   // Define u_int as uint32_t
+typedef uint16_t u_short; // Define u_short as uint16_t
+typedef uint8_t u_char;   // Define u_char as uint8_t
+
 #ifndef PACKET_H
 #define PACKET_H
 
 #include "ip.h"
-#include <pcap/pcap.h>
+#include <pcap.h>
+#include <sys/types.h>
 
 #define ETHERNET_HEADER_LEN 14
 #define UDP_HEADER_LEN 8
