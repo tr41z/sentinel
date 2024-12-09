@@ -14,8 +14,8 @@
 - **Cross-platform Support**: Built using [Tauri](https://tauri.app/) for Rust-based desktop applications, compatible with Windows, macOS, and Linux.
 
 ## Built With
-
-- **Rust (Tauri)**: Core of the application and GUI development.
+- **C**: Core of the application.
+- **Rust (Tauri)**: GUI development and fast processing.
 - **Python**: Machine learning algorithms for detecting anomalies and attacks.
 
 ## Installation
