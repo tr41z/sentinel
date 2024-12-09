@@ -2,13 +2,14 @@
 #define FLOW_H
 
 #include "packet.h"
+#include <cstdint>
 #include <ctime>
 
 struct Flow {
   char *src_ip;
-  int src_port;
+  uint16_t src_port;
   char *dst_ip;
-  int dst_port;
+  uint16_t dst_port;
   int total_bytes;
   PacketProtocol protocol;
   time_t *startTime;
@@ -17,9 +18,9 @@ struct Flow {
 
 struct FlowKey {
   char *src_ip;
-  int src_port;
+  uint16_t src_port;
   char *dst_ip;
-  int dst_port;
+  uint16_t dst_port;
   PacketProtocol protocol;
 };
 
