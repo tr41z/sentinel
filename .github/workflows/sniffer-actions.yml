@@ -53,9 +53,22 @@ jobs:
           if ($LASTEXITCODE -ne 0) {
             Write-Host "Npcap installation failed via Chocolatey. Trying direct installer."
             Invoke-WebRequest -Uri "https://nmap.org/npcap/dist/npcap-1.80.exe" -OutFile "npcap-1.80.exe"
-            Start-Process -FilePath "npcap-1.80.exe" -ArgumentList "/S" -NoNewWindow -Wait
-            refreshenv
+            
+            # Start installation with timeout (in seconds)
+            $process = Start-Process -FilePath "npcap-1.80.exe" -ArgumentList "/S" -NoNewWindow -PassThru
+            $process.WaitForExit(600)  # Wait for 10 minutes (600 seconds)
+            
+            # Check if process exited successfully
+            if ($process.HasExited -eq $false) {
+              Write-Host "Npcap installation timed out."
+              $process.Kill()
+            } else {
+              Write-Host "Npcap installation completed successfully."
+            }
           }
+
+          # Refresh environment variables after installation
+          refreshenv
 
       - name: Build the project
         run: |
