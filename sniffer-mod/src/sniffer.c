@@ -1,5 +1,6 @@
 #include "include/sniffer.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 char err_buff[PCAP_ERRBUF_SIZE]; /* Error string */
@@ -27,13 +28,13 @@ interPtr find_devices() {
 }
 
 void start_sniffer(interPtr dev) {
-  if (dev == NULL) {
+  if (!dev) {
     fprintf(stderr, "Device pointer is NULL. Cannot start sniffer.\n");
     return;
   }
 
   handle = pcap_open_live(dev->name, BUFSIZ, 1, 1000, err_buff);
-  if (handle == NULL) {
+  if (!handle) {
     fprintf(stderr, "Couldn't open device %s: %s\n", dev->name, err_buff);
     return;
   }
@@ -42,4 +43,7 @@ void start_sniffer(interPtr dev) {
 
   pcap_loop(handle, 0, packet_handler, NULL);
   pcap_close(handle); /* Close the handle when done */
+
+  free(handle);
+  handle = NULL;
 }
