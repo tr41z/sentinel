@@ -20,10 +20,19 @@ jobs:
 
       - name: Verify Source Branch
         run: |
-          if [[ "${{ github.head_ref }}" != "sniffer" ]]; then
+          if [ "${{ github.head_ref }}" != "sniffer" ]; then
             echo "This workflow only runs for PRs from the 'sniffer' branch to 'dev'. Current source branch: '${{ github.head_ref }}'."
             exit 0
           fi
+        shell: bash # Ensure Bash is used on Linux/macOS
+
+      - name: Verify Source Branch (Windows)
+        run: |
+          if ($env:GITHUB_HEAD_REF -ne "sniffer") {
+            Write-Host "This workflow only runs for PRs from the 'sniffer' branch to 'dev'. Current source branch: $env:GITHUB_HEAD_REF."
+            exit 0
+          }
+        shell: pwsh # Use PowerShell shell for Windows
 
       - name: Install dependencies (Linux only)
         if: runner.os == 'Linux'
