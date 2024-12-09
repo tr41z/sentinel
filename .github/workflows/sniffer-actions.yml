@@ -50,30 +50,14 @@ jobs:
         run: |
           choco install mingw make -y
 
-          # Attempt to install Npcap via Chocolatey
-          choco install npcap --params "/S" -y > install_log.txt; tail -n 20 install_log.txt
-          if ($LASTEXITCODE -ne 0) {
-            Write-Host "Npcap installation failed via Chocolatey. Trying direct installer."
-            
-            # Fallback to direct installer if Chocolatey fails
-            Invoke-WebRequest -Uri "https://nmap.org/npcap/dist/npcap-1.80.exe" -OutFile "npcap-1.80.exe"
-            
-            # Start installation with timeout (in seconds)
-            $process = Start-Process -FilePath "npcap-1.80.exe" -ArgumentList "/S" -NoNewWindow -PassThru
-            $process.WaitForExit(600)  # Wait for 10 minutes (600 seconds)
-            
-            # Check if process exited successfully
-            if ($process.HasExited -eq $false) {
-              Write-Host "Npcap installation timed out."
-              $process.Kill()
-            } else {
-              Write-Host "Npcap installation completed successfully."
-            }
-          }
+          # Attempt to install WinPcap via direct installer
+          Write-Host "Installing WinPcap..."
+          Invoke-WebRequest -Uri "https://github.com/npadmana/winpcap/releases/download/v4.1.3/WinPcap_4_1_3.exe" -OutFile "WinPcap_4_1_3.exe"
 
-          # Refresh environment variables after installation
-          Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
-          refreshenv
+          # Run the installer silently
+          Start-Process -FilePath "WinPcap_4_1_3.exe" -ArgumentList "/S" -NoNewWindow -PassThru | Wait-Process
+
+          Write-Host "WinPcap installation completed."
 
       - name: Build the project
         run: |
