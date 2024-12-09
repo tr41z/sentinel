@@ -3,12 +3,25 @@ name: C Automated Testing
 on:
   pull_request:
     branches:
-      - main # Trigger on pull requests to the main branch
+      - dev # Trigger on pull requests to the dev branch
 
 jobs:
+  validate-branch:
+    name: Validate Source Branch
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check Source Branch
+        run: |
+          if [[ "${{ github.head_ref }}" != "sniffer" ]]; then
+            echo "This PR must originate from the 'sniffer' branch. Found '${{ github.head_ref }}'."
+            exit 1
+          fi
+
   run-c-tests:
     name: C Tests
     runs-on: ubuntu-latest
+    needs: validate-branch
 
     steps:
       - name: Checkout Code
@@ -34,7 +47,7 @@ jobs:
 
       - name: Check Test Results
         run: |
-          if grep grep -q '\.\.\.FAILED' test_output.log; then
+          if grep -q '\.\.\.FAILED' test_output.log; then
             echo "Tests failed. Please check the output."
             exit 1
           else
