@@ -48,7 +48,7 @@ jobs:
       - name: Install dependencies (Windows only)
         if: runner.os == 'Windows'
         run: |
-          choco install mingw make
+          choco install mingw make npcap
 
       - name: Build the project
         run: |
