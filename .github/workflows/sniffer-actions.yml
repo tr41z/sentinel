@@ -59,6 +59,23 @@ jobs:
 
           Write-Host "Npcap 0.96 installation completed."
 
+          # Verify that Npcap installed correctly
+          if (Test-Path "C:\Program Files\Npcap\include\pcap.h") {
+            Write-Host "Npcap installed correctly. pcap.h found."
+          } else {
+            Write-Host "Npcap installation failed. pcap.h not found."
+            exit 1
+          }
+
+      - name: Set Environment Variables for Npcap (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          $env:INCLUDE_PATH = "C:\Program Files\Npcap\include"
+          $env:LIB_PATH = "C:\Program Files\Npcap\lib"
+          Write-Host "Include Path: $env:INCLUDE_PATH"
+          Write-Host "Library Path: $env:LIB_PATH"
+        shell: pwsh
+
       - name: Build the project
         run: |
           make all
