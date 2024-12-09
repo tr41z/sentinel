@@ -37,6 +37,8 @@ jobs:
           brew install gcc make libpcap
           # Manually install libcunit from source
           curl -L https://github.com/pauljuliusmartin/cunit/archive/refs/tags/v2.1-3.tar.gz -o cunit.tar.gz
+          # Verify the file download
+          file cunit.tar.gz
           tar -xvf cunit.tar.gz
           cd cunit-2.1-3
           ./configure
