@@ -48,8 +48,9 @@ jobs:
       - name: Install dependencies (Windows only)
         if: runner.os == 'Windows'
         run: |
-          choco install mingw make winpcap -y
-          refreshenv  # Refresh environment variables
+          # Install dependencies silently on Windows
+          choco install mingw make winpcap -y --params "/S"
+          refreshenv  # Refresh environment variables to include new paths
 
       - name: Build the project
         run: |
