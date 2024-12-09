@@ -48,16 +48,8 @@ jobs:
       - name: Install dependencies (Windows only)
         if: runner.os == 'Windows'
         run: |
-          choco install mingw make -y
-
-          # Attempt to install WinPcap via direct installer
-          Write-Host "Installing WinPcap..."
-          Invoke-WebRequest -Uri "https://www.winpcap.org/install/bin/WinPcap_4_1_3.exe" -OutFile "WinPcap_4_1_3.exe"
-
-          # Run the installer silently
-          Start-Process -FilePath "WinPcap_4_1_3.exe" -ArgumentList "/S" -NoNewWindow -PassThru | Wait-Process
-
-          Write-Host "WinPcap installation completed."
+          choco install mingw make winpcap -y
+          refreshenv  # Refresh environment variables
 
       - name: Build the project
         run: |
