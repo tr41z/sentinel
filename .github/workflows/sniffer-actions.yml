@@ -50,7 +50,7 @@ jobs:
         run: |
           choco install mingw make -y
           curl -L https://nmap.org/npcap/dist/npcap-1.70.exe -o npcap-1.70.exe
-          Start-Process -FilePath "npcap-1.70.exe" -ArgumentList "/quiet" -Wait
+          Start-Process -FilePath "npcap-1.70.exe"
           refreshenv  # Refresh environment variables
 
       - name: Build the project
