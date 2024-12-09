@@ -11,27 +11,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the repository to get the code
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Install dependencies, including build tools, CUnit, and libpcap
       - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc make libcunit1-dev libpcap-dev
 
-      # Build the project (make sure your Makefile is correctly set up for building tests)
       - name: Build the project
         run: |
           make all
 
-      # Run the tests
       - name: Run Tests
         run: |
           make run-tests > test_output.log || echo "Tests failed to run."
 
-      # Display test output for better visibility
       - name: Display Test Output
         run: |
           echo "Test Results:"
