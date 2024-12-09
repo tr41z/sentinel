@@ -52,7 +52,7 @@ jobs:
 
           # Attempt to install WinPcap via direct installer
           Write-Host "Installing WinPcap..."
-          Invoke-WebRequest -Uri "https://github.com/npadmana/winpcap/releases/download/v4.1.3/WinPcap_4_1_3.exe" -OutFile "WinPcap_4_1_3.exe"
+          Invoke-WebRequest -Uri "https://www.winpcap.org/install/bin/WinPcap_4_1_3.exe" -OutFile "WinPcap_4_1_3.exe"
 
           # Run the installer silently
           Start-Process -FilePath "WinPcap_4_1_3.exe" -ArgumentList "/S" -NoNewWindow -PassThru | Wait-Process
