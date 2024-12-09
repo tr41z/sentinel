@@ -49,9 +49,13 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           choco install mingw make -y
-          choco install npcap --params "/S" -y
+
+          # Attempt to install Npcap via Chocolatey
+          choco install npcap --params "/S" -y > install_log.txt; tail -n 20 install_log.txt
           if ($LASTEXITCODE -ne 0) {
             Write-Host "Npcap installation failed via Chocolatey. Trying direct installer."
+            
+            # Fallback to direct installer if Chocolatey fails
             Invoke-WebRequest -Uri "https://nmap.org/npcap/dist/npcap-1.80.exe" -OutFile "npcap-1.80.exe"
             
             # Start installation with timeout (in seconds)
@@ -68,6 +72,7 @@ jobs:
           }
 
           # Refresh environment variables after installation
+          Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
           refreshenv
 
       - name: Build the project
