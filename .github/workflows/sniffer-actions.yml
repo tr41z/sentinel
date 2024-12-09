@@ -52,8 +52,8 @@ jobs:
           choco install npcap --params "/S" -y
           if ($LASTEXITCODE -ne 0) {
             Write-Host "Npcap installation failed via Chocolatey. Trying direct installer."
-            Invoke-WebRequest -Uri "https://nmap.org/npcap/dist/npcap-1.70.exe" -OutFile "npcap-1.70.exe"
-            Start-Process "npcap-1.70.exe" -ArgumentList "/S" -NoNewWindow -Wait
+            Invoke-WebRequest -Uri "https://nmap.org/npcap/dist/npcap-1.80.exe" -OutFile "npcap-1.80.exe"
+            Start-Process "npcap-1.80.exe" -ArgumentList "/S" -NoNewWindow -Wait
           }
           refreshenv
 
