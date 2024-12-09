@@ -34,23 +34,7 @@ jobs:
       - name: Install dependencies (macOS only)
         if: runner.os == 'macOS'
         run: |
-          # Install dependencies for macOS
-          brew install gcc make libpcap
-
-          # Manually install libcunit from source using a .zip archive
-          curl -L https://github.com/pauljuliusmartin/cunit/archive/refs/tags/v2.1-3.zip -o cunit.zip
-          unzip cunit.zip
-          cd cunit-2.1-3
-
-          # Set environment variables for libpcap
-          export LDFLAGS="-L/opt/homebrew/opt/libpcap/lib"
-          export CPPFLAGS="-I/opt/homebrew/opt/libpcap/include"
-          export PKG_CONFIG_PATH="/opt/homebrew/opt/libpcap/lib/pkgconfig"
-
-          # Build and install libcunit
-          ./configure
-          make
-          sudo make install
+          brew install gcc make cunit libpcap
 
       - name: Install dependencies (Windows only)
         if: runner.os == 'Windows'
