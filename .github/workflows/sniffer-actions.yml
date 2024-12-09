@@ -25,9 +25,18 @@ jobs:
 
       - name: Run Tests
         run: |
-          make run-tests > test_output.log || echo "Tests failed to run."
+          make run-tests > test_output.log || exit 1
 
       - name: Display Test Output
         run: |
           echo "Test Results:"
           cat test_output.log || echo "No test output file found"
+
+      - name: Check Test Results
+        run: |
+          if grep -q "failed" test_output.log; then
+            echo "Tests failed. Please check the output."
+            exit 1
+          else
+            echo "All tests passed."
+          fi

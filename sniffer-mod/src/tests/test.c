@@ -118,6 +118,7 @@ void test_tcp_new_edge_case() {
   new_tcp_packet = NULL;
 
   CU_ASSERT_PTR_NULL(new_tcp_packet);
+  CU_ASSERT_PTR_NULL(src_ip);
 }
 
 void test_tcp_free() {
