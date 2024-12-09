@@ -1,0 +1,25 @@
+name: C Automated Testing
+
+on:
+  pull_request:
+
+jobs:
+  run-c-tests:
+    name: C Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y gcc make
+
+      - name: Run Tests
+        run: |
+          make run-tests > test_output.log
+
+      - name: Display Test Output
+        run: |
+          echo "Test Results:"
+          cat test_output.log || echo "No test output file found"
