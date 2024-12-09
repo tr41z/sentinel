@@ -9,10 +9,6 @@
 #define ETHERNET_HEADER_LEN 14
 #define UDP_HEADER_LEN 8
 
-typedef uint32_t u_int;
-typedef uint16_t u_short;
-typedef uint8_t u_char;
-
 enum PacketProtocol {
   TCP,
   UDP,
