@@ -27,11 +27,7 @@ CFLAGS = -std=c11 -Wall -g
 LDFLAGS = -lpthread -lcunit
 
 # Set include paths and link libraries based on OS
-ifeq ($(OS), Windows_NT)
-	# Windows-specific flags (e.g., Npcap path)
-	CFLAGS += -I"C:/Program Files/Nmap/include" -I"C:/Program Files/Npcap/include"
-	LDFLAGS += -L"C:/Program Files/Nmap/lib" -L"C:/Program Files/Npcap/lib" -lpcap
-else ifeq ($(shell uname), Darwin)
+ifeq ($(shell uname), Darwin)
 	# macOS-specific flags (e.g., Homebrew paths)
 	CFLAGS += -I/opt/homebrew/include -I/opt/homebrew/include/CUnit
 	LDFLAGS += -L/opt/homebrew/lib -lpcap

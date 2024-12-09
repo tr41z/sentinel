@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest] # Add all the operating systems you want to test on
+        os: [ubuntu-latest, macos-latest] # Add all the operating systems you want to test on
 
     steps:
       - name: Checkout Code
@@ -26,14 +26,6 @@ jobs:
           fi
         shell: bash # Ensure Bash is used on Linux/macOS
 
-      - name: Verify Source Branch (Windows)
-        run: |
-          if ($env:GITHUB_HEAD_REF -ne "sniffer") {
-            Write-Host "This workflow only runs for PRs from the 'sniffer' branch to 'dev'. Current source branch: $env:GITHUB_HEAD_REF."
-            exit 0
-          }
-        shell: pwsh # Use PowerShell shell for Windows
-
       - name: Install dependencies (Linux only)
         if: runner.os == 'Linux'
         run: |
@@ -44,17 +36,6 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           brew install gcc make cunit libpcap
-
-      - name: Install dependencies (Windows only)
-        if: runner.os == 'Windows'
-        run: |
-          # Install dependencies silently via Chocolatey
-          choco install mingw make nmap -y --params "/S"
-
-          # Refresh environment variables by importing the Chocolatey profile
-          Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1
-
-          refreshenv  # Refresh environment variables
 
       - name: Build the project
         run: |
