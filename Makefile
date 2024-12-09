@@ -23,8 +23,19 @@ build-exec:
 # C Sniffer
 # Compiler and flags
 CC = gcc
-CFLAGS = -std=c11 -Wall -g -I/opt/homebrew/include -I/opt/homebrew/include/CUnit
-LDFLAGS = -L/opt/homebrew/lib -lpcap -lpthread -lcunit # Link the pcap and lpthread libraries
+CFLAGS = -std=c11 -Wall -g
+LDFLAGS = -lpthread -lcunit
+
+# Set include paths and link libraries based on OS
+ifeq ($(shell uname), Darwin)
+	# macOS-specific flags (e.g., Homebrew paths)
+	CFLAGS += -I/opt/homebrew/include -I/opt/homebrew/include/CUnit
+	LDFLAGS += -L/opt/homebrew/lib -lpcap
+else
+	# Linux-specific flags
+	CFLAGS += -I/usr/include
+	LDFLAGS += -L/usr/lib -lpcap
+endif
 
 # Directories
 SNIFFER_DIR = sniffer-mod
@@ -79,3 +90,4 @@ run-sniffer: $(EXEC)
 # Run tests
 run-tests: $(TEST_EXEC)
 	@cd $(SNIFFER_DIR) && ./$(TEST_EXEC)
+
