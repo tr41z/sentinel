@@ -3,7 +3,7 @@ name: C Automated Testing
 on:
   pull_request:
     branches:
-      - main # Trigger on pull requests to the main branch
+      - dev # Trigger on pull requests to the dev branch
 
 jobs:
   run-c-tests:
@@ -13,6 +13,13 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+
+      - name: Verify Source Branch
+        run: |
+          if [[ "${{ github.head_ref }}" != "sniffer" ]]; then
+            echo "This workflow only runs for PRs from the 'sniffer' branch to 'dev'. Current source branch: '${{ github.head_ref }}'."
+            exit 0
+          fi
 
       - name: Install dependencies
         run: |
@@ -34,7 +41,7 @@ jobs:
 
       - name: Check Test Results
         run: |
-          if grep grep -q '\.\.\.FAILED' test_output.log; then
+          if grep -q '\.\.\.FAILED' test_output.log; then
             echo "Tests failed. Please check the output."
             exit 1
           else
