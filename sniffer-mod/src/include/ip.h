@@ -1,7 +1,7 @@
 #ifndef IP_H
 #define IP_H
 
-#include <stdlib.h>
+#include <stdint.h>
 
 typedef struct {
   uint8_t octets[4];
