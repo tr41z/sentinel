@@ -1,7 +1,6 @@
-#include <stdint.h>           // Add this to define uint32_t, uint16_t, uint8_t
-typedef uint32_t bpf_u_int32; // Define u_int as uint32_t if needed
-typedef uint16_t u_short;     // Define u_short as uint16_t if needed
-typedef uint8_t u_char;       // Define u_char as uint8_t if needed
+#include <stdint.h>       // Add this to define uint32_t, uint16_t, uint8_t
+typedef uint16_t u_short; // Define u_short as uint16_t if needed
+typedef uint8_t u_char;   // Define u_char as uint8_t if needed
 
 #ifndef PACKET_H
 #define PACKET_H
