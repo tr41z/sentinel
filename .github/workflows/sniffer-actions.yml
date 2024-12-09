@@ -48,7 +48,7 @@ jobs:
       - name: Install dependencies (Windows only)
         if: runner.os == 'Windows'
         run: |
-          choco install mingw make winpcap -y
+          choco install mingw make -y
           choco install npcap --params "/S" -y || (
             Write-Host "Npcap installation failed via Chocolatey. Trying direct installer."
             Invoke-WebRequest -Uri "https://nmap.org/npcap/dist/npcap-1.70.exe" -OutFile "npcap-1.70.exe"
