@@ -7,7 +7,7 @@ char err_buff[PCAP_ERRBUF_SIZE]; /* Error string */
 pcap_t *handle;                  /* Session handle */
 pcap_if_t *interface, *temp;     /* Interfaces */
 
-interPtr find_devices() {
+devPtr find_devices() {
   // Find all devices
   if (pcap_findalldevs(&interface, err_buff) == -1) {
     printf("\nError in pcap_findalldevs: %s\n", err_buff);
@@ -27,7 +27,7 @@ interPtr find_devices() {
   return NULL;
 }
 
-void start_sniffer(interPtr dev) {
+void start_sniffer(devPtr dev) {
   if (!dev) {
     fprintf(stderr, "Device pointer is NULL. Cannot start sniffer.\n");
     return;

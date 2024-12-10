@@ -2,6 +2,7 @@
 #define FLOW_H
 
 #include "packet.h"
+#include <cstdint>
 #include <stdint.h>
 #include <time.h>
 
@@ -11,7 +12,7 @@ struct Flow {
   char *dst_ip;
   uint16_t dst_port;
   int total_bytes;
-  PacketProtocol protocol;
+  uint8_t protocol;
   time_t *startTime;
   time_t *lastUpdateTime;
 };
@@ -21,7 +22,7 @@ struct FlowKey {
   uint16_t src_port;
   char *dst_ip;
   uint16_t dst_port;
-  PacketProtocol protocol;
+  uint8_t protocol;
 };
 
 struct FlowsMap {

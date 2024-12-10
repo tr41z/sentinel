@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 int main() {
-  interPtr dev = find_devices();
+  devPtr dev = find_devices();
 
   if (!dev) {
     printf("No devices found or an error occured!\n");

@@ -71,7 +71,7 @@ void test_tcp_new() {
 
   // New TCP packet & IP header
   ipPtr ip_header =
-      ip_new(4, 30, 40, 2324, 1, 3, 88, 64, UDP, 333, src_ip, dst_ip, 32, 10);
+      ip_new(4, 30, 40, 2324, 1, 3, 88, 64, 17, 333, src_ip, dst_ip, 32, 10);
   tcpPtr tcp_packet = tcp_new(ip_header, src_port, dst_port, 30);
 
   // Ensure packet is properly allocated
@@ -106,7 +106,7 @@ void test_tcp_new_edge_case() {
 
   // New TCP packet & IP header
   ipPtr ip_header =
-      ip_new(4, 30, 40, 2324, 1, 3, 88, 64, UDP, 333, src_ip, dst_ip, 32, 10);
+      ip_new(4, 30, 40, 2324, 1, 3, 88, 64, 6, 333, src_ip, dst_ip, 32, 10);
   tcpPtr tcp_packet = tcp_new(ip_header, src_port, dst_port, 20);
 
   // Ensure packet is properly allocated
@@ -133,7 +133,7 @@ void test_tcp_free() {
 
   // New TCP packet & IP header
   ipPtr ip_header =
-      ip_new(4, 30, 40, 2324, 1, 3, 88, 64, UDP, 333, src_ip, dst_ip, 32, 10);
+      ip_new(4, 30, 40, 2324, 1, 3, 88, 64, 17, 333, src_ip, dst_ip, 32, 10);
   tcpPtr tcp_packet = tcp_new(ip_header, src_port, dst_port, 20);
 
   // Ensure memory is allocated
@@ -153,7 +153,7 @@ void test_tcp_free() {
 
 void test_start_sniffer_failure_dev_null() {
   // Intentionally set device to NULL to force error
-  interPtr dev = NULL;
+  devPtr dev = NULL;
 
   CU_ASSERT_PTR_NULL(dev);
 
