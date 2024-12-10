@@ -64,6 +64,7 @@ jobs:
           Write-Host "Npcap 0.96 installation completed to C:\Npcap."
 
       - name: Verify Npcap Installation
+        if runner.os == 'Windows'
         run: |
           dir "C:/Npcap/Include/" # Check if pcap.h exists in the specified directory
         shell: pwsh
