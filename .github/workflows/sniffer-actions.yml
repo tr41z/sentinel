@@ -50,23 +50,22 @@ jobs:
         run: |
           choco install mingw make -y
 
-          # Install Npcap version 0.96 via direct download for silent installation
+          # Install Npcap version 0.96 via direct download for silent installation to a custom path
           Write-Host "Installing Npcap 0.96 (silent)..."
           Invoke-WebRequest -Uri "https://nmap.org/npcap/dist/npcap-0.96.exe" -OutFile "npcap-0.96.exe"
 
-          # Run the installer silently (includes Npcap)
-          Start-Process -FilePath "npcap-0.96.exe" -ArgumentList "/S" -NoNewWindow -PassThru | Wait-Process
+          # Run the installer silently with custom installation path (C:\Npcap)
+          Start-Process -FilePath "npcap-0.96.exe" -ArgumentList "/S /D=C:\Npcap" -NoNewWindow -PassThru | Wait-Process
 
           # Refresh environment variables by importing the Chocolatey profile
           Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1
           refreshenv
 
-          Write-Host "Npcap 0.96 installation completed."
+          Write-Host "Npcap 0.96 installation completed to C:\Npcap."
 
-      - name: Search for pcap.h (whole system)
         run: |
           Write-Host "Searching for pcap.h file..."
-          Get-ChildItem -Recurse -Path "C:\" -Filter "pcap.h" -ErrorAction SilentlyContinue | Select-Object FullName
+          Get-ChildItem -Recurse -Path "C:\Npcap" -Filter "pcap.h" -ErrorAction SilentlyContinue | Select-Object FullName
         shell: pwsh
 
       - name: Build the project
