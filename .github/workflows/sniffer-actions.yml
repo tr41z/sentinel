@@ -63,10 +63,9 @@ jobs:
 
           Write-Host "Npcap 0.96 installation completed to C:\Npcap."
 
-      - name: "Search for pcap.h"
+      - name: Verify Npcap Installation
         run: |
-          Write-Host "Searching for pcap.h file...."
-          Get-ChildItem -Recurse -Path "C:\Npcap" -Filter "pcap.h" -ErrorAction SilentlyContinue | Select-Object FullName
+          dir "C:/Npcap/Include/" # Check if pcap.h exists in the specified directory
         shell: pwsh
 
       - name: Build the project
