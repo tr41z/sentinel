@@ -2,8 +2,8 @@
 #define FLOW_H
 
 #include "packet.h"
-#include <cstdint>
-#include <ctime>
+#include <stdint.h>
+#include <time.h>
 
 struct Flow {
   char *src_ip;
