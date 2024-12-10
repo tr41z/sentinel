@@ -1,6 +1,8 @@
 #include "include/packet.h"
+#include "include/ip.h"
 #include <net/ethernet.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -18,62 +20,124 @@ int ip_header_len;  /* Initialisation of ip header len since its not fixed */
 int tcp_header_len; /* Initialisaion of tcp header len since its not fixed */
 int payload_len;    /* Initialisaion of payload len since its not fixed */
 
-// Strings for development only
-char src_ip_str[20];
-char dst_ip_str[20];
-
-tcpPtr tcp_new(ipv4Ptr src_ip, uint16_t src_port, ipv4Ptr dst_ip,
-               uint16_t dst_port) {
+tcpPtr tcp_new(ipPtr ip_header, uint16_t src_port, uint16_t dst_port,
+               uint8_t header_len) {
   // Allocating memory for new TCP packet
-  tcpPtr tcp_packet = (tcpPtr)malloc(sizeof(TcpPacket));
+  tcpPtr tcp_packet = (tcpPtr)malloc(sizeof(FullTcpPacket));
 
   // Case when memory wasn't allocated properly
-  if (!tcp_packet)
+  if (!tcp_packet) {
+    fprintf(stderr, "Memory allocation failed for `tcp_packet`.\n");
     return NULL;
+  }
 
   // Assign new values
-  tcp_packet->src_ip = src_ip;
+  tcp_packet->ip_header = ip_header;
   tcp_packet->src_port = src_port;
-  tcp_packet->dst_ip = dst_ip;
   tcp_packet->dst_port = dst_port;
-  tcp_packet->protocol = TCP;
+  tcp_packet->header_length = header_len;
 
   return tcp_packet; /* Return struct */
+}
+
+ipPtr ip_new(uint8_t version, uint8_t ihl, uint8_t tos, uint16_t total_length,
+             uint16_t identification, uint8_t flags, uint16_t fragment_offset,
+             uint8_t ttl, uint8_t protocol, uint16_t checksum,
+             ipv4Ptr source_address, ipv4Ptr destination_address,
+             uint32_t options, uint8_t padding) {
+  ipPtr ip_header = (ipPtr)malloc(sizeof(IpHeader));
+
+  if (!ip_header) {
+    fprintf(stderr, "Memory allocation failed for `ip_header`.\n");
+    return NULL;
+  }
+
+  ip_header->options = options;
+  ip_header->padding = padding;
+  ip_header->ttl = ttl;
+  ip_header->source_address = source_address;
+  ip_header->destination_address = destination_address;
+  ip_header->ihl = ihl;
+  ip_header->tos = tos;
+  ip_header->flags = flags;
+  ip_header->version = version;
+  ip_header->checksum = checksum;
+  ip_header->total_length = total_length;
+  ip_header->identification = identification;
+  ip_header->fragment_offset = fragment_offset;
+  ip_header->protocol = protocol;
+
+  return ip_header;
 }
 
 // Free the memory and destroy struct and pointer
 void tcp_free(tcpPtr self) {
   if (self) {
-    if (self->src_ip)
-      ipv4_free(self->src_ip);
-    if (self->dst_ip)
-      ipv4_free(self->dst_ip);
-    free(self);
+    if (self->ip_header)
+      ip_free(self->ip_header);
   }
+  free(self);
 }
 
-void handle_ip_header(const u_char *ip_header, const u_char *packet) {
+void ip_free(ipPtr self) {
+  if (self) {
+    if (self->source_address)
+      ipv4_free(self->source_address);
+    if (self->destination_address)
+      ipv4_free(self->destination_address);
+  }
+  free(self);
+}
+
+ipPtr handle_ip_header(const u_char *ip_header, const u_char *packet) {
   if (!ip_header) {
     fprintf(stderr, "Invalid IP header.\n");
+    return NULL;
   }
 
   if (!packet) {
     fprintf(stderr, "Invalid packet. \n");
+    return NULL;
   }
 
   ipv4Ptr src_ip = ipv4_new(*(ip_header + 12), *(ip_header + 13),
                             *(ip_header + 14), *(ip_header + 15));
   ipv4Ptr dst_ip = ipv4_new(*(ip_header + 16), *(ip_header + 17),
                             *(ip_header + 18), *(ip_header + 19));
+  uint8_t ttl = *(ip_header + 8);
+  uint8_t protocol = *(ip_header + 9);
+  uint16_t checksum = ntohs((*(ip_header + 10) << 8) + *(ip_header + 11));
+  uint8_t ihl = (*(ip_header) & 0x0F);
+  ihl *= 4;
 
-  // For testning purposes only
-  sprintf(src_ip_str, "%d.%d.%d.%d", src_ip->octets[0], src_ip->octets[1],
-          src_ip->octets[2], src_ip->octets[3]);
-  sprintf(dst_ip_str, "%d.%d.%d.%d", dst_ip->octets[0], dst_ip->octets[2],
-          dst_ip->octets[2], dst_ip->octets[3]);
+  /* Extract other features */
 
-  printf("Source IP Address: [%s]\n", src_ip_str);
-  printf("Destination IP Address: [%s]\n", dst_ip_str);
+  // New TCP packet & IP header
+  ipPtr new_ip_header = ip_new(100, ihl, 40, 2324, 1, 3, 88, ttl, protocol,
+                               checksum, src_ip, dst_ip, 32, 10);
+  return new_ip_header;
+}
+
+tcpPtr handle_tcp_header(const u_char *packet, ipPtr ip_header) {
+  if (!ip_header) {
+    fprintf(stderr, "Invalid IP header.\n");
+    return NULL;
+  }
+
+  if (!packet) {
+    fprintf(stderr, "Invalid packet. \n");
+    return NULL;
+  }
+
+  ip_header_len = ip_header->ihl;
+  tcp_header = packet + ETHERNET_HEADER_LEN + ip_header_len;
+
+  uint16_t src_port = ntohs(*(uint16_t *)(tcp_header));
+  uint16_t dst_port = ntohs(*(uint16_t *)(tcp_header + 2));
+  uint8_t header_len = (*(tcp_header + 12) & 0xF0) >> 4;
+
+  tcpPtr new_tcp_packet = tcp_new(ip_header, src_port, dst_port, header_len);
+  return new_tcp_packet;
 }
 
 void packet_handler(u_char *args, const struct pcap_pkthdr *header,
@@ -86,37 +150,32 @@ void packet_handler(u_char *args, const struct pcap_pkthdr *header,
 
   // Find start of IP header
   ip_header = packet + ETHERNET_HEADER_LEN;
+  ipPtr new_ip_header = handle_ip_header(ip_header, packet);
 
-  u_char protocol = *(ip_header + 9);
-  if (protocol != IPPROTO_TCP && protocol != IPPROTO_UDP) {
-    printf("Not a TCP or UDP Packet. Skipping...\n");
-  }
-
-  switch (protocol) {
+  switch (new_ip_header->protocol) {
   case IPPROTO_UDP:
     printf("======================== UDP ===========================\n");
-    handle_ip_header(ip_header, packet);
     udp_header = packet + ETHERNET_HEADER_LEN + ip_header_len;
-    printf("========================================================\n");
+    printf("========================================================\n\n");
 
+    // udp_free(new_udp_header);
     break;
 
   case IPPROTO_TCP:
     printf("======================== TCP ===========================\n");
-    handle_ip_header(ip_header, packet);
-    tcp_header = packet + ETHERNET_HEADER_LEN + ip_header_len;
-    tcp_header_len = (*(tcp_header + 12) & 0xF0) >> 4;
 
-    // Add up all the header sizes to find payload
-    int total_tcp_header_size =
-        ETHERNET_HEADER_LEN + ip_header_len + tcp_header_len;
-    payload_len =
-        header->caplen - (ETHERNET_HEADER_LEN + ip_header_len + tcp_header_len);
-    printf("Payload size: %d bytes\n", payload_len);
-    payload = packet + total_tcp_header_size;
-    printf("Memory address where payload begins: %p\n", payload);
-    printf("========================================================\n");
+    ipPtr new_ip_header = handle_ip_header(ip_header, packet);
+    tcpPtr new_tcp_header = handle_tcp_header(packet, new_ip_header);
+
+    printf("Source Port: [%d]\n", new_tcp_header->src_port);
+    printf("Destination Port: [%d]\n", new_tcp_header->dst_port);
+    printf("IHL: [%d]\n", new_ip_header->ihl);
+    printf("========================================================\n\n");
+
+    tcp_free(new_tcp_header);
 
     break;
   }
+
+  ip_free(new_ip_header);
 }

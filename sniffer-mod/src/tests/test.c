@@ -69,22 +69,24 @@ void test_tcp_new() {
   sprintf(dst_ip_str, "%d.%d.%d.%d", dst_ip->octets[0], dst_ip->octets[1],
           dst_ip->octets[2], dst_ip->octets[3]);
 
-  // New TCP packet
-  tcpPtr new_tcp_packet = tcp_new(src_ip, src_port, dst_ip, dst_port);
+  // New TCP packet & IP header
+  ipPtr ip_header =
+      ip_new(4, 30, 40, 2324, 1, 3, 88, 64, UDP, 333, src_ip, dst_ip, 32, 10);
+  tcpPtr tcp_packet = tcp_new(ip_header, src_port, dst_port, 30);
 
   // Ensure packet is properly allocated
-  CU_ASSERT_PTR_NOT_NULL(new_tcp_packet);
+  CU_ASSERT_PTR_NOT_NULL(tcp_packet);
 
   // Checks if values were set correctly
   CU_ASSERT_STRING_EQUAL(src_ip_str, "192.168.10.102");
-  CU_ASSERT_EQUAL(new_tcp_packet->src_port, 20);
+  CU_ASSERT_EQUAL(tcp_packet->src_port, 20);
   CU_ASSERT_STRING_EQUAL(dst_ip_str, "192.168.1.1");
-  CU_ASSERT_EQUAL(new_tcp_packet->dst_port, 33);
+  CU_ASSERT_EQUAL(tcp_packet->dst_port, 33);
 
-  tcp_free(new_tcp_packet);
-  new_tcp_packet = NULL;
+  tcp_free(tcp_packet);
+  tcp_packet = NULL;
 
-  CU_ASSERT_PTR_NULL(new_tcp_packet);
+  CU_ASSERT_PTR_NULL(tcp_packet);
 }
 
 void test_tcp_new_edge_case() {
@@ -102,23 +104,25 @@ void test_tcp_new_edge_case() {
   sprintf(dst_ip_str, "%d.%d.%d.%d", dst_ip->octets[0], dst_ip->octets[1],
           dst_ip->octets[2], dst_ip->octets[3]);
 
-  // New TCP packet
-  tcpPtr new_tcp_packet = tcp_new(src_ip, src_port, dst_ip, dst_port);
+  // New TCP packet & IP header
+  ipPtr ip_header =
+      ip_new(4, 30, 40, 2324, 1, 3, 88, 64, UDP, 333, src_ip, dst_ip, 32, 10);
+  tcpPtr tcp_packet = tcp_new(ip_header, src_port, dst_port, 20);
 
   // Ensure packet is properly allocated
-  CU_ASSERT_PTR_NOT_NULL(new_tcp_packet);
+  CU_ASSERT_PTR_NOT_NULL(tcp_packet);
 
   // Check if values were set correctly
   CU_ASSERT_STRING_EQUAL(src_ip_str, "0.0.0.0");
-  CU_ASSERT_EQUAL(new_tcp_packet->src_port, 0);
+  CU_ASSERT_EQUAL(tcp_packet->src_port, 0);
   CU_ASSERT_STRING_EQUAL(dst_ip_str, "255.255.255.255");
-  CU_ASSERT_EQUAL(new_tcp_packet->dst_port, 65535);
+  CU_ASSERT_EQUAL(tcp_packet->dst_port, 65535);
 
   // IPs are freed by freeing tcp packet as it has full ownership
-  tcp_free(new_tcp_packet);
-  new_tcp_packet = NULL;
+  tcp_free(tcp_packet);
+  tcp_packet = NULL;
 
-  CU_ASSERT_PTR_NULL(new_tcp_packet);
+  CU_ASSERT_PTR_NULL(tcp_packet);
 }
 
 void test_tcp_free() {
@@ -127,21 +131,24 @@ void test_tcp_free() {
   ipv4Ptr dst_ip = ipv4_new(192, 168, 1, 10);
   uint16_t dst_port = 33;
 
-  tcpPtr new_tcp_packet = tcp_new(src_ip, src_port, dst_ip, dst_port);
+  // New TCP packet & IP header
+  ipPtr ip_header =
+      ip_new(4, 30, 40, 2324, 1, 3, 88, 64, UDP, 333, src_ip, dst_ip, 32, 10);
+  tcpPtr tcp_packet = tcp_new(ip_header, src_port, dst_port, 20);
 
   // Ensure memory is allocated
-  CU_ASSERT_PTR_NOT_NULL(new_tcp_packet);
+  CU_ASSERT_PTR_NOT_NULL(tcp_packet);
   CU_ASSERT_PTR_NOT_NULL(src_ip);
   CU_ASSERT_PTR_NOT_NULL(dst_ip);
 
   // Free the TCP packet with addresses
-  tcp_free(new_tcp_packet);
+  tcp_free(tcp_packet);
 
   // After freeing, set the pointer to NULL
-  new_tcp_packet = NULL;
+  tcp_packet = NULL;
 
   // Check if freed properly
-  CU_ASSERT_PTR_NULL(new_tcp_packet);
+  CU_ASSERT_PTR_NULL(tcp_packet);
 }
 
 void test_start_sniffer_failure_dev_null() {
@@ -153,7 +160,8 @@ void test_start_sniffer_failure_dev_null() {
   // Start sniffer with NULL interface
   start_sniffer(dev);
 
-  // Add additional logic to store `stderr` in file and then compare strings
+  // Add additional logic to store `stderr` in temp file and then compare
+  // strings
 }
 
 int main() {
