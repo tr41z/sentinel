@@ -1,5 +1,6 @@
 #include "../include/ip.h"
 #include "../include/packet.h"
+#include "../include/sniffer.h"
 #include <CUnit/Basic.h>
 #include <CUnit/CUnit.h>
 #include <stdint.h>
@@ -143,6 +144,18 @@ void test_tcp_free() {
   CU_ASSERT_PTR_NULL(new_tcp_packet);
 }
 
+void test_start_sniffer_failure_dev_null() {
+  // Intentionally set device to NULL to force error
+  interPtr dev = NULL;
+
+  CU_ASSERT_PTR_NULL(dev);
+
+  // Start sniffer with NULL interface
+  start_sniffer(dev);
+
+  // Add additional logic to store `stderr` in file and then compare strings
+}
+
 int main() {
   CU_initialize_registry();
   CU_pSuite suite = CU_add_suite("Sentinel Sniffer Tests", 0, 0);
@@ -154,6 +167,8 @@ int main() {
   CU_add_test(suite, "Testing TCP Packet Creation", test_tcp_new);
   CU_add_test(suite, "Testing TCP Packet Freeing", test_tcp_free);
   CU_add_test(suite, "Testing TCP Packet Edge Cases", test_tcp_new_edge_case);
+  CU_add_test(suite, "Testing Sniffer Functionality",
+              test_start_sniffer_failure_dev_null);
 
   CU_basic_set_mode(CU_BRM_VERBOSE);
 

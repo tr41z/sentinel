@@ -53,6 +53,14 @@ void tcp_free(tcpPtr self) {
 }
 
 void handle_ip_header(const u_char *ip_header, const u_char *packet) {
+  if (!ip_header) {
+    fprintf(stderr, "Invalid IP header.\n");
+  }
+
+  if (!packet) {
+    fprintf(stderr, "Invalid packet. \n");
+  }
+
   ipv4Ptr src_ip = ipv4_new(*(ip_header + 12), *(ip_header + 13),
                             *(ip_header + 14), *(ip_header + 15));
   ipv4Ptr dst_ip = ipv4_new(*(ip_header + 16), *(ip_header + 17),

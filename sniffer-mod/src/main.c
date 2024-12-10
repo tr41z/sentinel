@@ -4,7 +4,7 @@
 int main() {
   interPtr dev = find_devices();
 
-  if (dev == NULL) {
+  if (!dev) {
     printf("No devices found or an error occured!\n");
     return 1;
   }

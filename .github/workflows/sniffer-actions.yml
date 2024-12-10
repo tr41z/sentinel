@@ -8,7 +8,11 @@ on:
 jobs:
   run-c-tests:
     name: C Tests
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest] # Add all the operating systems you want to test on
 
     steps:
       - name: Checkout Code
@@ -16,15 +20,22 @@ jobs:
 
       - name: Verify Source Branch
         run: |
-          if [[ "${{ github.head_ref }}" != "sniffer" ]]; then
+          if [ "${{ github.head_ref }}" != "sniffer" ]; then
             echo "This workflow only runs for PRs from the 'sniffer' branch to 'dev'. Current source branch: '${{ github.head_ref }}'."
             exit 0
           fi
+        shell: bash # Ensure Bash is used on Linux/macOS
 
-      - name: Install dependencies
+      - name: Install dependencies (Linux only)
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc make libcunit1-dev libpcap-dev
+
+      - name: Install dependencies (macOS only)
+        if: runner.os == 'macOS'
+        run: |
+          brew install gcc make cunit libpcap
 
       - name: Build the project
         run: |
