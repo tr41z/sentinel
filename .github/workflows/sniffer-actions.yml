@@ -64,7 +64,7 @@ jobs:
           Write-Host "Npcap 0.96 installation completed to C:\Npcap."
 
         run: |
-          Write-Host "Searching for pcap.h file..."
+          Write-Host "Searching for pcap.h file...."
           Get-ChildItem -Recurse -Path "C:\Npcap" -Filter "pcap.h" -ErrorAction SilentlyContinue | Select-Object FullName
         shell: pwsh
 
