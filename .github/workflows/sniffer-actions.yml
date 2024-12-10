@@ -63,6 +63,10 @@ jobs:
 
           Write-Host "Npcap 0.96 installation completed."
 
+          # Search for packet.h file
+          Write-Host "Searching for packet.h..."
+          Get-ChildItem -Recurse -Path "C:\Program Files\Npcap" -Filter "packet.h" | Select-Object FullName
+
       - name: Build the project
         run: |
           make all
