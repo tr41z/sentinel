@@ -63,6 +63,7 @@ jobs:
 
           Write-Host "Npcap 0.96 installation completed to C:\Npcap."
 
+      - name: "Search for pcap.h"
         run: |
           Write-Host "Searching for pcap.h file...."
           Get-ChildItem -Recurse -Path "C:\Npcap" -Filter "pcap.h" -ErrorAction SilentlyContinue | Select-Object FullName
