@@ -63,9 +63,11 @@ jobs:
 
           Write-Host "Npcap 0.96 installation completed."
 
-          # Search for packet.h file
-          Write-Host "Searching for packet.h..."
-          Get-ChildItem -Recurse -Path "C:\Program Files\Npcap" -Filter "packet.h" | Select-Object FullName
+      - name: Search for pcap.h (whole system)
+        run: |
+          Write-Host "Searching for pcap.h file..."
+          Get-ChildItem -Recurse -Path "C:\" -Filter "pcap.h" -ErrorAction SilentlyContinue | Select-Object FullName
+        shell: pwsh
 
       - name: Build the project
         run: |
