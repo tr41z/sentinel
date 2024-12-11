@@ -20,24 +20,24 @@ int ip_header_len;  /* Initialisation of ip header len since its not fixed */
 int tcp_header_len; /* Initialisaion of tcp header len since its not fixed */
 int payload_len;    /* Initialisaion of payload len since its not fixed */
 
-tcpPtr tcp_new(ipPtr ip_header, uint16_t src_port, uint16_t dst_port,
+cmbPtr cmb_new(ipPtr ip_header, uint16_t src_port, uint16_t dst_port,
                uint8_t header_len) {
-  // Allocating memory for new TCP packet
-  tcpPtr tcp_packet = (tcpPtr)malloc(sizeof(FullTcpPacket));
+  // Allocating memory for new CMB packet
+  cmbPtr cmb_packet = (cmbPtr)malloc(sizeof(CombinedPacket));
 
   // Case when memory wasn't allocated properly
-  if (!tcp_packet) {
-    fprintf(stderr, "Memory allocation failed for `tcp_packet`.\n");
+  if (!cmb_packet) {
+    fprintf(stderr, "Memory allocation failed for `cmb_packet`.\n");
     return NULL;
   }
 
   // Assign new values
-  tcp_packet->ip_header = ip_header;
-  tcp_packet->src_port = src_port;
-  tcp_packet->dst_port = dst_port;
-  tcp_packet->header_length = header_len;
+  cmb_packet->ip_header = ip_header;
+  cmb_packet->src_port = src_port;
+  cmb_packet->dst_port = dst_port;
+  cmb_packet->header_length = header_len;
 
-  return tcp_packet; /* Return struct */
+  return cmb_packet; /* Return struct */
 }
 
 ipPtr ip_new(uint8_t version, uint8_t ihl, uint8_t tos, uint16_t total_length,
@@ -71,7 +71,7 @@ ipPtr ip_new(uint8_t version, uint8_t ihl, uint8_t tos, uint16_t total_length,
 }
 
 // Free the memory and destroy struct and pointer
-void tcp_free(tcpPtr self) {
+void cmb_free(cmbPtr self) {
   if (self) {
     if (self->ip_header)
       ip_free(self->ip_header);
@@ -112,13 +112,13 @@ ipPtr handle_ip_header(const u_char *ip_header, const u_char *packet) {
 
   /* Extract other features */
 
-  // New TCP packet & IP header
+  // New IP header
   ipPtr new_ip_header = ip_new(100, ihl, 40, 2324, 1, 3, 88, ttl, protocol,
                                checksum, src_ip, dst_ip, 32, 10);
   return new_ip_header;
 }
 
-tcpPtr handle_tcp_header(const u_char *packet, ipPtr ip_header) {
+cmbPtr handle_tcp_header(const u_char *packet, ipPtr ip_header) {
   if (!ip_header) {
     fprintf(stderr, "Invalid IP header.\n");
     return NULL;
@@ -136,8 +136,8 @@ tcpPtr handle_tcp_header(const u_char *packet, ipPtr ip_header) {
   uint16_t dst_port = ntohs(*(uint16_t *)(tcp_header + 2));
   uint8_t header_len = (*(tcp_header + 12) & 0xF0) >> 4;
 
-  tcpPtr new_tcp_packet = tcp_new(ip_header, src_port, dst_port, header_len);
-  return new_tcp_packet;
+  cmbPtr new_cmb_packet = cmb_new(ip_header, src_port, dst_port, header_len);
+  return new_cmb_packet;
 }
 
 void packet_handler(u_char *args, const struct pcap_pkthdr *header,
@@ -155,8 +155,11 @@ void packet_handler(u_char *args, const struct pcap_pkthdr *header,
   switch (new_ip_header->protocol) {
   case IPPROTO_UDP:
     printf("======================== UDP ===========================\n");
-    udp_header = packet + ETHERNET_HEADER_LEN + ip_header_len;
     printf("========================================================\n\n");
+
+    // cmbPtr new_udp_header = handle_udp_header(packet, new_ip_header);
+
+    // prints
 
     // udp_free(new_udp_header);
     break;
@@ -164,16 +167,14 @@ void packet_handler(u_char *args, const struct pcap_pkthdr *header,
   case IPPROTO_TCP:
     printf("======================== TCP ===========================\n");
 
-    ipPtr new_ip_header = handle_ip_header(ip_header, packet);
-    tcpPtr new_tcp_header = handle_tcp_header(packet, new_ip_header);
+    cmbPtr new_tcp_header = handle_tcp_header(packet, new_ip_header);
 
     printf("Source Port: [%d]\n", new_tcp_header->src_port);
     printf("Destination Port: [%d]\n", new_tcp_header->dst_port);
     printf("IHL: [%d]\n", new_ip_header->ihl);
     printf("========================================================\n\n");
 
-    tcp_free(new_tcp_header);
-
+    cmb_free(new_tcp_header);
     break;
   }
 

@@ -38,31 +38,25 @@ typedef struct {
   uint16_t src_port;
   uint16_t dst_port;
   uint8_t header_length;
-} FullTcpPacket; /* TCP packet struct */
+} CombinedPacket; /* Combined Packet struct meaning combination of IP Header and
+                     shared features from TCP / UDP packets */
 
-typedef struct {
-  ipPtr ip_header;
-  uint16_t src_port;
-  uint16_t dst_port;
-} FullUdpPacket; /* UDP packet struct */
+typedef CombinedPacket *cmbPtr; /* For better readibility */
 
-typedef FullTcpPacket *tcpPtr; /* For better readibility */
-typedef FullUdpPacket *udpPtr; /* For better readibility */
-
-tcpPtr
-tcp_new(ipPtr ip_header, uint16_t src_port, uint16_t dst_port,
-        uint8_t header_len); /* Create new TCP struct with assigned values */
+cmbPtr cmb_new(
+    ipPtr ip_header, uint16_t src_port, uint16_t dst_port,
+    uint8_t header_len); /* Create new CMB Packet struct with assigned values */
 ipPtr ip_new(uint8_t version, uint8_t ihl, uint8_t tos, uint16_t total_length,
              uint16_t identification, uint8_t flags, uint16_t fragment_offset,
              uint8_t ttl, uint8_t protocol, uint16_t checksum,
              ipv4Ptr source_address, ipv4Ptr destination_address,
              uint32_t options, uint8_t padding);
-void tcp_free(tcpPtr self); /* Free the memory of struct and values */
+void cmb_free(cmbPtr self); /* Free the memory of struct and values */
 void ip_free(ipPtr self);
 ipPtr handle_ip_header(const u_char *ip_header,
                        const u_char *packet); /* Extracts info from
                                                  ip header */
-tcpPtr handle_tcp_header(const u_char *packet, ipPtr ip_header);
+cmbPtr handle_tcp_header(const u_char *packet, ipPtr ip_header);
 void packet_handler(
     u_char *args, const struct pcap_pkthdr *header,
     const u_char *packet); /* Callback function for found packets */
