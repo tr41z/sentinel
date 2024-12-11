@@ -28,6 +28,9 @@ void test_ipv4_new_edge_case() {
   ipv4_addr = ipv4_new(0, 0, 0, 0);
   CU_ASSERT_PTR_NOT_NULL(ipv4_addr);
 
+  ipv4_free(ipv4_addr);
+  ipv4_addr = NULL;
+
   ipv4_addr = ipv4_new(255, 255, 255, 255);
   CU_ASSERT_PTR_NOT_NULL(ipv4_addr);
 

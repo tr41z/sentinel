@@ -4,7 +4,7 @@
 
 ipv4Ptr ipv4_new(uint8_t first, uint8_t second, uint8_t third, uint8_t fourth) {
   // New ipv4 address initialisation
-  ipv4Ptr ipv4_addr = (ipv4Ptr)calloc(4, sizeof(uint8_t));
+  ipv4Ptr ipv4_addr = (ipv4Ptr)calloc(1, sizeof(Ipv4Addr));
 
   // Assign new values
   ipv4_addr->octets[0] = first;

@@ -61,5 +61,6 @@ cmbPtr handle_udp_header(const u_char *packet, ipPtr ip_header);
 void packet_handler(
     u_char *args, const struct pcap_pkthdr *header,
     const u_char *packet); /* Callback function for found packets */
+void display_packet(ipPtr ip_header, cmbPtr proto_header);
 
 #endif
