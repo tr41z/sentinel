@@ -75,8 +75,8 @@ void tcp_free(tcpPtr self) {
   if (self) {
     if (self->ip_header)
       ip_free(self->ip_header);
+    free(self);
   }
-  free(self);
 }
 
 void ip_free(ipPtr self) {
@@ -85,8 +85,8 @@ void ip_free(ipPtr self) {
       ipv4_free(self->source_address);
     if (self->destination_address)
       ipv4_free(self->destination_address);
+    free(self);
   }
-  free(self);
 }
 
 ipPtr handle_ip_header(const u_char *ip_header, const u_char *packet) {
