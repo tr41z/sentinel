@@ -1,5 +1,6 @@
 #include "include/packet.h"
 #include "include/ip.h"
+#include <arpa/inet.h>
 #include <net/ethernet.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -106,15 +107,22 @@ ipPtr handle_ip_header(const u_char *ip_header, const u_char *packet) {
                             *(ip_header + 18), *(ip_header + 19));
   uint8_t ttl = *(ip_header + 8);
   uint8_t protocol = *(ip_header + 9);
-  uint16_t checksum = ntohs((*(ip_header + 10) << 8) + *(ip_header + 11));
-  uint8_t ihl = (*(ip_header) & 0x0F);
-  ihl *= 4;
+  uint16_t checksum = ntohs(*(uint16_t *)(ip_header + 10));
+  uint8_t ihl = ((*(ip_header) & 0x0F) * 4);
+  uint8_t version = ((*(ip_header) & 0xF0) >> 4);
+  uint8_t tos = *(ip_header + 1);
+  uint16_t total_length = ntohs(*(uint16_t *)(ip_header + 2));
+  uint16_t identification = ntohs(*(uint16_t *)(ip_header + 4));
+  uint8_t flags = ((*(ip_header + 6) & 0xE0) >> 5);
+  uint16_t fragment_offset =
+      ((*(ip_header + 6) & 0x1F) << 8) | *(ip_header + 7);
 
-  /* Extract other features */
+  /* Extract `options` and `padding` */
 
   // New IP header
-  ipPtr new_ip_header = ip_new(100, ihl, 40, 2324, 1, 3, 88, ttl, protocol,
-                               checksum, src_ip, dst_ip, 32, 10);
+  ipPtr new_ip_header =
+      ip_new(version, ihl, tos, total_length, identification, flags,
+             fragment_offset, ttl, protocol, checksum, src_ip, dst_ip, 32, 10);
   return new_ip_header;
 }
 
@@ -134,7 +142,7 @@ cmbPtr handle_tcp_header(const u_char *packet, ipPtr ip_header) {
 
   uint16_t src_port = ntohs(*(uint16_t *)(tcp_header));
   uint16_t dst_port = ntohs(*(uint16_t *)(tcp_header + 2));
-  uint8_t header_len = (*(tcp_header + 12) & 0xF0) >> 4;
+  uint8_t header_len = ((*(tcp_header + 12) >> 4) * 4);
 
   cmbPtr new_cmb_packet = cmb_new(ip_header, src_port, dst_port, header_len);
   return new_cmb_packet;
@@ -157,7 +165,8 @@ cmbPtr handle_udp_header(const u_char *packet, ipPtr ip_header) {
   uint16_t src_port = ntohs(*(uint16_t *)(udp_header));
   uint16_t dst_port = ntohs(*(uint16_t *)(udp_header + 2));
 
-  cmbPtr new_cmb_packet = cmb_new(ip_header, src_port, dst_port, 0);
+  cmbPtr new_cmb_packet =
+      cmb_new(ip_header, src_port, dst_port, UDP_HEADER_LEN);
   return new_cmb_packet;
 }
 
@@ -180,9 +189,17 @@ void packet_handler(u_char *args, const struct pcap_pkthdr *header,
     ipPtr new_ip_header_udp = handle_ip_header(ip_header, packet);
     cmbPtr new_udp_header = handle_udp_header(packet, new_ip_header_udp);
 
+    printf("Version: [%d]\n", new_ip_header_udp->version);
+    printf("IHL: %d bytes\n", new_ip_header_udp->ihl);
+    printf("TOS: [%d]\n", new_ip_header_udp->tos);
+    printf("IP Total Length: %d bytes\n", new_ip_header_udp->total_length);
+    printf("Checksum: [%d]\n", new_ip_header_udp->checksum);
+    printf("Identification: [%d]\n", new_ip_header_udp->identification);
+    printf("Flags: [%d]\n", new_ip_header_udp->flags);
+    printf("Fragment Offset: [%d]\n", new_ip_header_udp->fragment_offset);
     printf("Source Port: [%d]\n", new_udp_header->src_port);
     printf("Destination Port: [%d]\n", new_udp_header->dst_port);
-    printf("IHL: [%d]\n", new_ip_header->ihl);
+    printf("UDP Header Length: %d bytes\n", new_udp_header->header_length);
     printf("========================================================\n\n");
 
     cmb_free(new_udp_header);
@@ -195,9 +212,17 @@ void packet_handler(u_char *args, const struct pcap_pkthdr *header,
     ipPtr new_ip_header_tcp = handle_ip_header(ip_header, packet);
     cmbPtr new_tcp_header = handle_tcp_header(packet, new_ip_header_tcp);
 
+    printf("Version: [%d]\n", new_ip_header_tcp->version);
+    printf("IHL: %d bytes\n", new_ip_header_tcp->ihl);
+    printf("TOS: [%d]\n", new_ip_header_tcp->tos);
+    printf("IP Total Length: %d bytes\n", new_ip_header_tcp->total_length);
+    printf("Checksum: [%d]\n", new_ip_header_tcp->checksum);
+    printf("Identification: [%d]\n", new_ip_header_tcp->identification);
+    printf("Flags: [%d]\n", new_ip_header_tcp->flags);
+    printf("Fragment Offset: [%d]\n", new_ip_header_tcp->fragment_offset);
     printf("Source Port: [%d]\n", new_tcp_header->src_port);
     printf("Destination Port: [%d]\n", new_tcp_header->dst_port);
-    printf("IHL: [%d]\n", new_ip_header->ihl);
+    printf("TCP Header Length: %d bytes\n", new_tcp_header->header_length);
     printf("========================================================\n\n");
 
     cmb_free(new_tcp_header);
@@ -206,4 +231,5 @@ void packet_handler(u_char *args, const struct pcap_pkthdr *header,
   }
 
   ip_free(new_ip_header);
+  new_ip_header = NULL;
 }

@@ -29,7 +29,7 @@ typedef struct {
   ipv4Ptr destination_address;
   uint32_t options;
   uint8_t padding;
-} IpHeader;
+} IpHeader; /* Struct for collecting information from IP Header */
 
 typedef IpHeader *ipPtr;
 
