@@ -57,6 +57,7 @@ ipPtr handle_ip_header(const u_char *ip_header,
                        const u_char *packet); /* Extracts info from
                                                  ip header */
 cmbPtr handle_tcp_header(const u_char *packet, ipPtr ip_header);
+cmbPtr handle_udp_header(const u_char *packet, ipPtr ip_header);
 void packet_handler(
     u_char *args, const struct pcap_pkthdr *header,
     const u_char *packet); /* Callback function for found packets */

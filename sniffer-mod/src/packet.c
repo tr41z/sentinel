@@ -125,7 +125,7 @@ cmbPtr handle_tcp_header(const u_char *packet, ipPtr ip_header) {
   }
 
   if (!packet) {
-    fprintf(stderr, "Invalid packet. \n");
+    fprintf(stderr, "Invalid packet.\n");
     return NULL;
   }
 
@@ -137,6 +137,27 @@ cmbPtr handle_tcp_header(const u_char *packet, ipPtr ip_header) {
   uint8_t header_len = (*(tcp_header + 12) & 0xF0) >> 4;
 
   cmbPtr new_cmb_packet = cmb_new(ip_header, src_port, dst_port, header_len);
+  return new_cmb_packet;
+}
+
+cmbPtr handle_udp_header(const u_char *packet, ipPtr ip_header) {
+  if (!ip_header) {
+    fprintf(stderr, "Invalid IP header.\n");
+    return NULL;
+  }
+
+  if (!packet) {
+    fprintf(stderr, "Invalid packet.\n");
+    return NULL;
+  }
+
+  ip_header_len = ip_header->ihl;
+  udp_header = packet + ETHERNET_HEADER_LEN + ip_header_len;
+
+  uint16_t src_port = ntohs(*(uint16_t *)(udp_header));
+  uint16_t dst_port = ntohs(*(uint16_t *)(udp_header + 2));
+
+  cmbPtr new_cmb_packet = cmb_new(ip_header, src_port, dst_port, 0);
   return new_cmb_packet;
 }
 
@@ -155,19 +176,24 @@ void packet_handler(u_char *args, const struct pcap_pkthdr *header,
   switch (new_ip_header->protocol) {
   case IPPROTO_UDP:
     printf("======================== UDP ===========================\n");
+
+    ipPtr new_ip_header_udp = handle_ip_header(ip_header, packet);
+    cmbPtr new_udp_header = handle_udp_header(packet, new_ip_header_udp);
+
+    printf("Source Port: [%d]\n", new_udp_header->src_port);
+    printf("Destination Port: [%d]\n", new_udp_header->dst_port);
+    printf("IHL: [%d]\n", new_ip_header->ihl);
     printf("========================================================\n\n");
 
-    // cmbPtr new_udp_header = handle_udp_header(packet, new_ip_header);
-
-    // prints
-
-    // udp_free(new_udp_header);
+    cmb_free(new_udp_header);
+    new_udp_header = NULL;
     break;
 
   case IPPROTO_TCP:
     printf("======================== TCP ===========================\n");
 
-    cmbPtr new_tcp_header = handle_tcp_header(packet, new_ip_header);
+    ipPtr new_ip_header_tcp = handle_ip_header(ip_header, packet);
+    cmbPtr new_tcp_header = handle_tcp_header(packet, new_ip_header_tcp);
 
     printf("Source Port: [%d]\n", new_tcp_header->src_port);
     printf("Destination Port: [%d]\n", new_tcp_header->dst_port);
@@ -175,6 +201,7 @@ void packet_handler(u_char *args, const struct pcap_pkthdr *header,
     printf("========================================================\n\n");
 
     cmb_free(new_tcp_header);
+    new_tcp_header = NULL;
     break;
   }
 
