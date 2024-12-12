@@ -74,7 +74,7 @@ void test_cmb_new() {
 
   // New Combined Packet
   ipPtr ip_header =
-      ip_new(4, 30, 40, 2324, 1, 3, 88, 64, 17, 333, src_ip, dst_ip, 32, 10);
+      ip_new(4, 30, 40, 2324, 1, 3, 88, 64, 17, 333, src_ip, dst_ip);
   cmbPtr cmb_packet = cmb_new(ip_header, src_port, dst_port, 30);
 
   // Ensure packet is properly allocated
@@ -109,7 +109,7 @@ void test_cmb_new_edge_case() {
 
   // New Combined Packet
   ipPtr ip_header =
-      ip_new(4, 30, 40, 2324, 1, 3, 88, 64, 6, 333, src_ip, dst_ip, 32, 10);
+      ip_new(4, 30, 40, 2324, 1, 3, 88, 64, 6, 333, src_ip, dst_ip);
   cmbPtr cmb_packet = cmb_new(ip_header, src_port, dst_port, 20);
 
   // Ensure packet is properly allocated
@@ -136,7 +136,7 @@ void test_cmb_free() {
 
   // New Combined Packet
   ipPtr ip_header =
-      ip_new(4, 30, 40, 2324, 1, 3, 88, 64, 17, 333, src_ip, dst_ip, 32, 10);
+      ip_new(4, 30, 40, 2324, 1, 3, 88, 64, 17, 333, src_ip, dst_ip);
   cmbPtr cmb_packet = cmb_new(ip_header, src_port, dst_port, 20);
 
   // Ensure memory is allocated
@@ -154,17 +154,82 @@ void test_cmb_free() {
   CU_ASSERT_PTR_NULL(cmb_packet);
 }
 
+void test_ip_new() {
+  ipv4Ptr src_ip = ipv4_new(192, 168, 1, 1);
+  ipv4Ptr dst_ip = ipv4_new(192, 168, 1, 10);
+
+  CU_ASSERT_PTR_NOT_NULL(src_ip);
+  CU_ASSERT_PTR_NOT_NULL(dst_ip);
+
+  // New Combined Packet
+  ipPtr ip_header =
+      ip_new(4, 30, 40, 2324, 1, 3, 88, 64, 17, 333, src_ip, dst_ip);
+
+  CU_ASSERT_PTR_NOT_NULL(ip_header);
+
+  ip_free(ip_header);
+  src_ip = NULL;
+  dst_ip = NULL;
+  ip_header = NULL;
+}
+
+void test_ip_new_edge_case() {
+  ipv4Ptr src_ip = ipv4_new(0, 0, 0, 0);
+  ipv4Ptr dst_ip = ipv4_new(255, 255, 255, 255);
+
+  CU_ASSERT_PTR_NOT_NULL(src_ip);
+  CU_ASSERT_PTR_NOT_NULL(dst_ip);
+
+  // New Combined Packet
+  ipPtr ip_header = ip_new(255, 255, 255, 65535, 65535, 255, 65535, 255, 255,
+                           65535, src_ip, dst_ip);
+
+  CU_ASSERT_PTR_NOT_NULL(ip_header);
+
+  ip_free(ip_header);
+  src_ip = NULL;
+  dst_ip = NULL;
+  ip_header = NULL;
+}
+
+void test_ip_free() {
+  ipv4Ptr src_ip = ipv4_new(0, 0, 0, 0);
+  ipv4Ptr dst_ip = ipv4_new(255, 255, 255, 255);
+
+  CU_ASSERT_PTR_NOT_NULL(src_ip);
+  CU_ASSERT_PTR_NOT_NULL(dst_ip);
+
+  // New Combined Packet
+  ipPtr ip_header = ip_new(255, 255, 255, 65535, 65535, 255, 65535, 255, 255,
+                           65535, src_ip, dst_ip);
+
+  CU_ASSERT_PTR_NOT_NULL(ip_header);
+
+  ip_free(ip_header);
+  src_ip = NULL;
+  dst_ip = NULL;
+  ip_header = NULL;
+
+  CU_ASSERT_PTR_NULL(ip_header);
+  CU_ASSERT_PTR_NULL(src_ip);
+  CU_ASSERT_PTR_NULL(dst_ip);
+}
+
 int main() {
   CU_initialize_registry();
   CU_pSuite suite = CU_add_suite("Sentinel Sniffer Tests", 0, 0);
 
   CU_add_test(suite, "Testing IPV4 Address Creation", test_ipv4_new);
   CU_add_test(suite, "Testing IPV4 Address Freeing", test_ipv4_free);
-  CU_add_test(suite, "Testing IPV4 Address Edge Cases",
+  CU_add_test(suite, "Testing IPV4 Address Creation Edge Cases",
               test_ipv4_new_edge_case);
   CU_add_test(suite, "Testing CMB Packet Creation", test_cmb_new);
   CU_add_test(suite, "Testing CMB Packet Freeing", test_cmb_free);
   CU_add_test(suite, "Testing CMB Packet Edge Cases", test_cmb_new_edge_case);
+  CU_add_test(suite, "Testing IP Header Creation", test_ip_new);
+  CU_add_test(suite, "Testing IP Header Creation Edge Cases",
+              test_ip_new_edge_case);
+  CU_add_test(suite, "Testing IP Header Freeing", test_ip_free);
 
   CU_basic_set_mode(CU_BRM_VERBOSE);
 

@@ -98,3 +98,7 @@ run-tests: $(TEST_EXEC)
 # Check for memory leaks
 mem-safe:
 	@cd $(SNIFFER_DIR) && leaks -atExit -- ./sniffer
+
+# Check for memory leaks for tests
+mem-safe-tests:
+	@cd $(SNIFFER_DIR) && leaks -atExit -- ./test
