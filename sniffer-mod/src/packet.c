@@ -44,8 +44,7 @@ cmbPtr cmb_new(ipPtr ip_header, uint16_t src_port, uint16_t dst_port,
 ipPtr ip_new(uint8_t version, uint8_t ihl, uint8_t tos, uint16_t total_length,
              uint16_t identification, uint8_t flags, uint16_t fragment_offset,
              uint8_t ttl, uint8_t protocol, uint16_t checksum,
-             ipv4Ptr source_address, ipv4Ptr destination_address,
-             uint32_t options, uint8_t padding) {
+             ipv4Ptr source_address, ipv4Ptr destination_address) {
   ipPtr ip_header = (ipPtr)malloc(sizeof(IpHeader));
 
   if (!ip_header) {
@@ -53,8 +52,6 @@ ipPtr ip_new(uint8_t version, uint8_t ihl, uint8_t tos, uint16_t total_length,
     return NULL;
   }
 
-  ip_header->options = options;
-  ip_header->padding = padding;
   ip_header->ttl = ttl;
   ip_header->source_address = source_address;
   ip_header->destination_address = destination_address;
@@ -117,12 +114,10 @@ ipPtr handle_ip_header(const u_char *ip_header, const u_char *packet) {
   uint16_t fragment_offset =
       ((*(ip_header + 6) & 0x1F) << 8) | *(ip_header + 7);
 
-  /* Extract `options` and `padding` */
-
   // New IP header
   ipPtr new_ip_header =
       ip_new(version, ihl, tos, total_length, identification, flags,
-             fragment_offset, ttl, protocol, checksum, src_ip, dst_ip, 32, 10);
+             fragment_offset, ttl, protocol, checksum, src_ip, dst_ip);
   return new_ip_header;
 }
 
@@ -181,7 +176,7 @@ void display_packet(ipPtr ip_header, cmbPtr proto_header) {
   printf("Fragment Offset: [%d]\n", ip_header->fragment_offset);
   printf("Source Port: [%d]\n", proto_header->src_port);
   printf("Destination Port: [%d]\n", proto_header->dst_port);
-  printf("UDP Header Length: %d bytes\n", proto_header->header_length);
+  printf("Header Length: %d bytes\n", proto_header->header_length);
   printf("========================================================\n\n");
 }
 

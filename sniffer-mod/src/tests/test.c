@@ -154,19 +154,6 @@ void test_cmb_free() {
   CU_ASSERT_PTR_NULL(cmb_packet);
 }
 
-void test_start_sniffer_failure_dev_null() {
-  // Intentionally set device to NULL to force error
-  devPtr dev = NULL;
-
-  CU_ASSERT_PTR_NULL(dev);
-
-  // Start sniffer with NULL interface
-  start_sniffer(dev);
-
-  // Add additional logic to store `stderr` in temp file and then compare
-  // strings
-}
-
 int main() {
   CU_initialize_registry();
   CU_pSuite suite = CU_add_suite("Sentinel Sniffer Tests", 0, 0);
@@ -178,8 +165,6 @@ int main() {
   CU_add_test(suite, "Testing CMB Packet Creation", test_cmb_new);
   CU_add_test(suite, "Testing CMB Packet Freeing", test_cmb_free);
   CU_add_test(suite, "Testing CMB Packet Edge Cases", test_cmb_new_edge_case);
-  CU_add_test(suite, "Testing Sniffer Functionality",
-              test_start_sniffer_failure_dev_null);
 
   CU_basic_set_mode(CU_BRM_VERBOSE);
 

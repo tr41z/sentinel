@@ -27,9 +27,8 @@ typedef struct {
   uint16_t checksum;
   ipv4Ptr source_address;
   ipv4Ptr destination_address;
-  uint32_t options;
-  uint8_t padding;
-} IpHeader; /* Struct for collecting information from IP Header */
+} IpHeader; /* Struct for collecting information from IP Header. Skipping
+               options and padding */
 
 typedef IpHeader *ipPtr;
 
@@ -49,8 +48,7 @@ cmbPtr cmb_new(
 ipPtr ip_new(uint8_t version, uint8_t ihl, uint8_t tos, uint16_t total_length,
              uint16_t identification, uint8_t flags, uint16_t fragment_offset,
              uint8_t ttl, uint8_t protocol, uint16_t checksum,
-             ipv4Ptr source_address, ipv4Ptr destination_address,
-             uint32_t options, uint8_t padding);
+             ipv4Ptr source_address, ipv4Ptr destination_address);
 void cmb_free(cmbPtr self); /* Free the memory of struct and values */
 void ip_free(ipPtr self);
 ipPtr handle_ip_header(const u_char *ip_header,
