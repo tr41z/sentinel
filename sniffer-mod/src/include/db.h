@@ -26,6 +26,9 @@ static inline void create_hidden_dir(char *dir) {
 }
 static inline char *connect_string(const char *s1, const char *s2) {
   char *result = (char *)malloc(strlen(s1) + strlen(s2) + 1);
+  if (!result) {
+    fprintf(stderr, "Failed to allocate memory for `result`\n");
+  }
 
   strcpy(result, s1);
   strcat(result, s2);

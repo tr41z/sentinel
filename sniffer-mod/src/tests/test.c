@@ -1,10 +1,34 @@
+#include "../include/db.h"
 #include "../include/ip.h"
 #include "../include/packet.h"
 #include "../include/sniffer.h"
 #include <CUnit/Basic.h>
 #include <CUnit/CUnit.h>
+#include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
+
+void test_connect_string() {
+  char *result = connect_string("Hello ", "World!");
+
+  CU_ASSERT_STRING_EQUAL(result, "Hello World!");
+
+  free(result);
+  result = NULL;
+
+  CU_ASSERT_PTR_NULL(result);
+}
+
+void test_connect_string_edge_case() {
+  char *result = connect_string("", "");
+
+  CU_ASSERT_STRING_EQUAL(result, "");
+
+  free(result);
+  result = NULL;
+
+  CU_ASSERT_PTR_NULL(result);
+}
 
 void test_ipv4_new() {
   char str_ipv4_addr[20];
@@ -230,6 +254,9 @@ int main() {
   CU_add_test(suite, "Testing IP Header Creation Edge Cases",
               test_ip_new_edge_case);
   CU_add_test(suite, "Testing IP Header Freeing", test_ip_free);
+  CU_add_test(suite, "Testing String Connection", test_connect_string);
+  CU_add_test(suite, "Testing String Connection Edge Cases",
+              test_connect_string_edge_case);
 
   CU_basic_set_mode(CU_BRM_VERBOSE);
 

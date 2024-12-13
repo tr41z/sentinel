@@ -10,7 +10,7 @@ void connect_db(char *home_dir) {
   create_hidden_dir(hidden_dir);
 
   connection_string = connect_string(home_dir, "/.sentinel/sentinel.db");
-  printf("CONNECTION STRING: %s", connection_string);
+  printf("CONNECTION STRING: %s\n", connection_string);
   rc = sqlite3_open(connection_string, &db);
 
   if (rc) {
