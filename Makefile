@@ -24,7 +24,7 @@ build-exec:
 # Compiler and flags
 CC = gcc
 CFLAGS = -std=c11 -Wall -g
-LDFLAGS = -lpthread -lcunit
+LDFLAGS = -lpthread -lcunit -lsqlite3
 
 # Platform-specific flags
 ifeq ($(OS), Windows_NT)
@@ -71,7 +71,7 @@ $(EXEC): $(OBJECTS) $(OBJ_DIR)
 
 # Compile test executable
 $(TEST_EXEC): $(TEST_OBJECTS) $(OBJ_DIR)/packet.o $(OBJ_DIR)/ip.o
-	$(CC) $(TEST_OBJECTS) $(OBJ_DIR)/sniffer.o $(OBJ_DIR)/packet.o $(OBJ_DIR)/ip.o $(CFLAGS) $(LDFLAGS) -o $(SNIFFER_DIR)/$(TEST_EXEC)
+	$(CC) $(TEST_OBJECTS) $(OBJ_DIR)/db.o $(OBJ_DIR)/sniffer.o $(OBJ_DIR)/packet.o $(OBJ_DIR)/ip.o $(CFLAGS) $(LDFLAGS) -o $(SNIFFER_DIR)/$(TEST_EXEC)
 
 # Compile sniffer source files into object files
 $(OBJ_DIR)/%.o: $(SNIFFER_DIR)/$(SRC_DIR)/%.c | $(OBJ_DIR)
