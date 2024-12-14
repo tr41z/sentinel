@@ -33,7 +33,7 @@ void start_sniffer(devPtr dev) {
     return;
   }
 
-  handle = pcap_open_live(dev->name, BUFSIZ, 1, 100, err_buff);
+  handle = pcap_open_live(dev->name, BUFSIZ, 1, 5, err_buff);
   if (!handle) {
     fprintf(stderr, "Couldn't open device %s: %s\n", dev->name, err_buff);
     return;

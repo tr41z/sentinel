@@ -19,6 +19,15 @@ void test_connect_string() {
   CU_ASSERT_PTR_NULL(result);
 }
 
+void test_connect_string_path() {
+  char *home_dir = "/Users/profile";
+  char *db_path = "/.sentinel/sentinel.db";
+
+  char *result = connect_string(home_dir, db_path);
+
+  CU_ASSERT_STRING_EQUAL(result, "/Users/profile/.sentinel/sentinel.db");
+}
+
 void test_connect_string_edge_case() {
   char *result = connect_string("", "");
 
@@ -257,7 +266,8 @@ int main() {
   CU_add_test(suite, "Testing String Connection", test_connect_string);
   CU_add_test(suite, "Testing String Connection Edge Cases",
               test_connect_string_edge_case);
-
+  CU_add_test(suite, "Testing String Connection with Path",
+              test_connect_string_path);
   CU_basic_set_mode(CU_BRM_VERBOSE);
 
   CU_basic_run_tests();
