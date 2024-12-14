@@ -14,38 +14,51 @@ typedef uint8_t u_char;   // Define u_char as uint8_t
 #define ETHERNET_HEADER_LEN 14
 #define UDP_HEADER_LEN 8
 
-enum PacketProtocol {
-  TCP,
-  UDP,
-};
+typedef struct {
+  uint8_t version;
+  uint8_t ihl;
+  uint8_t tos;
+  uint16_t total_length;
+  uint16_t identification;
+  uint8_t flags;
+  uint16_t fragment_offset;
+  uint8_t ttl;
+  uint8_t protocol;
+  uint16_t checksum;
+  ipv4Ptr source_address;
+  ipv4Ptr destination_address;
+} IpHeader; /* Struct for collecting information from IP Header. Skipping
+               options and padding */
+
+typedef IpHeader *ipPtr;
 
 typedef struct {
-  ipv4Ptr src_ip;
+  ipPtr ip_header;
   uint16_t src_port;
-  ipv4Ptr dst_ip;
   uint16_t dst_port;
-  enum PacketProtocol protocol;
-} TcpPacket; /* TCP packet struct */
+  uint8_t header_length;
+} CombinedPacket; /* Combined Packet struct meaning combination of IP Header and
+                     shared features from TCP / UDP packets */
 
-typedef struct {
-  ipv4Ptr src_ip;
-  uint16_t src_port;
-  ipv4Ptr dst_ip;
-  uint16_t dst_port;
-  enum PacketProtocol protocol;
-} UdpPacket; /* UDP packet struct */
+typedef CombinedPacket *cmbPtr; /* For better readibility */
 
-typedef TcpPacket *tcpPtr; /* For better readibility */
-typedef UdpPacket *udpPtr; /* For better readibility */
-
-tcpPtr
-tcp_new(ipv4Ptr src_ip, uint16_t src_port, ipv4Ptr dst_ip,
-        uint16_t dst_port); /* Create new TCP struct with assigned values */
-void tcp_free(tcpPtr self); /* Free the memory of struct and values */
-void handle_ip_header(const u_char *ip_header,
-                      const u_char *packet); /* Extracts info from ip header */
+cmbPtr cmb_new(
+    ipPtr ip_header, uint16_t src_port, uint16_t dst_port,
+    uint8_t header_len); /* Create new CMB Packet struct with assigned values */
+ipPtr ip_new(uint8_t version, uint8_t ihl, uint8_t tos, uint16_t total_length,
+             uint16_t identification, uint8_t flags, uint16_t fragment_offset,
+             uint8_t ttl, uint8_t protocol, uint16_t checksum,
+             ipv4Ptr source_address, ipv4Ptr destination_address);
+void cmb_free(cmbPtr self); /* Free the memory of struct and values */
+void ip_free(ipPtr self);
+ipPtr handle_ip_header(const u_char *ip_header,
+                       const u_char *packet); /* Extracts info from
+                                                 ip header */
+cmbPtr handle_tcp_header(const u_char *packet, ipPtr ip_header);
+cmbPtr handle_udp_header(const u_char *packet, ipPtr ip_header);
 void packet_handler(
     u_char *args, const struct pcap_pkthdr *header,
     const u_char *packet); /* Callback function for found packets */
+void display_packet(ipPtr ip_header, cmbPtr proto_header);
 
 #endif

@@ -24,17 +24,21 @@ build-exec:
 # Compiler and flags
 CC = gcc
 CFLAGS = -std=c11 -Wall -g
-LDFLAGS = -lpthread -lcunit
+LDFLAGS = -lpthread -lcunit -lsqlite3
 
-# Set include paths and link libraries based on OS
-ifeq ($(shell uname), Darwin)
-	# macOS-specific flags (e.g., Homebrew paths)
-	CFLAGS += -I/opt/homebrew/include -I/opt/homebrew/include/CUnit
-	LDFLAGS += -L/opt/homebrew/lib -lpcap
+# Platform-specific flags
+ifeq ($(OS), Windows_NT)
+    # Windows-specific flags for MinGW and npcap
+    CFLAGS += -I$(INCLUDE)
+    LDFLAGS += -L$(LIB) -lwpcap
+else ifeq ($(shell uname), Darwin)
+    # macOS-specific flags
+    CFLAGS += -I/opt/homebrew/include -I/opt/homebrew/include/CUnit
+    LDFLAGS += -L/opt/homebrew/lib -lpcap
 else
-	# Linux-specific flags
-	CFLAGS += -I/usr/include
-	LDFLAGS += -L/usr/lib -lpcap
+    # Linux-specific flags
+    CFLAGS += -I/usr/include
+    LDFLAGS += -L/usr/lib -lpcap
 endif
 
 # Directories
@@ -67,7 +71,7 @@ $(EXEC): $(OBJECTS) $(OBJ_DIR)
 
 # Compile test executable
 $(TEST_EXEC): $(TEST_OBJECTS) $(OBJ_DIR)/packet.o $(OBJ_DIR)/ip.o
-	$(CC) $(TEST_OBJECTS) $(OBJ_DIR)/sniffer.o $(OBJ_DIR)/packet.o $(OBJ_DIR)/ip.o $(CFLAGS) $(LDFLAGS) -o $(SNIFFER_DIR)/$(TEST_EXEC)
+	$(CC) $(TEST_OBJECTS) $(OBJ_DIR)/db.o $(OBJ_DIR)/sniffer.o $(OBJ_DIR)/packet.o $(OBJ_DIR)/ip.o $(CFLAGS) $(LDFLAGS) -o $(SNIFFER_DIR)/$(TEST_EXEC)
 
 # Compile sniffer source files into object files
 $(OBJ_DIR)/%.o: $(SNIFFER_DIR)/$(SRC_DIR)/%.c | $(OBJ_DIR)
@@ -91,3 +95,10 @@ run-sniffer: $(EXEC)
 run-tests: $(TEST_EXEC)
 	@cd $(SNIFFER_DIR) && ./$(TEST_EXEC)
 
+# Check for memory leaks
+mem-safe:
+	@cd $(SNIFFER_DIR) && leaks -atExit -- ./sniffer
+
+# Check for memory leaks for tests
+mem-safe-tests:
+	@cd $(SNIFFER_DIR) && leaks -atExit -- ./test
