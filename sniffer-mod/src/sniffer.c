@@ -7,7 +7,7 @@ char err_buff[PCAP_ERRBUF_SIZE]; /* Error string */
 pcap_t *handle;                  /* Session handle */
 pcap_if_t *interface, *temp;     /* Interfaces */
 
-interPtr find_devices() {
+devPtr find_devices() {
   // Find all devices
   if (pcap_findalldevs(&interface, err_buff) == -1) {
     printf("\nError in pcap_findalldevs: %s\n", err_buff);
@@ -27,13 +27,13 @@ interPtr find_devices() {
   return NULL;
 }
 
-void start_sniffer(interPtr dev) {
+void start_sniffer(devPtr dev) {
   if (!dev) {
     fprintf(stderr, "Device pointer is NULL. Cannot start sniffer.\n");
     return;
   }
 
-  handle = pcap_open_live(dev->name, BUFSIZ, 1, 1000, err_buff);
+  handle = pcap_open_live(dev->name, BUFSIZ, 1, 5, err_buff);
   if (!handle) {
     fprintf(stderr, "Couldn't open device %s: %s\n", dev->name, err_buff);
     return;
@@ -41,9 +41,7 @@ void start_sniffer(interPtr dev) {
 
   printf("Listening on device: %s\n", dev->name);
 
-  pcap_loop(handle, 0, packet_handler, NULL);
+  // 0 for deployment, 10 for testing
+  pcap_loop(handle, 10, packet_handler, NULL);
   pcap_close(handle); /* Close the handle when done */
-
-  free(handle);
-  handle = NULL;
 }

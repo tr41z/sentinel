@@ -10,9 +10,9 @@ typedef uint8_t u_char;   // Define u_char as uint8_t
 #include "packet.h"
 #include <pcap.h>
 
-typedef pcap_if_t *interPtr; /* For better readibility */
+typedef pcap_if_t *devPtr; /* For better readibility */
 
-interPtr find_devices();          /* Returns interfaces to sniff on */
-void start_sniffer(interPtr dev); /* Starts sniffer on device (interface) */
+devPtr find_devices();          /* Returns interfaces to sniff on */
+void start_sniffer(devPtr dev); /* Starts sniffer on device (interface) */
 
 #endif
