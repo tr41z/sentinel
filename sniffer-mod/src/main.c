@@ -6,7 +6,7 @@
 int main() {
   char *home_dir = get_home_dir();
   connect_db(home_dir);
-  testFunc();
+  add_test(2, 3);
 
   start_multithreaded_sniffing();
   return 0;
