@@ -10,6 +10,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void connect_db(char *home_dir);
 static inline char *get_home_dir() {
   struct passwd *pw = getpwuid(getuid());
@@ -34,5 +38,9 @@ static inline char *connect_string(const char *s1, const char *s2) {
   strcat(result, s2);
   return result;
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
