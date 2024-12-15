@@ -82,7 +82,7 @@ $(TEST_EXEC): $(TEST_OBJECTS) $(OBJ_DIR)/packet.o $(OBJ_DIR)/ip.o
 
 # Compile sniffer source files into object files (handle both C and C++)
 $(OBJ_DIR)/%.o: $(SNIFFER_DIR)/$(SRC_DIR)/%.c | $(OBJ_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(if $(findstring main.c,$<),$(CXX),$(CC)) $(CFLAGS) -c $< -o $@
 
 $(OBJ_DIR)/%.o: $(SNIFFER_DIR)/$(SRC_DIR)/%.cpp | $(OBJ_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@

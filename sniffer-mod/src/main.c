@@ -1,5 +1,5 @@
 #include "include/db.h"
-#include "include/flow.hpp"
+#include "include/flow.h"
 #include "include/sniffer.h"
 #include <stdio.h>
 

@@ -7,6 +7,10 @@ typedef uint8_t u_char;   /* Define u_char as uint8_t */
 #ifndef SNIFFER_H
 #define SNIFFER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define DEV_NUM_PACKETS 1
 #define PACKET_ARRIVAL_THRESHOLD 5
 
@@ -22,5 +26,9 @@ typedef pcap_if_t *devPtr; /* For better readibility */
 
 devPtr find_devices();          /* Returns interfaces to sniff on */
 void start_sniffer(devPtr dev); /* Starts sniffer on device (interface) */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
