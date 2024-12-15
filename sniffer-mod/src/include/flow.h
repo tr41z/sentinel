@@ -7,8 +7,6 @@
 #ifdef __cplusplus
 #include <chrono>
 #include <unordered_map>
-extern "C" {
-#endif
 
 struct Flow {
   ipv4Ptr src_ip;
@@ -47,6 +45,9 @@ struct FlowKeyHash {
 };
 
 using FlowsMap = std::unordered_map<FlowKey, Flow>;
+
+extern "C" {
+#endif
 
 void add_test(int a, int b);
 
