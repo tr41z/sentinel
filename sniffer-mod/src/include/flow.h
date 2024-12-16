@@ -2,10 +2,15 @@
 #define FLOW_H
 
 #include "ip.h"
+#include <arpa/inet.h>
+#include <stdio.h>
 
 #ifdef __cplusplus
 #include <chrono>
 #include <unordered_map>
+
+#define IDLE_DURATION_MAX_THRESHOLD 60
+#define DURATION_MAX_THRESHOLD 300
 
 struct Flow {
   ipv4Ptr src_ip;
@@ -14,6 +19,7 @@ struct Flow {
   uint16_t dst_port;
   int total_bytes;
   uint8_t protocol;
+  int packet_count = 1;
   std::chrono::system_clock::time_point start_time;
   std::chrono::system_clock::time_point last_update_time;
 };
@@ -46,11 +52,20 @@ using FlowsMap = std::unordered_map<FlowKey, Flow, FlowKeyHash>;
 
 extern FlowsMap flows_map;
 
+FlowKey create_normalized_key(ipv4Ptr src_ip, uint16_t src_port, ipv4Ptr dst_ip,
+                              uint16_t dst_port,
+                              uint8_t protocol); /* Normalizing key */
+void terminate_and_save_flows(); /* Async function to terminate flows based on
+                                  * their duration */
+
 extern "C" {
 #endif
 
-void add_or_update(ipv4Ptr src_ip, uint16_t src_port, ipv4Ptr dst_ip,
-                   uint16_t dst_port, int total_bytes, uint8_t protocol);
+void flow_add_or_update(
+    ipv4Ptr src_ip, uint16_t src_port, ipv4Ptr dst_ip, uint16_t dst_port,
+    int total_bytes,
+    uint8_t protocol); /* Function that either adds or updates existing flow
+                          based on its existance in map */
 
 #ifdef __cplusplus
 }
