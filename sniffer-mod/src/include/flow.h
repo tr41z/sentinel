@@ -3,7 +3,6 @@
 
 #include "ip.h"
 
-/* C++ HEADER FOR `PACKET` -> `FLOW` AGGREGATION */
 #ifdef __cplusplus
 #include <chrono>
 #include <unordered_map>
@@ -13,7 +12,7 @@ struct Flow {
   uint16_t src_port;
   ipv4Ptr dst_ip;
   uint16_t dst_port;
-  int total_bytes = 0;
+  int total_bytes;
   uint8_t protocol;
   std::chrono::system_clock::time_point start_time;
   std::chrono::system_clock::time_point last_update_time;
@@ -33,7 +32,6 @@ struct FlowKey {
   }
 };
 
-// Custom hash function for FlowKey
 struct FlowKeyHash {
   std::size_t operator()(const FlowKey &key) const {
     return std::hash<ipv4Ptr>()(key.src_ip) ^
@@ -44,12 +42,15 @@ struct FlowKeyHash {
   }
 };
 
-using FlowsMap = std::unordered_map<FlowKey, Flow>;
+using FlowsMap = std::unordered_map<FlowKey, Flow, FlowKeyHash>;
+
+extern FlowsMap flows_map;
 
 extern "C" {
 #endif
 
-void add_test(int a, int b);
+void add_or_update(ipv4Ptr src_ip, uint16_t src_port, ipv4Ptr dst_ip,
+                   uint16_t dst_port, int total_bytes, uint8_t protocol);
 
 #ifdef __cplusplus
 }
