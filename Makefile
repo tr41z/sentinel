@@ -78,7 +78,7 @@ $(EXEC): $(OBJECTS) $(OBJ_DIR)
 
 # Compile test executable
 $(TEST_EXEC): $(TEST_OBJECTS) $(OBJ_DIR)/packet.o $(OBJ_DIR)/ip.o
-	$(CXX) $(TEST_OBJECTS) $(OBJ_DIR)/db.o $(OBJ_DIR)/sniffer.o $(OBJ_DIR)/packet.o $(OBJ_DIR)/ip.o $(CXXFLAGS) $(LDFLAGS) -o $(SNIFFER_DIR)/$(TEST_EXEC)
+	$(CXX) $(TEST_OBJECTS) $(OBJ_DIR)/flow.o $(OBJ_DIR)/db.o $(OBJ_DIR)/sniffer.o $(OBJ_DIR)/packet.o $(OBJ_DIR)/ip.o $(CXXFLAGS) $(LDFLAGS) -o $(SNIFFER_DIR)/$(TEST_EXEC)
 
 # Compile sniffer source files into object files (handle both C and C++)
 $(OBJ_DIR)/%.o: $(SNIFFER_DIR)/$(SRC_DIR)/%.c | $(OBJ_DIR)

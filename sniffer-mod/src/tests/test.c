@@ -26,6 +26,11 @@ void test_connect_string_path() {
   char *result = connect_string(home_dir, db_path);
 
   CU_ASSERT_STRING_EQUAL(result, "/Users/profile/.sentinel/sentinel.db");
+
+  free(result);
+  result = NULL;
+
+  CU_ASSERT_PTR_NULL(result);
 }
 
 void test_connect_string_edge_case() {

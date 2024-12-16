@@ -1,4 +1,5 @@
 #include "include/packet.h"
+#include "include/flow.h"
 #include "include/ip.h"
 #include <arpa/inet.h>
 #include <net/ethernet.h>
@@ -210,7 +211,10 @@ void packet_handler(u_char *args, const struct pcap_pkthdr *header,
     cmbPtr new_udp_header = handle_udp_header(packet, new_ip_header_udp);
 
     display_packet(new_ip_header_udp, new_udp_header);
-
+    add_or_update(new_ip_header_udp->source_address, new_udp_header->src_port,
+                  new_ip_header_udp->destination_address,
+                  new_udp_header->dst_port, new_udp_header->header_length,
+                  new_ip_header_udp->protocol);
     cmb_free(new_udp_header);
     new_udp_header = NULL;
     new_ip_header_udp = NULL;
