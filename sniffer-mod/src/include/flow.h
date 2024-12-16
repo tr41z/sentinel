@@ -57,7 +57,6 @@ extern "C" {
 
 void flow_add_or_update(ipv4Ptr src_ip, uint16_t src_port, ipv4Ptr dst_ip,
                         uint16_t dst_port, int total_bytes, uint8_t protocol);
-char *ip_to_str(ipv4Ptr ip);
 
 #ifdef __cplusplus
 }

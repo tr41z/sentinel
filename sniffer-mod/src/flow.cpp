@@ -2,16 +2,10 @@
 #include "include/ip.h"
 #include <iomanip>
 #include <iostream>
+#include <stdio.h>
 
 // Global map instance
 FlowsMap flows_map;
-
-char *ip_to_str(ipv4Ptr ip) {
-  static char ip_str[16]; // Enough space for "xxx.xxx.xxx.xxx\0"
-  sprintf(ip_str, "%d.%d.%d.%d", ip->octets[0], ip->octets[1], ip->octets[2],
-          ip->octets[3]);
-  return ip_str;
-}
 
 FlowKey create_normalized_key(ipv4Ptr src_ip, uint16_t src_port, ipv4Ptr dst_ip,
                               uint16_t dst_port, uint8_t protocol) {
@@ -57,12 +51,12 @@ void flow_add_or_update(ipv4Ptr src_ip, uint16_t src_port, ipv4Ptr dst_ip,
             << "dst_port: " << value.dst_port << "\n"
             << "protocol: " << static_cast<int>(value.protocol) << "\n"
             << "total_bytes: " << value.total_bytes << "\n"
+            << "packet_count: " << value.packet_count << "\n"
             << "start_time: "
             << std::put_time(std::localtime(&start_time), "%Y-%m-%d %H:%M:%S")
             << "\n"
             << "last_update_time: "
             << std::put_time(std::localtime(&last_update_time),
                              "%Y-%m-%d %H:%M:%S")
-            << "\n"
-            << "packet_count: " << value.packet_count << "\n";
+            << "\n";
 }
