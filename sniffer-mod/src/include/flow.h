@@ -2,6 +2,8 @@
 #define FLOW_H
 
 #include "ip.h"
+#include <arpa/inet.h>
+#include <stdio.h>
 
 #ifdef __cplusplus
 #include <chrono>
@@ -46,11 +48,15 @@ using FlowsMap = std::unordered_map<FlowKey, Flow, FlowKeyHash>;
 
 extern FlowsMap flows_map;
 
+FlowKey create_normalized_key(ipv4Ptr src_ip, uint16_t src_port, ipv4Ptr dst_ip,
+                              uint16_t dst_port, uint8_t protocol);
+
 extern "C" {
 #endif
 
-void add_or_update(ipv4Ptr src_ip, uint16_t src_port, ipv4Ptr dst_ip,
-                   uint16_t dst_port, int total_bytes, uint8_t protocol);
+void flow_add_or_update(ipv4Ptr src_ip, uint16_t src_port, ipv4Ptr dst_ip,
+                        uint16_t dst_port, int total_bytes, uint8_t protocol);
+char *ip_to_str(ipv4Ptr ip);
 
 #ifdef __cplusplus
 }
