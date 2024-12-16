@@ -11,7 +11,6 @@ typedef uint8_t u_char;   /* Define u_char as uint8_t */
 extern "C" {
 #endif
 
-#define DEV_NUM_PACKETS 1
 #define PACKET_ARRIVAL_THRESHOLD 5
 
 #include "packet.h"
