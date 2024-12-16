@@ -16,6 +16,7 @@ struct Flow {
   uint16_t dst_port;
   int total_bytes;
   uint8_t protocol;
+  int packet_count = 1;
   std::chrono::system_clock::time_point start_time;
   std::chrono::system_clock::time_point last_update_time;
 };

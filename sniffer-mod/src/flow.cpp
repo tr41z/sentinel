@@ -30,6 +30,7 @@ void flow_add_or_update(ipv4Ptr src_ip, uint16_t src_port, ipv4Ptr dst_ip,
 
   if (it != flows_map.end()) {
     it->second.total_bytes += total_bytes;
+    it->second.packet_count += 1;
     it->second.last_update_time = std::chrono::system_clock::now();
     std::cout << "Flow Updated!\n";
   } else {
@@ -62,5 +63,6 @@ void flow_add_or_update(ipv4Ptr src_ip, uint16_t src_port, ipv4Ptr dst_ip,
             << "last_update_time: "
             << std::put_time(std::localtime(&last_update_time),
                              "%Y-%m-%d %H:%M:%S")
-            << "\n";
+            << "\n"
+            << "packet_count: " << value.packet_count << "\n";
 }
