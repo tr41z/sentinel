@@ -3,8 +3,11 @@
 #include <chrono>
 #include <iomanip>
 #include <iostream>
+#include <mutex>
 #include <stdio.h>
+#include <thread>
 
+std::mutex flows_map_mutex; /* Mutex for  */
 // Global map instance
 FlowsMap flows_map;
 
@@ -17,27 +20,47 @@ FlowKey create_normalized_key(ipv4Ptr src_ip, uint16_t src_port, ipv4Ptr dst_ip,
   }
 }
 
+void terminate_and_save_flows() {
+  while (true) {
+    std::this_thread::sleep_for(std::chrono::seconds(1)); // Check every second
+    std::lock_guard<std::mutex> lock(flows_map_mutex);
+
+    for (auto it = flows_map.begin(); it != flows_map.end();) {
+      auto idle_time = std::chrono::duration_cast<std::chrono::seconds>(
+          std::chrono::system_clock::now() - it->second.last_update_time);
+
+      if (idle_time.count() >= IDLE_DURATION_MAX_THRESHOLD) {
+        std::cout << "Terminating flow due to idle timeout: "
+                  << ip_to_str(it->second.src_ip) << " -> "
+                  << ip_to_str(it->second.dst_ip) << "\n";
+
+        /*
+         *
+         * SAVE FLOW TO DB
+         *
+         */
+
+        it = flows_map.erase(it); // Remove the flow and get the next iterator
+      } else {
+        ++it; // Move to the next flow
+      }
+    }
+  }
+}
+
 void flow_add_or_update(ipv4Ptr src_ip, uint16_t src_port, ipv4Ptr dst_ip,
                         uint16_t dst_port, int total_bytes, uint8_t protocol) {
+  std::lock_guard<std::mutex> lock(flows_map_mutex);
   FlowKey key =
       create_normalized_key(src_ip, src_port, dst_ip, dst_port, protocol);
   auto it = flows_map.find(key);
 
   if (it != flows_map.end()) {
-    auto seconds = std::chrono::duration_cast<std::chrono::seconds>(
-        it->second.last_update_time - it->second.start_time);
-    auto dur = seconds.count();
-
-    if (dur >= IDLE_DURATION_MAX_THRESHOLD) {
-      std::cout << "!!!! TERMINATING FLOW !!!!" << std::endl;
-      flows_map.erase(it);
-    } else {
-      // Update existing flow data
-      it->second.total_bytes += total_bytes;
-      it->second.packet_count += 1;
-      it->second.last_update_time = std::chrono::system_clock::now();
-      std::cout << "Flow Updated!\n";
-    }
+    // Update existing flow data
+    it->second.total_bytes += total_bytes;
+    it->second.packet_count += 1;
+    it->second.last_update_time = std::chrono::system_clock::now();
+    std::cout << "Flow Updated!\n";
   } else {
     // If flow doesn't exist, create new
     std::cout << "Flow Created!\n";

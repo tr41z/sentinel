@@ -53,13 +53,19 @@ using FlowsMap = std::unordered_map<FlowKey, Flow, FlowKeyHash>;
 extern FlowsMap flows_map;
 
 FlowKey create_normalized_key(ipv4Ptr src_ip, uint16_t src_port, ipv4Ptr dst_ip,
-                              uint16_t dst_port, uint8_t protocol);
+                              uint16_t dst_port,
+                              uint8_t protocol); /* Normalizing key */
+void terminate_and_save_flows(); /* Async function to terminate flows based on
+                                  * their duration */
 
 extern "C" {
 #endif
 
-void flow_add_or_update(ipv4Ptr src_ip, uint16_t src_port, ipv4Ptr dst_ip,
-                        uint16_t dst_port, int total_bytes, uint8_t protocol);
+void flow_add_or_update(
+    ipv4Ptr src_ip, uint16_t src_port, ipv4Ptr dst_ip, uint16_t dst_port,
+    int total_bytes,
+    uint8_t protocol); /* Function that either adds or updates existing flow
+                          based on its existance in map */
 
 #ifdef __cplusplus
 }
