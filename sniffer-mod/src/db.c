@@ -18,7 +18,7 @@ void connect_db(char *home_dir) {
     fprintf(stderr, "Cant open database: %s\n", sqlite3_errmsg(db));
   } else {
     fprintf(stderr, "Opened database successfully\n");
-    db_build(rc, db);
+    flows_table_build(rc, db);
   }
 
   sqlite3_close(db);
@@ -26,11 +26,25 @@ void connect_db(char *home_dir) {
   free(hidden_dir);
 }
 
-void db_build(int rc, sqlite3 *db) {
-  const char sql[] = "CREATE TABLE FLOWS("
-                     "ID INT PRIMARY        KEY      NOT NULL,"
-                     "OCCURANCES            INT      NOT NULL);";
+void flows_table_build(int rc, sqlite3 *db) {
+  const char sql[] =
+      "CREATE TABLE IF NOT EXISTS FLOWS("
+      "id                    INTEGER          PRIMARY KEY       AUTOINCREMENT,"
+      "src_ip                VARCHAR(45),"
+      "src_port              INT,"
+      "dst_ip                VARCHAR(45),"
+      "dst_port              INT,"
+      "protocol              INT,"
+      "total_bytes           INT,"
+      "total_packet_count    INT,"
+      "start_time            INTEGER,"
+      "last_updated_time     INTEGER);";
 
   rc = sqlite3_exec(db, sql, NULL, NULL, NULL);
-  fprintf(stderr, "Table created successfully!\n");
+
+  if (rc) {
+    fprintf(stderr, "Cant create table: %s\n", sqlite3_errmsg(db));
+  } else {
+    fprintf(stderr, "Table created successfully!\n");
+  }
 }

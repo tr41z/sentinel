@@ -15,7 +15,7 @@ extern "C" {
 #endif
 
 void connect_db(char *home_dir);
-void db_build(int rc, sqlite3 *db);
+void flows_table_build(int rc, sqlite3 *db);
 static inline char *get_home_dir() {
   struct passwd *pw = getpwuid(getuid());
   char *homedir = pw->pw_dir;

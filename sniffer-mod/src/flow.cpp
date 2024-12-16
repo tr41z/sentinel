@@ -1,5 +1,6 @@
 #include "include/flow.h"
 #include "include/ip.h"
+#include <chrono>
 #include <iomanip>
 #include <iostream>
 #include <stdio.h>
@@ -23,11 +24,22 @@ void flow_add_or_update(ipv4Ptr src_ip, uint16_t src_port, ipv4Ptr dst_ip,
   auto it = flows_map.find(key);
 
   if (it != flows_map.end()) {
-    it->second.total_bytes += total_bytes;
-    it->second.packet_count += 1;
-    it->second.last_update_time = std::chrono::system_clock::now();
-    std::cout << "Flow Updated!\n";
+    auto seconds = std::chrono::duration_cast<std::chrono::seconds>(
+        it->second.last_update_time - it->second.start_time);
+    auto dur = seconds.count();
+
+    if (dur >= IDLE_DURATION_MAX_THRESHOLD) {
+      std::cout << "!!!! TERMINATING FLOW !!!!" << std::endl;
+      flows_map.erase(it);
+    } else {
+      // Update existing flow data
+      it->second.total_bytes += total_bytes;
+      it->second.packet_count += 1;
+      it->second.last_update_time = std::chrono::system_clock::now();
+      std::cout << "Flow Updated!\n";
+    }
   } else {
+    // If flow doesn't exist, create new
     std::cout << "Flow Created!\n";
     Flow flow;
     flow.src_ip = src_ip;

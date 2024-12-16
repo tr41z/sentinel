@@ -9,6 +9,9 @@
 #include <chrono>
 #include <unordered_map>
 
+#define IDLE_DURATION_MAX_THRESHOLD 60
+#define DURATION_MAX_THRESHOLD 300
+
 struct Flow {
   ipv4Ptr src_ip;
   uint16_t src_port;
