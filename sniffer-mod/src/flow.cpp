@@ -19,8 +19,12 @@ FlowKey create_normalized_key(ipv4Ptr src_ip, uint16_t src_port, ipv4Ptr dst_ip,
 // Function to check and terminate flows based on thresholds
 void terminate_and_save_flows() {
   while (true) {
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(std::chrono::seconds(3));
     std::lock_guard<std::mutex> lock(flows_map_mutex);
+
+    if (flows_map.empty()) {
+      break;
+    }
 
     for (auto it = flows_map.begin(); it != flows_map.end();) {
       auto idle_time = std::chrono::duration_cast<std::chrono::seconds>(
@@ -33,21 +37,28 @@ void terminate_and_save_flows() {
                   << ip_to_str(it->second.src_ip) << " -> "
                   << ip_to_str(it->second.dst_ip) << "\n";
 
-        ipv4_free(it->second.src_ip);
-        ipv4_free(it->second.dst_ip);
+        free(it->second.src_ip);
+        free(it->second.dst_ip);
+        it->second.src_ip = NULL;
+        it->second.dst_ip = NULL;
         it = flows_map.erase(it);
       } else if (working_time.count() >= DURATION_MAX_THRESHOLD) {
         std::cout << "Terminating flow due to reaching max threshold: "
                   << ip_to_str(it->second.src_ip) << " -> "
                   << ip_to_str(it->second.dst_ip) << "\n";
 
-        ipv4_free(it->second.src_ip);
-        ipv4_free(it->second.dst_ip);
+        free(it->second.src_ip);
+        free(it->second.dst_ip);
+        it->second.src_ip = NULL;
+        it->second.dst_ip = NULL;
         it = flows_map.erase(it);
       } else {
         ++it;
       }
     }
+
+    // Print the number of flows left in the map after each round of termination
+    std::cout << "Flows left: " << flows_map.size() << "\n";
   }
 }
 

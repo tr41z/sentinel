@@ -2,7 +2,12 @@
 
 ipv4Ptr ipv4_new(uint8_t first, uint8_t second, uint8_t third, uint8_t fourth) {
   // New ipv4 address initialisation
-  ipv4Ptr ipv4_addr = (ipv4Ptr)calloc(1, sizeof(Ipv4Addr));
+  ipv4Ptr ipv4_addr = (ipv4Ptr)malloc(sizeof(Ipv4Addr));
+
+  // Check if malloc succeeded
+  if (ipv4_addr == NULL) {
+    return NULL; // Return NULL if memory allocation failed
+  }
 
   // Assign new values
   ipv4_addr->octets[0] = first;
