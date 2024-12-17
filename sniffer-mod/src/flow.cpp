@@ -37,8 +37,8 @@ void terminate_and_save_flows() {
                   << ip_to_str(it->second.src_ip) << " -> "
                   << ip_to_str(it->second.dst_ip) << "\n";
 
-        free(it->second.src_ip);
-        free(it->second.dst_ip);
+        ipv4_free(it->second.src_ip);
+        ipv4_free(it->second.dst_ip);
         it->second.src_ip = NULL;
         it->second.dst_ip = NULL;
         it = flows_map.erase(it);
@@ -47,8 +47,8 @@ void terminate_and_save_flows() {
                   << ip_to_str(it->second.src_ip) << " -> "
                   << ip_to_str(it->second.dst_ip) << "\n";
 
-        free(it->second.src_ip);
-        free(it->second.dst_ip);
+        ipv4_free(it->second.src_ip);
+        ipv4_free(it->second.dst_ip);
         it->second.src_ip = NULL;
         it->second.dst_ip = NULL;
         it = flows_map.erase(it);
