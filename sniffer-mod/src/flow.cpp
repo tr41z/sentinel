@@ -1,11 +1,5 @@
 #include "include/flow.h"
 #include "include/ip.h"
-#include <chrono>
-#include <iomanip>
-#include <iostream>
-#include <mutex>
-#include <stdio.h>
-#include <thread>
 
 std::mutex flows_map_mutex; /* Mutex for  */
 // Global map instance
@@ -28,9 +22,23 @@ void terminate_and_save_flows() {
     for (auto it = flows_map.begin(); it != flows_map.end();) {
       auto idle_time = std::chrono::duration_cast<std::chrono::seconds>(
           std::chrono::system_clock::now() - it->second.last_update_time);
+      auto working_time = std::chrono::duration_cast<std::chrono::seconds>(
+          std::chrono::system_clock::now() - it->second.start_time);
 
       if (idle_time.count() >= IDLE_DURATION_MAX_THRESHOLD) {
         std::cout << "Terminating flow due to idle timeout: "
+                  << ip_to_str(it->second.src_ip) << " -> "
+                  << ip_to_str(it->second.dst_ip) << "\n";
+
+        /*
+         *
+         * SAVE FLOW TO DB
+         *
+         */
+
+        it = flows_map.erase(it); // Remove the flow and get the next iterator
+      } else if (working_time.count() >= DURATION_MAX_THRESHOLD) {
+        std::cout << "Terminating flow due to reaching max threshold: "
                   << ip_to_str(it->second.src_ip) << " -> "
                   << ip_to_str(it->second.dst_ip) << "\n";
 

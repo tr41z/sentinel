@@ -1,7 +1,4 @@
 #include "include/ip.h"
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 ipv4Ptr ipv4_new(uint8_t first, uint8_t second, uint8_t third, uint8_t fourth) {
   // New ipv4 address initialisation

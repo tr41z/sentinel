@@ -1,12 +1,6 @@
 #include "include/packet.h"
 #include "include/flow.h"
 #include "include/ip.h"
-#include <arpa/inet.h>
-#include <net/ethernet.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 struct pcap_pkthdr header;       /* The header that pcap returns */
 struct ether_header *eth_header; /* Starting point of ethernet header */

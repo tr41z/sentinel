@@ -7,6 +7,10 @@
 
 #ifdef __cplusplus
 #include <chrono>
+#include <iomanip>
+#include <iostream>
+#include <mutex>
+#include <thread>
 #include <unordered_map>
 
 #define IDLE_DURATION_MAX_THRESHOLD 60
