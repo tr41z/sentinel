@@ -1,11 +1,22 @@
 #ifndef IP_H
 #define IP_H
 
+#include <arpa/inet.h>
+#include <errno.h>
+#include <netinet/in.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/socket.h>
+#include <unistd.h>
 
 #ifdef __cplusplus
+
+#include <cstring>
+#include <iostream>
+
+char *local_ip_addr();
+
 extern "C" {
 #endif
 

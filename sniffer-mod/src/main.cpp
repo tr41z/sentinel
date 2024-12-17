@@ -14,8 +14,6 @@ int main() {
   // Start the sniffer in the main thread (or in another thread if needed)
   start_multithreaded_sniffing();
 
-  // Wait for the terminate_and_save_flows thread to finish
   terminate_thread.join();
-
   return 0;
 }

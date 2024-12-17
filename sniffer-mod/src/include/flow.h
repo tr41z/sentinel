@@ -13,8 +13,8 @@
 #include <thread>
 #include <unordered_map>
 
-#define IDLE_DURATION_MAX_THRESHOLD 60
-#define DURATION_MAX_THRESHOLD 300
+#define IDLE_DURATION_MAX_THRESHOLD 5
+#define DURATION_MAX_THRESHOLD 5
 
 struct Flow {
   ipv4Ptr src_ip;
@@ -36,17 +36,20 @@ struct FlowKey {
   uint8_t protocol;
 
   bool operator==(const FlowKey &other) const {
-    return src_ip == other.src_ip && src_port == other.src_port &&
-           dst_ip == other.dst_ip && dst_port == other.dst_port &&
-           protocol == other.protocol;
+    return std::memcmp(src_ip, other.src_ip, sizeof(Ipv4Addr)) == 0 &&
+           src_port == other.src_port &&
+           std::memcmp(dst_ip, other.dst_ip, sizeof(Ipv4Addr)) == 0 &&
+           dst_port == other.dst_port && protocol == other.protocol;
   }
 };
 
 struct FlowKeyHash {
   std::size_t operator()(const FlowKey &key) const {
-    return std::hash<ipv4Ptr>()(key.src_ip) ^
-           std::hash<uint16_t>()(key.src_port) ^
-           std::hash<ipv4Ptr>()(key.dst_ip) ^
+    std::size_t h1 = std::hash<std::string>()(
+        std::string((char *)key.src_ip, sizeof(Ipv4Addr)));
+    std::size_t h2 = std::hash<std::string>()(
+        std::string((char *)key.dst_ip, sizeof(Ipv4Addr)));
+    return h1 ^ (h2 << 1) ^ std::hash<uint16_t>()(key.src_port) ^
            std::hash<uint16_t>()(key.dst_port) ^
            std::hash<uint8_t>()(key.protocol);
   }
