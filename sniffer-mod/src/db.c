@@ -1,5 +1,4 @@
 #include "include/db.h"
-#include <stdio.h>
 
 void connect_db(char *home_dir) {
   sqlite3 *db;
