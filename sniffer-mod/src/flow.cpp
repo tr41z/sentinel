@@ -1,6 +1,6 @@
 #include "include/flow.h"
+#include "include/db.h"
 #include "include/ip.h"
-#include <string.h>
 #include <string>
 
 std::mutex flows_map_mutex; // Mutex for thread safety
@@ -18,9 +18,9 @@ FlowKey create_normalized_key(uint32_t src_ip, uint16_t src_port,
 }
 
 // Function to check and terminate flows based on thresholds
-void terminate_and_save_flows() {
+void terminate_and_save_flows(sqlite3 *db) {
   while (true) {
-    std::this_thread::sleep_for(std::chrono::seconds(3));
+    std::this_thread::sleep_for(std::chrono::seconds(REFRESH_RATE));
     std::lock_guard<std::mutex> lock(flows_map_mutex);
 
     if (flows_map.empty()) {
@@ -38,11 +38,15 @@ void terminate_and_save_flows() {
                   << ip_to_str(it->second.src_ip) << " -> "
                   << ip_to_str(it->second.dst_ip) << "\n";
 
+        save_flow(db, it->second);
+
         it = flows_map.erase(it);
       } else if (working_time.count() >= DURATION_MAX_THRESHOLD) {
         std::cout << "Terminating flow due to reaching max threshold: "
                   << ip_to_str(it->second.src_ip) << " -> "
                   << ip_to_str(it->second.dst_ip) << "\n";
+
+        save_flow(db, it->second);
 
         it = flows_map.erase(it);
       } else {

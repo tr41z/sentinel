@@ -1,5 +1,4 @@
 #include "../include/db.h"
-#include "../include/ip.h"
 #include "../include/packet.h"
 #include "../include/sniffer.h"
 #include <CUnit/Basic.h>
