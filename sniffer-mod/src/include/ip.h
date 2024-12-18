@@ -1,9 +1,23 @@
 #ifndef IP_H
 #define IP_H
 
+#include <arpa/inet.h>
+#include <errno.h>
+#include <netinet/in.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/socket.h>
+#include <unistd.h>
 
 #ifdef __cplusplus
+
+#include <cstring>
+#include <iostream>
+
+std::string local_ip_addr();
+std::string ip_to_str(uint32_t ip);
+
 extern "C" {
 #endif
 
@@ -15,7 +29,6 @@ typedef Ipv4Addr *ipv4Ptr;
 
 ipv4Ptr ipv4_new(uint8_t first, uint8_t second, uint8_t third, uint8_t fourth);
 void ipv4_free(ipv4Ptr self);
-char *ip_to_str(ipv4Ptr ip);
 
 #ifdef __cplusplus
 }

@@ -1,9 +1,4 @@
 #include "include/sniffer.h"
-#include <pthread.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
 
 char err_buff[PCAP_ERRBUF_SIZE];
 pcap_if_t *interfaces, *temp;

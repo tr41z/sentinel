@@ -2,11 +2,7 @@
 #include "include/flow.h"
 #include "include/ip.h"
 #include <arpa/inet.h>
-#include <net/ethernet.h>
 #include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 struct pcap_pkthdr header;       /* The header that pcap returns */
 struct ether_header *eth_header; /* Starting point of ethernet header */
@@ -45,7 +41,7 @@ cmbPtr cmb_new(ipPtr ip_header, uint16_t src_port, uint16_t dst_port,
 ipPtr ip_new(uint8_t version, uint8_t ihl, uint8_t tos, uint16_t total_length,
              uint16_t identification, uint8_t flags, uint16_t fragment_offset,
              uint8_t ttl, uint8_t protocol, uint16_t checksum,
-             ipv4Ptr source_address, ipv4Ptr destination_address) {
+             uint32_t source_address, uint32_t destination_address) {
   ipPtr ip_header = (ipPtr)malloc(sizeof(IpHeader));
 
   if (!ip_header) {
@@ -80,10 +76,6 @@ void cmb_free(cmbPtr self) {
 
 void ip_free(ipPtr self) {
   if (self) {
-    if (self->source_address)
-      ipv4_free(self->source_address);
-    if (self->destination_address)
-      ipv4_free(self->destination_address);
     free(self);
   }
 }
@@ -99,10 +91,10 @@ ipPtr handle_ip_header(const u_char *ip_header, const u_char *packet) {
     return NULL;
   }
 
-  ipv4Ptr src_ip = ipv4_new(*(ip_header + 12), *(ip_header + 13),
-                            *(ip_header + 14), *(ip_header + 15));
-  ipv4Ptr dst_ip = ipv4_new(*(ip_header + 16), *(ip_header + 17),
-                            *(ip_header + 18), *(ip_header + 19));
+  uint32_t src_ip =
+      ntohl(*(reinterpret_cast<const uint32_t *>(ip_header + 12)));
+  uint32_t dst_ip =
+      ntohl(*(reinterpret_cast<const uint32_t *>(ip_header + 16)));
   uint8_t ttl = *(ip_header + 8);
   uint8_t protocol = *(ip_header + 9);
   uint16_t checksum = ntohs(*(uint16_t *)(ip_header + 10));
@@ -169,15 +161,16 @@ cmbPtr handle_udp_header(const u_char *packet, ipPtr ip_header) {
 void display_packet(ipPtr ip_header, cmbPtr proto_header) {
   printf("Version: [%d]\n", ip_header->version);
   printf("Source Address: [%d.%d.%d.%d]\n",
-         ip_header->source_address->octets[0],
-         ip_header->source_address->octets[1],
-         ip_header->source_address->octets[2],
-         ip_header->source_address->octets[3]);
+         (ip_header->source_address >> 24) & 0xFF, // First byte
+         (ip_header->source_address >> 16) & 0xFF, // Second byte
+         (ip_header->source_address >> 8) & 0xFF,  // Third byte
+         ip_header->source_address & 0xFF          // Fourth byte
+  );
   printf("Destination Address: [%d.%d.%d.%d]\n",
-         ip_header->destination_address->octets[0],
-         ip_header->destination_address->octets[1],
-         ip_header->destination_address->octets[2],
-         ip_header->destination_address->octets[3]);
+         (ip_header->destination_address >> 24) & 0xFF, // First byte
+         (ip_header->destination_address >> 16) & 0xFF, // Second byte
+         (ip_header->destination_address >> 8) & 0xFF,  // Third byte
+         ip_header->destination_address & 0xFF);        // Fourth byte
   printf("Source Port: [%d]\n", proto_header->src_port);
   printf("Destination Port: [%d]\n", proto_header->dst_port);
   printf("IHL: %d bytes\n", ip_header->ihl);
@@ -203,12 +196,18 @@ void packet_handler(u_char *args, const struct pcap_pkthdr *header,
   ip_header = packet + ETHERNET_HEADER_LEN;
   ipPtr new_ip_header = handle_ip_header(ip_header, packet);
 
+  // Initialize variables before the switch statement
+  ipPtr new_ip_header_udp = NULL;
+  cmbPtr new_udp_header = NULL;
+  ipPtr new_ip_header_tcp = NULL;
+  cmbPtr new_tcp_header = NULL;
+
   switch (new_ip_header->protocol) {
   case IPPROTO_UDP:
     printf("======================== UDP ===========================\n");
 
-    ipPtr new_ip_header_udp = handle_ip_header(ip_header, packet);
-    cmbPtr new_udp_header = handle_udp_header(packet, new_ip_header_udp);
+    new_ip_header_udp = handle_ip_header(ip_header, packet);
+    new_udp_header = handle_udp_header(packet, new_ip_header_udp);
 
     flow_add_or_update(
         new_ip_header_udp->source_address, new_udp_header->src_port,
@@ -223,8 +222,8 @@ void packet_handler(u_char *args, const struct pcap_pkthdr *header,
   case IPPROTO_TCP:
     printf("======================== TCP ===========================\n");
 
-    ipPtr new_ip_header_tcp = handle_ip_header(ip_header, packet);
-    cmbPtr new_tcp_header = handle_tcp_header(packet, new_ip_header_tcp);
+    new_ip_header_tcp = handle_ip_header(ip_header, packet);
+    new_tcp_header = handle_tcp_header(packet, new_ip_header_tcp);
 
     flow_add_or_update(
         new_ip_header_tcp->source_address, new_tcp_header->src_port,

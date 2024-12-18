@@ -1,4 +1,4 @@
-#include <stdint.h> /* For standard types like uint32_t, uint16_t, uint8_t */
+#include <stdint.h>
 
 typedef uint32_t u_int;   /* Define u_int as uint32_t */
 typedef uint16_t u_short; /* Define u_short as uint16_t */
@@ -8,7 +8,12 @@ typedef uint8_t u_char;   /* Define u_char as uint8_t */
 #define PACKET_H
 
 #include "ip.h"
+#include <arpa/inet.h>
+#include <net/ethernet.h>
 #include <pcap.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/types.h>
 
 #define ETHERNET_HEADER_LEN 14
@@ -25,8 +30,8 @@ typedef struct {
   uint8_t ttl;
   uint8_t protocol;
   uint16_t checksum;
-  ipv4Ptr source_address;
-  ipv4Ptr destination_address;
+  uint32_t source_address;
+  uint32_t destination_address;
 } IpHeader; /* Struct for collecting information from IP Header. Skipping
                options and padding */
 
@@ -48,7 +53,7 @@ cmbPtr cmb_new(
 ipPtr ip_new(uint8_t version, uint8_t ihl, uint8_t tos, uint16_t total_length,
              uint16_t identification, uint8_t flags, uint16_t fragment_offset,
              uint8_t ttl, uint8_t protocol, uint16_t checksum,
-             ipv4Ptr source_address, ipv4Ptr destination_address);
+             uint32_t source_address, uint32_t destination_address);
 void cmb_free(cmbPtr self); /* Free the memory of struct and values */
 void ip_free(ipPtr self);
 ipPtr handle_ip_header(const u_char *ip_header,
