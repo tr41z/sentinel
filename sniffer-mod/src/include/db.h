@@ -1,6 +1,10 @@
 #ifndef DB_H
 #define DB_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <pwd.h>
 #include <sqlite3.h>
 #include <stdio.h>
@@ -9,10 +13,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 void connect_db(char *home_dir);
 void flows_table_build(int rc, sqlite3 *db);

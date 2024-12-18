@@ -1,9 +1,6 @@
 #ifndef FLOW_H
 #define FLOW_H
 
-#include <arpa/inet.h>
-#include <stdio.h>
-
 #ifdef __cplusplus
 #include <chrono>
 #include <iomanip>
@@ -69,6 +66,9 @@ void terminate_and_save_flows();
 
 extern "C" {
 #endif
+
+#include <arpa/inet.h>
+#include <stdio.h>
 
 // Function to add or update flows in the map
 void flow_add_or_update(uint32_t src_ip, uint16_t src_port, uint32_t dst_ip,

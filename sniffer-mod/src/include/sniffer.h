@@ -8,16 +8,17 @@ typedef uint8_t u_char;   /* Define u_char as uint8_t */
 #define SNIFFER_H
 
 #include "packet.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <pcap.h>
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #define PACKET_ARRIVAL_THRESHOLD 20
 

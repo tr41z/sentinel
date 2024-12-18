@@ -1,15 +1,6 @@
 #ifndef IP_H
 #define IP_H
 
-#include <arpa/inet.h>
-#include <errno.h>
-#include <netinet/in.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/socket.h>
-#include <unistd.h>
-
 #ifdef __cplusplus
 
 #include <cstring>
@@ -20,6 +11,15 @@ std::string ip_to_str(uint32_t ip);
 
 extern "C" {
 #endif
+
+#include <arpa/inet.h>
+#include <errno.h>
+#include <netinet/in.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/socket.h>
+#include <unistd.h>
 
 typedef struct {
   uint8_t octets[4];
