@@ -2,15 +2,18 @@
 #define FLOW_H
 
 #ifdef __cplusplus
+
 #include <chrono>
 #include <iomanip>
 #include <iostream>
 #include <mutex>
 #include <thread>
 #include <unordered_map>
+#include <sqlite3.h>
 
 #define IDLE_DURATION_MAX_THRESHOLD 30
 #define DURATION_MAX_THRESHOLD 300
+#define REFRESH_RATE 1
 
 // Flow structure with uint32_t for IP addresses
 struct Flow {
@@ -62,7 +65,7 @@ FlowKey create_normalized_key(uint32_t src_ip, uint16_t src_port, uint32_t dst_i
                               uint16_t dst_port, uint8_t protocol); 
 
 // Async function to terminate and save flows based on their duration
-void terminate_and_save_flows();
+void terminate_and_save_flows(sqlite3 *db);
 
 extern "C" {
 #endif

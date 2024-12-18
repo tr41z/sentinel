@@ -25,12 +25,9 @@ extern "C" {
 typedef struct {
   char *device_name;
 } ThreadArgs;
+
 void *sniffer_thread(void *args);
 void start_multithreaded_sniffing();
-typedef pcap_if_t *devPtr; /* For better readibility */
-
-devPtr find_devices();          /* Returns interfaces to sniff on */
-void start_sniffer(devPtr dev); /* Starts sniffer on device (interface) */
 
 #ifdef __cplusplus
 }

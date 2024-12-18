@@ -2,6 +2,12 @@
 #define DB_H
 
 #ifdef __cplusplus
+
+#include "flow.h"
+#include <sqlite3.h>
+
+void save_flow(sqlite3 *db, const Flow &flow);
+
 extern "C" {
 #endif
 
@@ -14,7 +20,7 @@ extern "C" {
 #include <sys/types.h>
 #include <unistd.h>
 
-void connect_db(char *home_dir);
+void connect_db(char *home_dir, sqlite3 **db);
 void flows_table_build(int rc, sqlite3 *db);
 static inline char *get_home_dir() {
   struct passwd *pw = getpwuid(getuid());

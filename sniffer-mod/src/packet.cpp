@@ -160,16 +160,15 @@ cmbPtr handle_udp_header(const u_char *packet, ipPtr ip_header) {
 void display_packet(ipPtr ip_header, cmbPtr proto_header) {
   printf("Version: [%d]\n", ip_header->version);
   printf("Source Address: [%d.%d.%d.%d]\n",
-         (ip_header->source_address >> 24) & 0xFF, // First byte
-         (ip_header->source_address >> 16) & 0xFF, // Second byte
-         (ip_header->source_address >> 8) & 0xFF,  // Third byte
-         ip_header->source_address & 0xFF          // Fourth byte
-  );
+         (ip_header->source_address >> 24) & 0xFF,
+         (ip_header->source_address >> 16) & 0xFF,
+         (ip_header->source_address >> 8) & 0xFF,
+         ip_header->source_address & 0xFF);
   printf("Destination Address: [%d.%d.%d.%d]\n",
-         (ip_header->destination_address >> 24) & 0xFF, // First byte
-         (ip_header->destination_address >> 16) & 0xFF, // Second byte
-         (ip_header->destination_address >> 8) & 0xFF,  // Third byte
-         ip_header->destination_address & 0xFF);        // Fourth byte
+         (ip_header->destination_address >> 24) & 0xFF,
+         (ip_header->destination_address >> 16) & 0xFF,
+         (ip_header->destination_address >> 8) & 0xFF,
+         ip_header->destination_address & 0xFF);
   printf("Source Port: [%d]\n", proto_header->src_port);
   printf("Destination Port: [%d]\n", proto_header->dst_port);
   printf("IHL: %d bytes\n", ip_header->ihl);
