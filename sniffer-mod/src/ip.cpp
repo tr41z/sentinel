@@ -1,38 +1,19 @@
 #include "include/ip.h"
+#include <string>
 
-ipv4Ptr ipv4_new(uint8_t first, uint8_t second, uint8_t third, uint8_t fourth) {
-  // New ipv4 address initialisation
-  ipv4Ptr ipv4_addr = (ipv4Ptr)malloc(sizeof(Ipv4Addr));
+std::string ip_to_str(uint32_t ip) {
+  // Extract individual bytes from the uint32_t IP address
+  uint8_t byte1 = (ip >> 24) & 0xFF;
+  uint8_t byte2 = (ip >> 16) & 0xFF;
+  uint8_t byte3 = (ip >> 8) & 0xFF;
+  uint8_t byte4 = ip & 0xFF;
 
-  // Check if malloc succeeded
-  if (ipv4_addr == NULL) {
-    return NULL; // Return NULL if memory allocation failed
-  }
-
-  // Assign new values
-  ipv4_addr->octets[0] = first;
-  ipv4_addr->octets[1] = second;
-  ipv4_addr->octets[2] = third;
-  ipv4_addr->octets[3] = fourth;
-
-  return ipv4_addr;
+  // Format the IP address as a string in dotted-decimal format
+  return std::to_string(byte1) + "." + std::to_string(byte2) + "." +
+         std::to_string(byte3) + "." + std::to_string(byte4);
 }
 
-// Better readibility between `ip_free`, `ipv4_free` & `cmb_free`
-void ipv4_free(ipv4Ptr self) {
-  if (self) {
-    free(self);
-  }
-}
-
-char *ip_to_str(ipv4Ptr ip) {
-  static char ip_str[16]; // Enough space for "xxx.xxx.xxx.xxx\0"
-  sprintf(ip_str, "%d.%d.%d.%d", ip->octets[0], ip->octets[1], ip->octets[2],
-          ip->octets[3]);
-  return ip_str;
-}
-
-char *local_ip_addr() {
+std::string local_ip_addr() {
   const char *google_dns_server = "8.8.8.8";
   int dns_port = 53;
 
@@ -42,7 +23,7 @@ char *local_ip_addr() {
   // Socket could not be created
   if (sock < 0) {
     std::cout << "Socket error" << std::endl;
-    return nullptr;
+    return "";
   }
 
   memset(&serv, 0, sizeof(serv));
@@ -55,25 +36,23 @@ char *local_ip_addr() {
     std::cout << "Error number: " << errno
               << ". Error message: " << strerror(errno) << std::endl;
     close(sock);
-    return nullptr;
+    return "";
   }
 
   struct sockaddr_in name;
   socklen_t namelen = sizeof(name);
   err = getsockname(sock, (struct sockaddr *)&name, &namelen);
 
-  char *buffer = new char[80]; /* Dynamically allocate memory for buffer */
-  const char *p = inet_ntop(AF_INET, &name.sin_addr, buffer, 80);
+  char buffer[80]; // Use a fixed-size buffer instead of dynamic allocation
+  const char *p = inet_ntop(AF_INET, &name.sin_addr, buffer, sizeof(buffer));
   if (p != NULL) {
     std::cout << "Local IP address is: " << buffer << std::endl;
+    close(sock);
+    return std::string(buffer); // Return as std::string
   } else {
     std::cout << "Error number: " << errno
               << ". Error message: " << strerror(errno) << std::endl;
-    delete[] buffer; /* Clean up memory */
     close(sock);
-    return nullptr;
+    return "";
   }
-
-  close(sock);   /* Close the socket before returning */
-  return buffer; /* Return the dynamically allocated buffer */
 }

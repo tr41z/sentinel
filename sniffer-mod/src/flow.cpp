@@ -1,15 +1,16 @@
 #include "include/flow.h"
 #include "include/ip.h"
 #include <string.h>
+#include <string>
 
 std::mutex flows_map_mutex; // Mutex for thread safety
 FlowsMap flows_map;         // Global flows map
 
 // Function to normalize the flow key
-FlowKey create_normalized_key(ipv4Ptr src_ip, uint16_t src_port, ipv4Ptr dst_ip,
-                              uint16_t dst_port, uint8_t protocol) {
-  if (memcmp(src_ip, dst_ip, sizeof(Ipv4Addr)) < 0 ||
-      (memcmp(src_ip, dst_ip, sizeof(Ipv4Addr)) == 0 && src_port < dst_port)) {
+FlowKey create_normalized_key(uint32_t src_ip, uint16_t src_port,
+                              uint32_t dst_ip, uint16_t dst_port,
+                              uint8_t protocol) {
+  if (src_ip < dst_ip || (src_ip == dst_ip && src_port < dst_port)) {
     return {src_ip, src_port, dst_ip, dst_port, protocol};
   } else {
     return {dst_ip, dst_port, src_ip, src_port, protocol};
@@ -37,20 +38,12 @@ void terminate_and_save_flows() {
                   << ip_to_str(it->second.src_ip) << " -> "
                   << ip_to_str(it->second.dst_ip) << "\n";
 
-        ipv4_free(it->second.src_ip);
-        ipv4_free(it->second.dst_ip);
-        it->second.src_ip = NULL;
-        it->second.dst_ip = NULL;
         it = flows_map.erase(it);
       } else if (working_time.count() >= DURATION_MAX_THRESHOLD) {
         std::cout << "Terminating flow due to reaching max threshold: "
                   << ip_to_str(it->second.src_ip) << " -> "
                   << ip_to_str(it->second.dst_ip) << "\n";
 
-        ipv4_free(it->second.src_ip);
-        ipv4_free(it->second.dst_ip);
-        it->second.src_ip = NULL;
-        it->second.dst_ip = NULL;
         it = flows_map.erase(it);
       } else {
         ++it;
@@ -63,21 +56,18 @@ void terminate_and_save_flows() {
 }
 
 // Function to add or update a flow
-void flow_add_or_update(ipv4Ptr src_ip, uint16_t src_port, ipv4Ptr dst_ip,
+void flow_add_or_update(uint32_t src_ip, uint16_t src_port, uint32_t dst_ip,
                         uint16_t dst_port, int total_bytes, uint8_t protocol) {
   std::lock_guard<std::mutex> lock(flows_map_mutex);
 
   // Check if the IPs involve the local machine
-  char *local_addr = local_ip_addr();
-  if ((strcmp(ip_to_str(src_ip), local_addr) != 0) &&
-      (strcmp(ip_to_str(dst_ip), local_addr) != 0)) {
+  std::string local_addr = local_ip_addr();
+  if (ip_to_str(src_ip) != local_addr && ip_to_str(dst_ip) != local_addr) {
     printf("Skipping flow... (dst or src IP is not the local IP)\n");
-    printf("Flow src_ip: %s\n", ip_to_str(src_ip));
-    printf("Flow dst_ip: %s\n", ip_to_str(dst_ip));
-    free(local_addr);
+    std::cout << "Flow src_ip: " << ip_to_str(src_ip) << std::endl;
+    std::cout << "Flow dst_ip: " << ip_to_str(dst_ip) << std::endl;
     return;
   }
-  free(local_addr);
 
   // Normalize key
   FlowKey key =
@@ -91,12 +81,10 @@ void flow_add_or_update(ipv4Ptr src_ip, uint16_t src_port, ipv4Ptr dst_ip,
     it->second.last_update_time = std::chrono::system_clock::now();
     std::cout << "Flow Updated!\n";
   } else {
-    // Create new flow with dynamically allocated IPs
+    // Create new flow with uint32_t for IPs
     Flow flow;
-    flow.src_ip = ipv4_new(src_ip->octets[0], src_ip->octets[1],
-                           src_ip->octets[2], src_ip->octets[3]);
-    flow.dst_ip = ipv4_new(dst_ip->octets[0], dst_ip->octets[1],
-                           dst_ip->octets[2], dst_ip->octets[3]);
+    flow.src_ip = src_ip;
+    flow.dst_ip = dst_ip;
     flow.src_port = src_port;
     flow.dst_port = dst_port;
     flow.total_bytes = total_bytes;

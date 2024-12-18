@@ -19,7 +19,7 @@ typedef uint8_t u_char;   /* Define u_char as uint8_t */
 extern "C" {
 #endif
 
-#define PACKET_ARRIVAL_THRESHOLD 2
+#define PACKET_ARRIVAL_THRESHOLD 20
 
 typedef struct {
   char *device_name;
