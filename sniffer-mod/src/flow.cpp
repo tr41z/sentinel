@@ -23,10 +23,6 @@ void terminate_and_save_flows(sqlite3 *db) {
     std::this_thread::sleep_for(std::chrono::seconds(REFRESH_RATE));
     std::lock_guard<std::mutex> lock(flows_map_mutex);
 
-    if (flows_map.empty()) {
-      break;
-    }
-
     for (auto it = flows_map.begin(); it != flows_map.end();) {
       auto idle_time = std::chrono::duration_cast<std::chrono::seconds>(
           std::chrono::system_clock::now() - it->second.last_update_time);
@@ -61,11 +57,10 @@ void terminate_and_save_flows(sqlite3 *db) {
 
 // Function to add or update a flow
 void flow_add_or_update(uint32_t src_ip, uint16_t src_port, uint32_t dst_ip,
-                        uint16_t dst_port, int total_bytes, uint8_t protocol) {
+                        uint16_t dst_port, int total_bytes, uint8_t protocol,
+                        std::string local_addr) {
   std::lock_guard<std::mutex> lock(flows_map_mutex);
 
-  // Check if the IPs involve the local machine
-  std::string local_addr = local_ip_addr();
   if (ip_to_str(src_ip) != local_addr && ip_to_str(dst_ip) != local_addr) {
     printf("Skipping flow... (dst or src IP is not the local IP)\n");
     std::cout << "Flow src_ip: " << ip_to_str(src_ip) << std::endl;
