@@ -17,6 +17,9 @@ int ip_header_len;  /* Initialisation of ip header len since its not fixed */
 int tcp_header_len; /* Initialisaion of tcp header len since its not fixed */
 int payload_len;    /* Initialisaion of payload len since its not fixed */
 
+// Check the IP of the local machine
+std::string local_addr = local_ip_addr();
+
 cmbPtr cmb_new(ipPtr ip_header, uint16_t src_port, uint16_t dst_port,
                uint8_t header_len) {
   // Allocating memory for new CMB packet
@@ -210,7 +213,8 @@ void packet_handler(u_char *args, const struct pcap_pkthdr *header,
     flow_add_or_update(
         new_ip_header_udp->source_address, new_udp_header->src_port,
         new_ip_header_udp->destination_address, new_udp_header->dst_port,
-        new_ip_header_udp->total_length, new_ip_header_udp->protocol);
+        new_ip_header_udp->total_length, new_ip_header_udp->protocol,
+        local_addr);
 
     cmb_free(new_udp_header);
     new_udp_header = NULL;
@@ -226,7 +230,8 @@ void packet_handler(u_char *args, const struct pcap_pkthdr *header,
     flow_add_or_update(
         new_ip_header_tcp->source_address, new_tcp_header->src_port,
         new_ip_header_tcp->destination_address, new_tcp_header->dst_port,
-        new_ip_header_tcp->total_length, new_ip_header_tcp->protocol);
+        new_ip_header_tcp->total_length, new_ip_header_tcp->protocol,
+        local_addr);
 
     cmb_free(new_tcp_header);
     new_tcp_header = NULL;

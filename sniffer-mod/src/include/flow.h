@@ -7,19 +7,19 @@
 #include <iomanip>
 #include <iostream>
 #include <mutex>
+#include <sqlite3.h>
 #include <thread>
 #include <unordered_map>
-#include <sqlite3.h>
 
-#define IDLE_DURATION_MAX_THRESHOLD 30
-#define DURATION_MAX_THRESHOLD 300
+#define IDLE_DURATION_MAX_THRESHOLD 10
+#define DURATION_MAX_THRESHOLD 120
 #define REFRESH_RATE 1
 
 // Flow structure with uint32_t for IP addresses
 struct Flow {
-  uint32_t src_ip;  // Source IP as uint32_t
+  uint32_t src_ip; // Source IP as uint32_t
   uint16_t src_port;
-  uint32_t dst_ip;  // Destination IP as uint32_t
+  uint32_t dst_ip; // Destination IP as uint32_t
   uint16_t dst_port;
   int total_bytes;
   uint8_t protocol;
@@ -30,18 +30,17 @@ struct Flow {
 
 // FlowKey structure with uint32_t for IP addresses
 struct FlowKey {
-  uint32_t src_ip;  // Source IP as uint32_t
+  uint32_t src_ip; // Source IP as uint32_t
   uint16_t src_port;
-  uint32_t dst_ip;  // Destination IP as uint32_t
+  uint32_t dst_ip; // Destination IP as uint32_t
   uint16_t dst_port;
   uint8_t protocol;
 
   // Comparison operator for FlowKey
   bool operator==(const FlowKey &other) const {
-    return src_ip == other.src_ip &&
-           src_port == other.src_port &&
-           dst_ip == other.dst_ip &&
-           dst_port == other.dst_port && protocol == other.protocol;
+    return src_ip == other.src_ip && src_port == other.src_port &&
+           dst_ip == other.dst_ip && dst_port == other.dst_port &&
+           protocol == other.protocol;
   }
 };
 
@@ -61,9 +60,9 @@ using FlowsMap = std::unordered_map<FlowKey, Flow, FlowKeyHash>;
 extern FlowsMap flows_map;
 
 // Function to create a normalized flow key
-FlowKey create_normalized_key(uint32_t src_ip, uint16_t src_port, uint32_t dst_ip,
-                              uint16_t dst_port, uint8_t protocol); 
-
+FlowKey create_normalized_key(uint32_t src_ip, uint16_t src_port,
+                              uint32_t dst_ip, uint16_t dst_port,
+                              uint8_t protocol);
 // Async function to terminate and save flows based on their duration
 void terminate_and_save_flows(sqlite3 *db);
 
@@ -75,7 +74,8 @@ extern "C" {
 
 // Function to add or update flows in the map
 void flow_add_or_update(uint32_t src_ip, uint16_t src_port, uint32_t dst_ip,
-                        uint16_t dst_port, int total_bytes, uint8_t protocol);
+                        uint16_t dst_port, int total_bytes, uint8_t protocol,
+                        std::string local_addr);
 
 #ifdef __cplusplus
 }
