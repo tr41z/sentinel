@@ -61,10 +61,8 @@ void flow_add_or_update(uint32_t src_ip, uint16_t src_port, uint32_t dst_ip,
                         std::string local_addr) {
   std::lock_guard<std::mutex> lock(flows_map_mutex);
 
-  if (ip_to_str(src_ip) != local_addr && ip_to_str(dst_ip) != local_addr) {
-    printf("Skipping flow... (dst or src IP is not the local IP)\n");
-    std::cout << "Flow src_ip: " << ip_to_str(src_ip) << std::endl;
-    std::cout << "Flow dst_ip: " << ip_to_str(dst_ip) << std::endl;
+  if (ip_to_str(dst_ip) != local_addr) {
+    printf("Skipping flow... (dst IP is not the local IP)\n");
     return;
   }
 
