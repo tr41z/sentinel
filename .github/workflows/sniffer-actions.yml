@@ -1,4 +1,4 @@
-name: C Automated Testing
+name: C++ Automated Testing
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   run-c-tests:
-    name: C Tests
+    name: C++ Tests
     runs-on: ${{ matrix.os }}
 
     strategy:
