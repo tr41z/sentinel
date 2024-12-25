@@ -15,11 +15,10 @@
 #define DURATION_MAX_THRESHOLD 120
 #define REFRESH_RATE 1
 
-// Flow structure with uint32_t for IP addresses
 struct Flow {
-  uint32_t src_ip; // Source IP as uint32_t
+  uint32_t src_ip;
   uint16_t src_port;
-  uint32_t dst_ip; // Destination IP as uint32_t
+  uint32_t dst_ip;
   uint16_t dst_port;
   int total_bytes;
   uint8_t protocol;
@@ -28,11 +27,10 @@ struct Flow {
   std::chrono::system_clock::time_point last_update_time;
 };
 
-// FlowKey structure with uint32_t for IP addresses
 struct FlowKey {
-  uint32_t src_ip; // Source IP as uint32_t
+  uint32_t src_ip;
   uint16_t src_port;
-  uint32_t dst_ip; // Destination IP as uint32_t
+  uint32_t dst_ip;
   uint16_t dst_port;
   uint8_t protocol;
 
