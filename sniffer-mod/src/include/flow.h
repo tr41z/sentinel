@@ -20,11 +20,13 @@ struct Flow {
   uint32_t dst_ip;
   int total_bytes;
   uint8_t protocol;
+  int rate;
   int packet_count = 1;
   int src_port_count = 0;
   int dst_port_count = 0;
   std::chrono::system_clock::time_point start_time;
   std::chrono::system_clock::time_point last_update_time;
+  std::chrono::seconds duration;
 };
 
 struct FlowKey {

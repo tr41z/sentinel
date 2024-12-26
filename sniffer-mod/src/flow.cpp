@@ -1,6 +1,7 @@
 #include "include/flow.h"
 #include "include/db.h"
 #include "include/ip.h"
+#include <chrono>
 #include <string>
 
 std::mutex flows_map_mutex; // Mutex for thread safety
@@ -75,6 +76,9 @@ void flow_add_or_update(uint32_t src_ip, uint32_t dst_ip, uint16_t src_port,
     it->second.packet_count += 1;
     it->second.last_update_time = std::chrono::system_clock::now();
 
+    it->second.duration = std::chrono::duration_cast<std::chrono::seconds>(
+        it->second.last_update_time - it->second.start_time);
+
     // Track source and destination port counts
     if (it->second.src_port_count == 0 ||
         it->second.src_port_count < src_port) {
@@ -93,11 +97,13 @@ void flow_add_or_update(uint32_t src_ip, uint32_t dst_ip, uint16_t src_port,
     flow.dst_ip = dst_ip;
     flow.total_bytes = total_bytes;
     flow.protocol = protocol;
+    flow.rate = 0;
     flow.packet_count = 1;
     flow.src_port_count = 1;
     flow.dst_port_count = 1;
     flow.start_time = std::chrono::system_clock::now();
     flow.last_update_time = std::chrono::system_clock::now();
+    flow.duration = std::chrono::seconds(0);
 
     flows_map.insert({key, flow});
     std::cout << "Flow Created!\n";
