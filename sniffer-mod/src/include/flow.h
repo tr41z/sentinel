@@ -20,7 +20,8 @@ struct Flow {
   uint32_t dst_ip;
   int total_bytes;
   uint8_t protocol;
-  int rate;
+  double rate;
+  double avg_packet_size;
   int packet_count = 1;
   int src_port_count = 0;
   int dst_port_count = 0;

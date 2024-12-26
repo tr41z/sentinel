@@ -97,7 +97,8 @@ void flow_add_or_update(uint32_t src_ip, uint32_t dst_ip, uint16_t src_port,
     flow.dst_ip = dst_ip;
     flow.total_bytes = total_bytes;
     flow.protocol = protocol;
-    flow.rate = 0;
+    flow.rate = 0.0;
+    flow.avg_packet_size = 0.0;
     flow.packet_count = 1;
     flow.src_port_count = 1;
     flow.dst_port_count = 1;
