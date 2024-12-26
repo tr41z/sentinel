@@ -28,7 +28,7 @@ void connect_db(char *home_dir, sqlite3 **db) {
 void save_flow(sqlite3 *db, const Flow &flow) {
   sqlite3_stmt *stmt;
   const char *insert_sql =
-      "INSERT INTO FLOWS (src_ip, dst_ip, protocol, total_bytes, rate, "
+      "INSERT INTO flows (src_ip, dst_ip, protocol, total_bytes, rate, "
       "avg_packet_size,"
       "total_packet_count,"
       "src_port_count, dst_port_count, start_time, last_updated_time, "
@@ -73,7 +73,7 @@ void save_flow(sqlite3 *db, const Flow &flow) {
 
 void flows_table_build(int rc, sqlite3 *db) {
   const char sql[] =
-      "CREATE TABLE IF NOT EXISTS FLOWS("
+      "CREATE TABLE IF NOT EXISTS flows("
       "id                    INTEGER          PRIMARY KEY       AUTOINCREMENT,"
       "src_ip                VARCHAR(45),"
       "dst_ip                VARCHAR(45),"
