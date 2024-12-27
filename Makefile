@@ -17,5 +17,5 @@ run-ml:
 	@ml-mod/_venv/bin/python3 ml/main.py
 
 build-exec:
-	@cd ml-mod && pyinstaller --onefile --add-data "models/ml/recondet_model.joblib:models/ml" --hidden-import sklearn --hidden-import sklearn.ensemble._forest --hidden-import numpy --hidden-import scipy main.py
+	@cd ml-mod && pyinstaller --onefile --add-data "models/ml/recondet_model.joblib:models/ml" --hidden-import sklearn --hidden-import sklearn.ensemble._forest --hidden-import numpy --hidden-import scipy --name mlmod main.py
 	@rm -rf ml-mod/build ml-mod/dist ml-mod/main.spec
