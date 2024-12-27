@@ -73,9 +73,9 @@ pub async fn save_flow(pool: &SqlitePool, flow: DataModel) -> Result<(), Error> 
 
     let result: Result<sqlx::sqlite::SqliteQueryResult, Error> = sqlx::query(query)
         .bind(flow.src_ip.to_string())
-        .bind(flow.src_port_count) // Changed to bind distinct port count
+        .bind(flow.src_port_count)
         .bind(flow.dst_ip.to_string())
-        .bind(flow.dst_port_count) // Changed to bind distinct port count
+        .bind(flow.dst_port_count)
         .bind(flow.protocol)
         .bind(flow.total_bytes as i64)
         .bind(flow.total_packet_count as i64)
