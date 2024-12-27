@@ -1,4 +1,4 @@
-#![cfg_attr(not(debug_assertions), windows_subsystem = "window")]
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use database::db::connect;
 use database::model::DataModel;
 
