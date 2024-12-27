@@ -58,7 +58,6 @@ jobs:
       # Build sniffer module using Makefile
       - name: Build Sniffer Module
         run: |
-          cd sniffer-mod
           make all  # This will run the default 'all' target in your Makefile which builds sniffer and test executables
           if [ "${{ matrix.platform }}" == "macos-latest" ]; then
             cp sniffer-mod/sniffer src-tauri/bin/
