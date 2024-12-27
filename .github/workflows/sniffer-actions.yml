@@ -1,4 +1,4 @@
-name: C Automated Testing
+name: C++ Automated Testing
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   run-c-tests:
-    name: C Tests
+    name: C++ Tests
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -26,30 +26,26 @@ jobs:
           fi
         shell: bash
 
+      # Install dependencies based on OS
       - name: Install dependencies (Linux only)
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc make libcunit1-dev libpcap-dev
+          sudo apt-get install -y gcc make libcunit1-dev libpcap-dev g++ google-mock
 
       - name: Install dependencies (macOS only)
         if: runner.os == 'macOS'
         run: |
-          brew install gcc make cunit libpcap
+          brew install gcc make cunit libpcap googletest
 
       - name: Install dependencies (Windows only)
         if: runner.os == 'Windows'
         run: |
-          # Install MinGW
           choco install mingw -y
-          # Add MinGW to PATH
+          choco install nmap -y
           echo "::add-path::C:\\tools\\mingw64\\bin"
-
-          # Download and install Npcap SDK
           curl -LO https://nmap.org/npcap/dist/npcap-0.96.exe
           Start-Process -FilePath .\\npcap-0.96.exe -ArgumentList '/S' -Wait
-
-          # Download Npcap SDK (use direct links or GitHub Actions cache)
           curl -LO https://nmap.org/npcap/dist/npcap-sdk-1.0.zip
           Expand-Archive -Path npcapsdk-1.0.zip -DestinationPath C:\\npcap-sdk
 
@@ -59,19 +55,23 @@ jobs:
           echo "INCLUDE=C:\\npcap-sdk\\Include" >> $env:GITHUB_ENV
           echo "LIB=C:\\npcap-sdk\\Lib" >> $env:GITHUB_ENV
 
+      # Run make to build the project
       - name: Build the project
         run: |
           make all
 
+      # Run tests using make
       - name: Run Tests
         run: |
           make run-tests > test_output.log || exit 1
 
+      # Display test results from the output log
       - name: Display Test Output
         run: |
           echo "Test Results:"
           cat test_output.log || echo "No test output file found"
 
+      # Check test results
       - name: Check Test Results
         run: |
           if grep -q '\.\.\.FAILED' test_output.log; then
