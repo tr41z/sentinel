@@ -55,24 +55,17 @@ jobs:
       - name: Install frontend dependencies
         run: yarn install
 
-      # Build sniffer module (platform-specific)
+      # Build sniffer module using Makefile
       - name: Build Sniffer Module
         run: |
+          cd sniffer-mod
+          make all  # This will run the default 'all' target in your Makefile which builds sniffer and test executables
           if [ "${{ matrix.platform }}" == "macos-latest" ]; then
-            # macOS build (adjust for your sniffer module's source)
-            cd sniffer-mod
-            make build PLATFORM=macos
-            cp target/aarch64-apple-darwin/sniffer src-tauri/bin/
+            cp sniffer-mod/sniffer src-tauri/bin/
           elif [ "${{ matrix.platform }}" == "ubuntu-22.04" ]; then
-            # Ubuntu build
-            cd sniffer-mod
-            make build PLATFORM=linux
-            cp target/x86_64-unknown-linux-gnu/sniffer src-tauri/bin/
+            cp sniffer-mod/sniffer src-tauri/bin/
           elif [ "${{ matrix.platform }}" == "windows-latest" ]; then
-            # Windows build
-            cd sniffer-mod
-            make build PLATFORM=windows
-            cp target/x86_64-pc-windows-msvc/sniffer.exe src-tauri/bin/
+            cp sniffer-mod/sniffer.exe src-tauri/bin/
           fi
 
       # Extract version from src-tauri/tauri.conf.json (Windows only)
