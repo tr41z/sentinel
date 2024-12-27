@@ -12,7 +12,7 @@
 #include <unordered_map>
 
 #define IDLE_DURATION_MAX_THRESHOLD 10
-#define DURATION_MAX_THRESHOLD 120
+#define DURATION_MAX_THRESHOLD 20
 #define REFRESH_RATE 1
 
 struct Flow {
