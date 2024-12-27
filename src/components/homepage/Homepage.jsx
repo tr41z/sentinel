@@ -11,12 +11,7 @@ const Homepage = ({ flows }) => {
         other = 0;
 
       flows.forEach((flow) => {
-        const srcPort = flow.src_port.toString();
         const protocol = flow.protocol.toString();
-
-        if (srcPort === "443") http++;
-        else if (srcPort === "53") dns++;
-        else other++;
 
         if (protocol === "6") tcp++;
         else if (protocol === "17") udp++;

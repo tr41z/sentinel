@@ -53,9 +53,9 @@ fn build_connection_string() -> Result<String, sqlx::Error> {
 pub async fn get_all_flows(pool: &SqlitePool) -> Result<Vec<DataModel>, Error> {
     let query: &str = r#"
         SELECT 
-            src_ip, src_port, dst_ip, dst_port, protocol, 
-            total_bytes, total_packet_count,
-            start_time, last_updated_time
+            src_ip, dst_ip, protocol, 
+            total_bytes, rate, avg_packet_size, total_packet_count, src_port_count, dst_port_count,
+            start_time, last_updated_time, duration
         FROM flows
     "#;
 
@@ -65,14 +65,17 @@ pub async fn get_all_flows(pool: &SqlitePool) -> Result<Vec<DataModel>, Error> {
         .into_iter()
         .map(|row: sqlx::sqlite::SqliteRow| DataModel {
             src_ip: Ipv4Addr::from_str(row.get::<String, _>("src_ip").as_str()).unwrap(),
-            src_port: row.get("src_port"),
             dst_ip: Ipv4Addr::from_str(row.get::<String, _>("dst_ip").as_str()).unwrap(),
-            dst_port: row.get("dst_port"),
             protocol: row.get("protocol"),
             total_bytes: row.get::<i64, _>("total_bytes") as u64,
+            rate: row.get("rate"),
+            avg_packet_size: row.get("avg_packet_size"),
             total_packet_count: row.get("total_packet_count"),
+            src_port_count: row.get("src_port_count"),
+            dst_port_count: row.get("dst_port_count"),
             start_time: timestamp_to_system_time(row.get("start_time")),
             last_update_time: timestamp_to_system_time(row.get("last_updated_time")),
+            duration: row.get("duration"),
         })
         .collect();
 
