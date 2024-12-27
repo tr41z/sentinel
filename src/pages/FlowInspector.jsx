@@ -44,6 +44,8 @@ const FlowInspector = ({ flows }) => {
       <div className="grid grid-cols-4 font-bold mb-2 border-b-2 border-[#03045e]">
         <div className="flex-1">Source IP</div>
         <div className="flex-1">Destination IP</div>
+        <div className="flex-1">Protocol</div>
+        <div className="flex-1">Total Bytes</div>
       </div>
 
       {currentFlows.map((flow) => (
@@ -55,6 +57,8 @@ const FlowInspector = ({ flows }) => {
           <div className="grid grid-cols-4 gap-4 w-full">
             <InspectorElement item={flow.src_ip} />
             <InspectorElement item={flow.dst_ip} />
+            <InspectorElement item={flow.protocol} />
+            <InspectorElement item={flow.total_bytes} />
           </div>
         </button>
       ))}
