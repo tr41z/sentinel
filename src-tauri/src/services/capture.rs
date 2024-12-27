@@ -109,8 +109,8 @@ pub fn capture_packets(interface: NetworkInterface) {
                         let flows_map: Arc<Mutex<HashMap<FlowKey, Flow>>> = Arc::clone(&flows_map);
 
                         task::block_on(handle_packet_flow(
-                            src_ip, dst_ip, src_port, dst_port, protocol, size, ttl, flows_map,
-                            &db, local_ip,
+                            src_ip, dst_ip, src_port, dst_port, protocol, size, flows_map, &db,
+                            local_ip,
                         ));
                     }
                 }

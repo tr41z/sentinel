@@ -2,7 +2,7 @@
 
 # Sentinel
 
-![License](https://img.shields.io/badge/License-Apache_2.0-green.svg) ![Rust](https://img.shields.io/badge/Language-Rust-orange) ![Python](https://img.shields.io/badge/Language-Python-blue) ![Javascript](https://img.shields.io/badge/Language-Javascript-yellow) ![C](https://img.shields.io/badge/Language-C-gray)
+![License](https://img.shields.io/badge/License-Apache_2.0-green.svg) ![Rust](https://img.shields.io/badge/Language-Rust-orange) ![Python](https://img.shields.io/badge/Language-Python-blue) ![Javascript](https://img.shields.io/badge/Language-Javascript-yellow) ![C](https://img.shields.io/badge/Language-C-gray) ![C++](https://img.shields.io/badge/Language-C++-pink)
 
 **Sentinel** is a powerful tool for visualizing network flow data with real-time machine learning capabilities to detect reconnaissance (recon) attacks. Sentinel is designed for users to monitor network traffic, identify potential threats, and gain insights into network behavior through an intuitive interface.
 
@@ -14,7 +14,7 @@
 - **Cross-platform Support**: Built using [Tauri](https://tauri.app/) for Rust-based desktop applications, compatible with Windows, macOS, and Linux.
 
 ## Built With
-- **C**: Core of the application.
+- **C/C++**: Core of the application.
 - **Rust (Tauri)**: GUI development and fast processing.
 - **Python**: Machine learning algorithms for detecting anomalies and attacks.
 

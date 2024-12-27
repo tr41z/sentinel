@@ -5,7 +5,7 @@ const FlowDetails = ({ isOpened, flow }) => {
     isOpened && (
       <div className="border border-[#03045e] rounded-lg absolute top-5 left-[500px]">
         <div>
-          {flow.src_ip} -- {flow.src_port}
+          {flow.src_ip} -- {flow.dst_ip}
         </div>
       </div>
     )
