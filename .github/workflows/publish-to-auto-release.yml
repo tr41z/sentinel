@@ -9,73 +9,47 @@ jobs:
   publish-tauri:
     permissions:
       contents: write
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - platform: "macos-latest"
-            args: "--target aarch64-apple-darwin"
-          - platform: "macos-latest"
-            args: "--target x86_64-apple-darwin"
-          - platform: "ubuntu-22.04"
-            args: ""
-          - platform: "windows-latest"
-            args: ""
+    runs-on: macos-latest
 
-    runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
 
-      # Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
 
-      # Install Rust
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+          targets: "aarch64-apple-darwin,x86_64-apple-darwin"
 
-      # Install dependencies (Linux only)
-      - name: Install dependencies (Ubuntu only)
-        if: matrix.platform == 'ubuntu-22.04'
+      - name: Install dependencies (macOS only)
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
-          sudo apt-get install -y build-essential libpcap-dev
+          brew install cmake make libpcap
 
-      # Install Rust for Windows if necessary
-      - name: Install Rust for Windows (if required)
-        if: runner.os == 'Windows'
-        run: rustup target add x86_64-pc-windows-msvc
-
-      # Install frontend dependencies
       - name: Install frontend dependencies
         run: yarn install
 
-      # Build sniffer module using Makefile
-      - name: Build Sniffer Module
-        run: |
-          make all  # This will run the default 'all' target in your Makefile which builds sniffer and test executables
-          if [ "${{ matrix.platform }}" == "macos-latest" ]; then
-            cp sniffer-mod/sniffer src-tauri/bin/
-          elif [ "${{ matrix.platform }}" == "ubuntu-22.04" ]; then
-            cp sniffer-mod/sniffer src-tauri/bin/
-          elif [ "${{ matrix.platform }}" == "windows-latest" ]; then
-            cp sniffer-mod/sniffer.exe src-tauri/bin/
-          fi
-
-      # Extract version from src-tauri/tauri.conf.json (Windows only)
-      - name: Extract version from src-tauri/tauri.conf.json (Windows)
+      - name: Extract version from src-tauri/tauri.conf.json (macOS)
         id: version
         shell: pwsh
         run: |
           $VERSION = (jq -r .version src-tauri/tauri.conf.json)
           echo "VERSION=$VERSION" >> $env:GITHUB_ENV
 
-      # Build Tauri app
+      - name: Build Sniffer executable
+        run: |
+          cd sniffer-mod
+          mkdir -p build
+          cd build
+          cmake ..
+          make
+
+      - name: Move executable to src-tauri/bin
+        run: |
+          mv sniffer-mod/build/sniffer src-tauri/bin/
+
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -86,4 +60,4 @@ jobs:
           releaseBody: "See the assets to download this version and install."
           releaseDraft: true
           prerelease: false
-          args: ${{ matrix.args }}
+          args: "--target aarch64-apple-darwin"
