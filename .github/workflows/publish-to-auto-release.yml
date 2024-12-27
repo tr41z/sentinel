@@ -9,8 +9,20 @@ jobs:
   publish-tauri:
     permissions:
       contents: write
-    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: "macos-latest"
+            args: "--target aarch64-apple-darwin"
+          - platform: "macos-latest"
+            args: "--target x86_64-apple-darwin"
+          - platform: "ubuntu-22.04"
+            args: ""
+          - platform: "windows-latest"
+            args: ""
 
+    runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
 
@@ -22,32 +34,48 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: "aarch64-apple-darwin,x86_64-apple-darwin"
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
 
-      - name: Install dependencies (macOS only)
+      - name: Install dependencies (Ubuntu only)
+        if: matrix.platform == 'ubuntu-22.04'
         run: |
-          brew install cmake make libpcap
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Install Rust for Windows (if required)
+        if: runner.os == 'Windows'
+        run: rustup target add x86_64-pc-windows-msvc
 
       - name: Install frontend dependencies
         run: yarn install
 
-      - name: Extract version from src-tauri/tauri.conf.json (macOS)
+      - name: Extract version from src-tauri/tauri.conf.json (Windows)
         id: version
         shell: pwsh
         run: |
           $VERSION = (jq -r .version src-tauri/tauri.conf.json)
           echo "VERSION=$VERSION" >> $env:GITHUB_ENV
 
-      - name: Build Sniffer executable
+            # Build Sniffer executable for x86_64 (Intel Macs)
+      - name: Build Sniffer executable for x86_64
         run: |
           mkdir -p sniffer-mod/build
-          cmake -S sniffer-mod -B sniffer-mod/build
+          cmake -S sniffer-mod -B sniffer-mod/build -DCMAKE_OSX_ARCHITECTURES=x86_64
           make -C sniffer-mod/build
 
+      # Build Sniffer executable for aarch64 (Apple Silicon Macs)
+      - name: Build Sniffer executable for aarch64
+        run: |
+          mkdir -p sniffer-mod/build-arm
+          cmake -S sniffer-mod -B sniffer-mod/build-arm -DCMAKE_OSX_ARCHITECTURES=arm64
+          make -C sniffer-mod/build-arm
+
+      # Move the built executables to the proper location
       - name: Move executable to src-tauri/bin
         run: |
           mkdir -p src-tauri/bin
-          mv sniffer-mod/build/sniffer src-tauri/bin/
+          mv sniffer-mod/build/sniffer src-tauri/bin/sniffer-x86_64
+          mv sniffer-mod/build-arm/sniffer src-tauri/bin/sniffer-aarch64
 
       - uses: tauri-apps/tauri-action@v0
         env:
@@ -59,4 +87,4 @@ jobs:
           releaseBody: "See the assets to download this version and install."
           releaseDraft: true
           prerelease: false
-          args: "--target aarch64-apple-darwin"
+          args: ${{ matrix.args }}
