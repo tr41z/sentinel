@@ -17,14 +17,6 @@
         "open": true
       }
     },
-    "windows": [
-      {
-        "title": "sentinel",
-        "width": 1200,
-        "height": 800,
-        "resizable": false
-      }
-    ],
     "security": {
       "csp": null
     },
@@ -39,6 +31,12 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ]
+    },
+    "windows": {
+      "title": "sentinel",
+      "width": 1200,
+      "height": 800,
+      "resizable": false
     }
   }
 }
