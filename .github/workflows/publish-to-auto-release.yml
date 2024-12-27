@@ -35,19 +35,6 @@ jobs:
       - name: Install frontend dependencies
         run: yarn install
 
-      # Build Sniffer executable for x86_64 (Intel Macs)
-      - name: Build Sniffer executable for x86_64
-        run: |
-          mkdir -p sniffer-mod/build
-          cmake -S sniffer-mod -B sniffer-mod/build
-          make -C sniffer-mod/build
-
-      # Move the built executables to the proper location
-      - name: Move executable to src-tauri/bin
-        run: |
-          mkdir -p src-tauri/bin
-          mv sniffer-mod/build/sniffer src-tauri/bin
-
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
