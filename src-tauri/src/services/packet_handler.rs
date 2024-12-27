@@ -10,7 +10,6 @@ use crate::database::model::DataModel;
 use crate::database::{self};
 use crate::utils::flow::{Flow, FlowKey};
 
-// WARNING: EVERYTHING IN THAT FUNCTION IS LOOPED
 pub async fn handle_packet_flow(
     src_ip: Ipv4Addr,
     dst_ip: Ipv4Addr,
@@ -18,7 +17,6 @@ pub async fn handle_packet_flow(
     dst_port: u16,
     protocol: IpNextHeaderProtocol,
     size: u16,
-    ttl: u8,
     flows_map: Arc<Mutex<HashMap<FlowKey, Flow>>>,
     db: &Pool<Sqlite>,
     local_ip: Ipv4Addr,
@@ -31,15 +29,12 @@ pub async fn handle_packet_flow(
         terminate_flows(flow, db).await;
     }
 
-    let flow_key: FlowKey = FlowKey::new(src_ip, dst_ip, src_port, dst_port, protocol.0);
+    let flow_key: FlowKey = FlowKey::new(src_ip, dst_ip, protocol.0);
 
     if src_ip == local_ip {
-        let reverse_flow_key = FlowKey::new(dst_ip, src_ip, dst_port, src_port, protocol.0);
+        let reverse_flow_key = FlowKey::new(dst_ip, src_ip, protocol.0);
         if let Some(flow) = flows_map.get_mut(&reverse_flow_key) {
-            flow.update(size as u64, SystemTime::now(), src_ip, dst_ip, ttl);
-            flow.dbytes += size as u64;
-            flow.destination_packet_count += 1;
-            flow.pretty_print("Reverse Flow Updated");
+            flow.update(src_port, dst_port, size as u64, SystemTime::now());
             return;
         } else {
             return;
@@ -49,29 +44,23 @@ pub async fn handle_packet_flow(
     match flows_map.get_mut(&flow_key) {
         Some(flow) => {
             if !flow.finished {
-                flow.update(size as u64, SystemTime::now(), src_ip, dst_ip, ttl);
-                flow.packet_count += 1;
-                flow.pretty_print("Forward Flow Updated");
+                flow.update(src_port, dst_port, size as u64, SystemTime::now());
             }
         }
         None => {
             let mut new_flow: Flow = Flow::new(
                 src_ip,
                 dst_ip,
-                src_port,
-                dst_port,
                 protocol.0,
                 size as u64,
                 SystemTime::now(),
                 SystemTime::now(),
             );
 
-            new_flow.sbytes += size as u64;
-            new_flow.source_packet_count += 1;
-            new_flow.sttl = Some(ttl);
+            new_flow.src_ports.insert(src_port);
+            new_flow.dst_ports.insert(dst_port);
 
             flows_map.insert(flow_key, new_flow);
-            new_flow.pretty_print("New Flow");
         }
     }
 }
@@ -82,16 +71,14 @@ async fn terminate_flows(flow: &mut Flow, db: &Pool<Sqlite>) {
     if let Ok(duration_since_last_update) = now.duration_since(flow.last_update_time) {
         if duration_since_last_update.as_secs_f64() >= 10.0 {
             flow.finished = true;
-            flow.flow_termination_print();
             save_flow_to_db(flow, db, None).await;
             return;
         }
     }
 
     if let Ok(duration_since_start) = now.duration_since(flow.start_time) {
-        if duration_since_start.as_secs_f32() >= 300.0 {
+        if duration_since_start.as_secs_f32() >= 30.0 {
             flow.finished = true;
-            flow.flow_termination_print();
             save_flow_to_db(flow, db, Some(300.0)).await;
         }
     }
@@ -111,17 +98,11 @@ async fn save_flow_to_db(flow: &mut Flow, db: &Pool<Sqlite>, forced_duration: Op
     let data_model: DataModel = database::model::DataModel::new(
         flow.src_ip,
         flow.dst_ip,
-        flow.src_port,
-        flow.dst_port,
+        flow.src_ports.len() as u16,
+        flow.dst_ports.len() as u16,
         flow.protocol,
         flow.total_bytes,
-        flow.source_packet_count + flow.destination_packet_count,
-        flow.source_packet_count,
-        flow.destination_packet_count,
-        flow.sbytes,
-        flow.dbytes,
-        flow.dttl.unwrap_or(0),
-        flow.sttl.unwrap_or(0),
+        flow.packet_count.into(),
         flow.start_time,
         flow.last_update_time,
         if flow_duration_in_secs <= 0.001 {
