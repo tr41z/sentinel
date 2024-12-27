@@ -2,14 +2,26 @@
 use database::db::connect;
 use database::model::DataModel;
 
+<<<<<<< HEAD
 use dotenv::Error;
 use std::thread;
 use tauri::{AppHandle, Manager};
 
 use std::{env, process::Command};
+=======
+use sqlx::Error;
+
+use tauri::{AppHandle, Manager};
+
+use std::env;
+use std::process::Command;
+use std::thread;
+>>>>>>> parent of e2e037d (removing sniffer from `rust` due to `c++` implementation)
 
 mod commands;
 mod database;
+mod services;
+mod utils;
 
 fn main() {
     // Set the default log level to info
@@ -17,6 +29,9 @@ fn main() {
 
     // Initialize logger
     env_logger::init();
+
+    // Run the sniffer immediately
+    commands::commands::start_sniffer();
 
     // Initialize the Tauri app
     tauri::Builder::default()
