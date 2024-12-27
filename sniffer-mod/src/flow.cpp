@@ -1,19 +1,18 @@
 #include "include/flow.h"
 #include "include/db.h"
 #include "include/ip.h"
+#include <chrono>
 #include <string>
 
 std::mutex flows_map_mutex; // Mutex for thread safety
 FlowsMap flows_map;         // Global flows map
 
-// Function to normalize the flow key
-FlowKey create_normalized_key(uint32_t src_ip, uint16_t src_port,
-                              uint32_t dst_ip, uint16_t dst_port,
+FlowKey create_normalized_key(uint32_t src_ip, uint32_t dst_ip,
                               uint8_t protocol) {
-  if (src_ip < dst_ip || (src_ip == dst_ip && src_port < dst_port)) {
-    return {src_ip, src_port, dst_ip, dst_port, protocol};
+  if (src_ip < dst_ip) {
+    return {src_ip, dst_ip, protocol};
   } else {
-    return {dst_ip, dst_port, src_ip, src_port, protocol};
+    return {dst_ip, src_ip, protocol};
   }
 }
 
@@ -56,19 +55,19 @@ void terminate_and_save_flows(sqlite3 *db) {
 }
 
 // Function to add or update a flow
-void flow_add_or_update(uint32_t src_ip, uint16_t src_port, uint32_t dst_ip,
+void flow_add_or_update(uint32_t src_ip, uint32_t dst_ip, uint16_t src_port,
                         uint16_t dst_port, int total_bytes, uint8_t protocol,
                         std::string local_addr) {
   std::lock_guard<std::mutex> lock(flows_map_mutex);
 
   if (ip_to_str(dst_ip) != local_addr) {
     printf("Skipping flow... (dst IP is not the local IP)\n");
+    std::cout << "dst_ip: \n" << ip_to_str(dst_ip) << std::endl;
     return;
   }
 
-  // Normalize key
-  FlowKey key =
-      create_normalized_key(src_ip, src_port, dst_ip, dst_port, protocol);
+  // Normalize key based on IP pair and protocol
+  FlowKey key = create_normalized_key(src_ip, dst_ip, protocol);
   auto it = flows_map.find(key);
 
   if (it != flows_map.end()) {
@@ -76,19 +75,36 @@ void flow_add_or_update(uint32_t src_ip, uint16_t src_port, uint32_t dst_ip,
     it->second.total_bytes += total_bytes;
     it->second.packet_count += 1;
     it->second.last_update_time = std::chrono::system_clock::now();
+
+    it->second.duration = std::chrono::duration_cast<std::chrono::seconds>(
+        it->second.last_update_time - it->second.start_time);
+
+    // Track source and destination port counts
+    if (it->second.src_port_count == 0 ||
+        it->second.src_port_count < src_port) {
+      it->second.src_port_count += 1;
+    }
+    if (it->second.dst_port_count == 0 ||
+        it->second.dst_port_count < dst_port) {
+      it->second.dst_port_count += 1;
+    }
+
     std::cout << "Flow Updated!\n";
   } else {
     // Create new flow with uint32_t for IPs
     Flow flow;
     flow.src_ip = src_ip;
     flow.dst_ip = dst_ip;
-    flow.src_port = src_port;
-    flow.dst_port = dst_port;
     flow.total_bytes = total_bytes;
     flow.protocol = protocol;
+    flow.rate = 0.0;
+    flow.avg_packet_size = 0.0;
     flow.packet_count = 1;
+    flow.src_port_count = 1;
+    flow.dst_port_count = 1;
     flow.start_time = std::chrono::system_clock::now();
     flow.last_update_time = std::chrono::system_clock::now();
+    flow.duration = std::chrono::seconds(0);
 
     flows_map.insert({key, flow});
     std::cout << "Flow Created!\n";
@@ -101,12 +117,12 @@ void flow_add_or_update(uint32_t src_ip, uint16_t src_port, uint32_t dst_ip,
       std::chrono::system_clock::to_time_t(value.last_update_time);
 
   std::cout << "src_ip: " << ip_to_str(value.src_ip) << "\n"
-            << "src_port: " << value.src_port << "\n"
             << "dst_ip: " << ip_to_str(value.dst_ip) << "\n"
-            << "dst_port: " << value.dst_port << "\n"
             << "protocol: " << static_cast<int>(value.protocol) << "\n"
             << "total_bytes: " << value.total_bytes << "\n"
             << "packet_count: " << value.packet_count << "\n"
+            << "src_port_count: " << value.src_port_count << "\n"
+            << "dst_port_count: " << value.dst_port_count << "\n"
             << "start_time: "
             << std::put_time(std::localtime(&start_time), "%Y-%m-%d %H:%M:%S")
             << "\n"
