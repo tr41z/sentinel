@@ -104,7 +104,7 @@ pub async fn save_flow(pool: &SqlitePool, flow: DataModel) -> Result<(), Error> 
 pub async fn get_all_flows(pool: &SqlitePool) -> Result<Vec<DataModel>, Error> {
     let query: &str = r#"
         SELECT 
-
+            src_ip, src_port_count, dst_ip, dst_port_count, protocol, 
             total_bytes, total_packet_count,
             start_time, last_updated_time, dur
         FROM flows
@@ -116,10 +116,15 @@ pub async fn get_all_flows(pool: &SqlitePool) -> Result<Vec<DataModel>, Error> {
         .into_iter()
         .map(|row: sqlx::sqlite::SqliteRow| DataModel {
             src_ip: Ipv4Addr::from_str(row.get::<String, _>("src_ip").as_str()).unwrap(),
-
+            src_port_count: row.get("src_port_count"),
+            dst_ip: Ipv4Addr::from_str(row.get::<String, _>("dst_ip").as_str()).unwrap(),
+            dst_port_count: row.get("dst_port_count"),
             protocol: row.get("protocol"),
             total_bytes: row.get::<i64, _>("total_bytes") as u64,
-
+            total_packet_count: row.get("total_packet_count"),
+            start_time: timestamp_to_system_time(row.get("start_time")),
+            last_update_time: timestamp_to_system_time(row.get("last_updated_time")),
+            duration: row.get("dur"),
         })
         .collect();
 
