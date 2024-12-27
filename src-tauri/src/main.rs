@@ -4,12 +4,15 @@ use database::model::DataModel;
 
 use dotenv::Error;
 use std::thread;
-use tauri::{AppHandle, Manager};
 
 use std::{env, process::Command};
 
+use tauri::{AppHandle, Manager};
+
 mod commands;
 mod database;
+mod services;
+mod utils;
 
 fn main() {
     // Set the default log level to info
@@ -18,6 +21,9 @@ fn main() {
     // Initialize logger
     env_logger::init();
 
+    // Run the sniffer immediately
+    commands::commands::start_sniffer();
+
     // Initialize the Tauri app
     tauri::Builder::default()
         .setup(|app: &mut tauri::App| {
@@ -25,14 +31,14 @@ fn main() {
             let current_dir: std::path::PathBuf = env::current_dir().map_err(Error::Io)?;
 
             // Create the relative path to the exec file
-            let exec_path: std::path::PathBuf = current_dir.join("bin/sniffer");
+            // let exec_path: std::path::PathBuf = current_dir.join("bin/sniffer");
 
             // Start the main executable in a separate thread
-            let _handle: thread::JoinHandle<()> = thread::spawn(move || {
-                Command::new(exec_path)
-                    .spawn()
-                    .expect("Failed to start the main executable");
-            });
+            //let _handle: thread::JoinHandle<()> = thread::spawn(move || {
+            //    Command::new(exec_path)
+            //        .spawn()
+            //        .expect("Failed to start the main executable");
+            //});
 
             // Show the main window
             let app_handle: AppHandle = app.handle();
