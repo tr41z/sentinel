@@ -9,15 +9,12 @@ import {
   YAxis,
 } from "recharts";
 
-const FlowChart = ({ dnsCount, httpCount, tcpCount, udpCount, otherCount }) => {
+const FlowChart = ({ tcpCount, udpCount }) => {
   const [showInfo, setShowInfo] = useState(false);
 
   const data = [
     { name: "TCP", pc: tcpCount },
     { name: "UDP", pc: udpCount },
-    { name: "HTTP", pc: httpCount },
-    { name: "DNS", pc: dnsCount },
-    { name: "Other", pc: otherCount },
   ];
 
   return (
