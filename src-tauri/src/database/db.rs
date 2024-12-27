@@ -70,7 +70,7 @@ pub async fn get_all_flows(pool: &SqlitePool) -> Result<Vec<DataModel>, Error> {
             total_bytes: row.get::<i64, _>("total_bytes") as u64,
             rate: row.get("rate"),
             avg_packet_size: row.get("avg_packet_size"),
-            total_packet_count: row.get("total_packet_count"),
+            total_packet_count: row.get::<i64, _>("total_packet_count") as u64,
             src_port_count: row.get("src_port_count"),
             dst_port_count: row.get("dst_port_count"),
             start_time: timestamp_to_system_time(row.get("start_time")),

@@ -10,7 +10,7 @@ pub struct DataModel {
     pub total_bytes: u64,
     pub rate: f64,
     pub avg_packet_size: f64,
-    pub total_packet_count: u16,
+    pub total_packet_count: u64,
     pub src_port_count: u64,
     pub dst_port_count: u64,
     pub start_time: SystemTime,
