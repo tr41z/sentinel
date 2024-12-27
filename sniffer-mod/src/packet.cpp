@@ -210,11 +210,11 @@ void packet_handler(u_char *args, const struct pcap_pkthdr *header,
     new_ip_header_udp = handle_ip_header(ip_header, packet);
     new_udp_header = handle_udp_header(packet, new_ip_header_udp);
 
-    flow_add_or_update(
-        new_ip_header_udp->source_address, new_udp_header->src_port,
-        new_ip_header_udp->destination_address, new_udp_header->dst_port,
-        new_ip_header_udp->total_length, new_ip_header_udp->protocol,
-        local_addr);
+    flow_add_or_update(new_ip_header_udp->source_address,
+                       new_ip_header_udp->destination_address,
+                       new_udp_header->src_port, new_udp_header->dst_port,
+                       new_ip_header_udp->total_length,
+                       new_ip_header_udp->protocol, local_addr);
 
     cmb_free(new_udp_header);
     new_udp_header = NULL;
@@ -227,11 +227,11 @@ void packet_handler(u_char *args, const struct pcap_pkthdr *header,
     new_ip_header_tcp = handle_ip_header(ip_header, packet);
     new_tcp_header = handle_tcp_header(packet, new_ip_header_tcp);
 
-    flow_add_or_update(
-        new_ip_header_tcp->source_address, new_tcp_header->src_port,
-        new_ip_header_tcp->destination_address, new_tcp_header->dst_port,
-        new_ip_header_tcp->total_length, new_ip_header_tcp->protocol,
-        local_addr);
+    flow_add_or_update(new_ip_header_tcp->source_address,
+                       new_ip_header_tcp->destination_address,
+                       new_tcp_header->src_port, new_tcp_header->dst_port,
+                       new_ip_header_tcp->total_length,
+                       new_ip_header_tcp->protocol, local_addr);
 
     cmb_free(new_tcp_header);
     new_tcp_header = NULL;
