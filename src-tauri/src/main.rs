@@ -1,14 +1,13 @@
-#![cfg_attr(not(debug_assertions), windows_subsystem = "window")]
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use database::db::connect;
 use database::model::DataModel;
 
-use sqlx::Error;
+use dotenv::Error;
+use std::thread;
+
+use std::{env, process::Command};
 
 use tauri::{AppHandle, Manager};
-
-use std::env;
-use std::process::Command;
-use std::thread;
 
 mod commands;
 mod database;
@@ -28,18 +27,18 @@ fn main() {
     // Initialize the Tauri app
     tauri::Builder::default()
         .setup(|app: &mut tauri::App| {
-            // // Get the current directory
-            // let current_dir: std::path::PathBuf = env::current_dir().map_err(Error::Io)?;
+            // Get the current directory
+            let current_dir: std::path::PathBuf = env::current_dir().map_err(Error::Io)?;
 
-            // // Create the relative path to the exec file
-            // let exec_path: std::path::PathBuf = current_dir.join("bin/main");
+            // Create the relative path to the exec file
+            // let exec_path: std::path::PathBuf = current_dir.join("bin/sniffer");
 
-            // // Start the main executable in a separate thread
-            // let _handle: thread::JoinHandle<()> = thread::spawn(move || {
-            //     Command::new(exec_path)
-            //         .spawn()
-            //         .expect("Failed to start the main executable");
-            // });
+            // Start the main executable in a separate thread
+            //let _handle: thread::JoinHandle<()> = thread::spawn(move || {
+            //    Command::new(exec_path)
+            //        .spawn()
+            //        .expect("Failed to start the main executable");
+            //});
 
             // Show the main window
             let app_handle: AppHandle = app.handle();
