@@ -40,14 +40,13 @@ jobs:
 
       - name: Build Sniffer executable
         run: |
-          cd sniffer-mod
-          mkdir -p build
-          cd build
-          cmake ..
-          make
+          mkdir -p sniffer-mod/build
+          cmake -S sniffer-mod -B sniffer-mod/build
+          make -C sniffer-mod/build
 
       - name: Move executable to src-tauri/bin
         run: |
+          mkdir -p src-tauri/bin
           mv sniffer-mod/build/sniffer src-tauri/bin/
 
       - uses: tauri-apps/tauri-action@v0
