@@ -1,5 +1,4 @@
 use sqlx::{pool::PoolOptions, Error, Executor, Pool, Row, Sqlite, SqlitePool};
-
 use std::{env, fs, net::Ipv4Addr, str::FromStr, time::SystemTime};
 
 use super::model::DataModel;
@@ -67,31 +66,19 @@ pub async fn save_flow(pool: &SqlitePool, flow: DataModel) -> Result<(), Error> 
 
     let query = r#"
         INSERT INTO flows (
-            src_ip, src_port, dst_ip, dst_port, protocol, 
+            src_ip, src_port_count, dst_ip, dst_port_count, protocol, 
             total_bytes, total_packet_count,
-            sbytes, smean, dmean, dbytes, dload, sload, dpkts, rate, dttl, sttl, spkts,
             start_time, last_updated_time, dur
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"#;
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"#;
 
     let result: Result<sqlx::sqlite::SqliteQueryResult, Error> = sqlx::query(query)
         .bind(flow.src_ip.to_string())
-        .bind(flow.src_port)
+        .bind(flow.src_port_count) // Changed to bind distinct port count
         .bind(flow.dst_ip.to_string())
-        .bind(flow.dst_port)
+        .bind(flow.dst_port_count) // Changed to bind distinct port count
         .bind(flow.protocol)
         .bind(flow.total_bytes as i64)
-        .bind(flow.total_packet_count)
-        .bind(flow.sbytes as i64)
-        .bind(flow.smean as i64)
-        .bind(flow.dmean as i64)
-        .bind(flow.dbytes as i64)
-        .bind(flow.dload)
-        .bind(flow.sload)
-        .bind(flow.dpkts)
-        .bind(flow.rate)
-        .bind(flow.dttl)
-        .bind(flow.sttl)
-        .bind(flow.spkts)
+        .bind(flow.total_packet_count as i64)
         .bind(system_time_to_timestamp(flow.start_time))
         .bind(system_time_to_timestamp(flow.last_update_time))
         .bind(flow.duration)
@@ -117,9 +104,8 @@ pub async fn save_flow(pool: &SqlitePool, flow: DataModel) -> Result<(), Error> 
 pub async fn get_all_flows(pool: &SqlitePool) -> Result<Vec<DataModel>, Error> {
     let query: &str = r#"
         SELECT 
-            src_ip, src_port, dst_ip, dst_port, protocol, 
+            src_ip, src_port_count, dst_ip, dst_port_count, protocol, 
             total_bytes, total_packet_count,
-            sbytes, smean, dmean, dbytes, dload, sload, dpkts, rate, dttl, sttl, spkts,
             start_time, last_updated_time, dur
         FROM flows
     "#;
@@ -130,23 +116,12 @@ pub async fn get_all_flows(pool: &SqlitePool) -> Result<Vec<DataModel>, Error> {
         .into_iter()
         .map(|row: sqlx::sqlite::SqliteRow| DataModel {
             src_ip: Ipv4Addr::from_str(row.get::<String, _>("src_ip").as_str()).unwrap(),
-            src_port: row.get("src_port"),
+            src_port_count: row.get("src_port_count"),
             dst_ip: Ipv4Addr::from_str(row.get::<String, _>("dst_ip").as_str()).unwrap(),
-            dst_port: row.get("dst_port"),
+            dst_port_count: row.get("dst_port_count"),
             protocol: row.get("protocol"),
             total_bytes: row.get::<i64, _>("total_bytes") as u64,
             total_packet_count: row.get("total_packet_count"),
-            sbytes: row.get::<i64, _>("sbytes") as u64,
-            smean: row.get::<i64, _>("smean") as u64,
-            dmean: row.get::<i64, _>("dmean") as u64,
-            dbytes: row.get::<i64, _>("dbytes") as u64,
-            dload: row.get("dload"),
-            sload: row.get("sload"),
-            dpkts: row.get("dpkts"),
-            rate: row.get("rate"),
-            dttl: row.get("dttl"),
-            sttl: row.get("sttl"),
-            spkts: row.get("spkts"),
             start_time: timestamp_to_system_time(row.get("start_time")),
             last_update_time: timestamp_to_system_time(row.get("last_updated_time")),
             duration: row.get("dur"),
