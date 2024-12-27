@@ -2,18 +2,12 @@
 use database::db::connect;
 use database::model::DataModel;
 
-use sqlx::Error;
-
 use tauri::{AppHandle, Manager};
 
 use std::env;
-use std::process::Command;
-use std::thread;
 
 mod commands;
 mod database;
-mod services;
-mod utils;
 
 fn main() {
     // Set the default log level to info
@@ -21,9 +15,6 @@ fn main() {
 
     // Initialize logger
     env_logger::init();
-
-    // Run the sniffer immediately
-    commands::commands::start_sniffer();
 
     // Initialize the Tauri app
     tauri::Builder::default()
