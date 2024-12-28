@@ -1,14 +1,13 @@
-use super::model::DataModel;
-use directories::ProjectDirs;
-use log::{error, info};
 use sqlx::{pool::PoolOptions, Error, Executor, Pool, Row, Sqlite, SqlitePool};
-use std::{fs, net::Ipv4Addr, str::FromStr, time::SystemTime};
+use std::{env, fs, net::Ipv4Addr, str::FromStr, time::SystemTime};
+
+use super::model::DataModel;
 
 pub async fn connect() -> Result<Pool<Sqlite>, Error> {
     let connection_string = build_connection_string()?;
 
     // Log the connection string
-    info!("Connecting to database at: {}", connection_string);
+    println!("Connecting to database at: {}", connection_string);
 
     let pool = PoolOptions::new()
         .max_connections(20)
@@ -18,91 +17,36 @@ pub async fn connect() -> Result<Pool<Sqlite>, Error> {
     Ok(pool)
 }
 
-fn ensure_sentinel_dir() -> Result<std::path::PathBuf, std::io::Error> {
-    let project_dirs = ProjectDirs::from("com", "sentinel", "app").ok_or_else(|| {
-        std::io::Error::new(
-            std::io::ErrorKind::NotFound,
-            "Unable to find project directories",
-        )
+fn build_connection_string() -> Result<String, sqlx::Error> {
+    // Get the user's home directory
+    let home_dir: std::path::PathBuf = home::home_dir().ok_or_else(|| {
+        sqlx::Error::Configuration(Box::new(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            "Unable to determine home directory",
+        )))
     })?;
 
-    let sentinel_dir = project_dirs.data_dir().to_path_buf();
+    // Create the hidden .sentinel directory in the home directory
+    let sentinel_dir: std::path::PathBuf = home_dir.join(".sentinel");
+    fs::create_dir_all(&sentinel_dir).map_err(sqlx::Error::Io)?;
 
-    if !sentinel_dir.exists() {
-        fs::create_dir_all(&sentinel_dir)?;
-        println!("Created directory: {}", sentinel_dir.display());
-    }
-
-    Ok(sentinel_dir)
-}
-
-fn build_connection_string() -> Result<String, sqlx::Error> {
-    let sentinel_dir = ensure_sentinel_dir().map_err(sqlx::Error::Io)?;
-
-    let db_path = sentinel_dir.join("app_data.db");
-    let db_path_str = db_path.to_str().ok_or_else(|| {
+    // Create the full path to the SQLite database file in the .sentinel directory
+    let db_path: std::path::PathBuf = sentinel_dir.join("app_data.db");
+    let db_path_str: &str = db_path.to_str().ok_or_else(|| {
         sqlx::Error::Configuration(Box::new(std::io::Error::new(
-            std::io::ErrorKind::InvalidInput,
+            std::io::ErrorKind::Other,
             "Invalid database path",
         )))
     })?;
 
+    // Ensure the database file exists
     if !db_path.exists() {
-        fs::File::create(&db_path).map_err(sqlx::Error::Io)?;
+        fs::File::create(&db_path).map_err(|e: std::io::Error| sqlx::Error::Io(e))?;
         println!("Created database file at: {}", db_path_str);
     }
 
+    // SQLite connection string with WAL mode enabled
     Ok(format!("sqlite://{}?mode=rwc&cache=shared", db_path_str))
-}
-
-fn get_schema() -> &'static str {
-    include_str!("migrations/schema.sql")
-}
-
-async fn initialise_schema(pool: &SqlitePool) -> Result<(), Error> {
-    let schema = get_schema();
-    pool.execute(schema).await?;
-    Ok(())
-}
-
-pub async fn save_flow(pool: &SqlitePool, flow: DataModel) -> Result<(), Error> {
-    initialise_schema(pool).await?;
-
-    let query = r#"
-        INSERT INTO flows (
-            src_ip, src_port_count, dst_ip, dst_port_count, protocol, 
-            total_bytes, total_packet_count,
-            start_time, last_updated_time, dur
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"#;
-
-    let result: Result<sqlx::sqlite::SqliteQueryResult, Error> = sqlx::query(query)
-        .bind(flow.src_ip.to_string())
-        .bind(flow.src_port_count)
-        .bind(flow.dst_ip.to_string())
-        .bind(flow.dst_port_count)
-        .bind(flow.protocol)
-        .bind(flow.total_bytes as i64)
-        .bind(flow.total_packet_count as i64)
-        .bind(system_time_to_timestamp(flow.start_time))
-        .bind(system_time_to_timestamp(flow.last_update_time))
-        .bind(flow.duration)
-        .execute(pool)
-        .await;
-
-    match result {
-        Err(e) => {
-            error!("Error inserting flow: {:#?}!", flow);
-            error!("Error message: [{}].", e);
-        }
-        Ok(res) => {
-            info!(
-                "Flow inserted successfully! Rows affected: {}",
-                res.rows_affected()
-            );
-        }
-    }
-
-    Ok(())
 }
 
 pub async fn get_all_flows(pool: &SqlitePool) -> Result<Vec<DataModel>, Error> {
@@ -135,10 +79,11 @@ pub async fn get_all_flows(pool: &SqlitePool) -> Result<Vec<DataModel>, Error> {
     Ok(flows)
 }
 
+// Helper function to convert SystemTime to Unix timestamp (i64)
 pub fn system_time_to_timestamp(time: SystemTime) -> i64 {
     time.duration_since(SystemTime::UNIX_EPOCH)
         .map(|dur: std::time::Duration| dur.as_secs() as i64)
-        .unwrap_or(0)
+        .unwrap_or(0) // fallback to 0 in case of error
 }
 
 pub fn timestamp_to_system_time(timestamp: i64) -> SystemTime {

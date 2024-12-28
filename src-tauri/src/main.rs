@@ -13,8 +13,6 @@ use tauri::{AppHandle, Manager};
 
 mod commands;
 mod database;
-mod services;
-mod utils;
 
 use log::{error, LevelFilter};
 use simplelog::{Config, WriteLogger};
@@ -25,7 +23,7 @@ fn main() {
     env::set_var("RUST_LOG", "info");
 
     // Initialize logger
-    let log_file_path: PathBuf = home_dir().unwrap().join("sentinel_app.log");
+    let log_file_path: PathBuf = home_dir().unwrap().join(".sentinel_app.log");
     
     // Initialize logger
     if let Err(e) = File::create(&log_file_path).map(|log_file| {
@@ -35,24 +33,21 @@ fn main() {
         return;
     }
 
-    // Run the sniffer immediately
-    commands::commands::start_sniffer();
-
     // Initialize the Tauri app
     tauri::Builder::default()
         .setup(|app: &mut tauri::App| {
             // Get the current directory
-            let _current_dir: std::path::PathBuf = env::current_dir().map_err(Error::Io)?;
+            let current_dir: std::path::PathBuf = env::current_dir().map_err(Error::Io)?;
 
             // Create the relative path to the exec file
-            // let exec_path: std::path::PathBuf = current_dir.join("bin/sniffer");
+            let exec_path: std::path::PathBuf = current_dir.join("bin/sniffer");
 
             // Start the main executable in a separate thread
-            //let _handle: thread::JoinHandle<()> = thread::spawn(move || {
-            //    Command::new(exec_path)
-            //        .spawn()
-            //        .expect("Failed to start the main executable");
-            //});
+            let _handle: thread::JoinHandle<()> = thread::spawn(move || {
+               Command::new(exec_path)
+                   .spawn()
+                   .expect("Failed to start the main executable");
+            });
 
             // Show the main window
             let app_handle: AppHandle = app.handle();
