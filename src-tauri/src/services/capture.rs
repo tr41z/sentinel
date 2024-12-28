@@ -44,10 +44,11 @@ fn get_local_ip(interface: &NetworkInterface) -> Option<Ipv4Addr> {
 }
 
 pub fn capture_packets(interface: NetworkInterface) {
-    info!("Starting packet capture...");
+    info!("Starting packet capture on interface: {}", interface.name);
 
     // Check if the interface exists and is available
-    if !datalink::interfaces().contains(&interface) {
+    let available_interfaces = datalink::interfaces();
+    if !available_interfaces.contains(&interface) {
         error!("The specified network interface does not exist or is not available: {}", interface.name);
         panic!("The specified network interface does not exist or is not available: {}", interface.name);
     }
@@ -65,12 +66,12 @@ pub fn capture_packets(interface: NetworkInterface) {
     let (_, mut rx) = match datalink::channel(&interface, Default::default()) {
         Ok(Ethernet(tx, rx)) => (tx, rx),
         Ok(_) => {
-            error!("Unhandled channel type: {}", &interface);
-            panic!("Unhandled channel type: {}", &interface);
+            error!("Unhandled channel type for interface: {}", interface.name);
+            panic!("Unhandled channel type for interface: {}", interface.name);
         }
         Err(e) => {
-            error!("An error occurred when creating the datalink channel: {}", e);
-            panic!("An error occurred when creating the datalink channel: {}", e);
+            error!("An error occurred when creating the datalink channel on interface {}: {}", interface.name, e);
+            panic!("An error occurred when creating the datalink channel on interface {}: {}", interface.name, e);
         }
     };
 
