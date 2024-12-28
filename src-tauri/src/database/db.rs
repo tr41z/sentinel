@@ -1,5 +1,6 @@
-use sqlx::{pool::PoolOptions, Error, Executor, Pool, Row, Sqlite, SqlitePool};
-use std::{env, fs, net::Ipv4Addr, str::FromStr, time::SystemTime};
+use sqlx::{pool::PoolOptions, Error, Pool, Row, Sqlite, SqlitePool};
+
+use std::{fs, net::Ipv4Addr, str::FromStr, time::SystemTime};
 
 use super::model::DataModel;
 
@@ -31,7 +32,7 @@ fn build_connection_string() -> Result<String, sqlx::Error> {
     fs::create_dir_all(&sentinel_dir).map_err(sqlx::Error::Io)?;
 
     // Create the full path to the SQLite database file in the .sentinel directory
-    let db_path: std::path::PathBuf = sentinel_dir.join("app_data.db");
+    let db_path: std::path::PathBuf = sentinel_dir.join("sentinel.db");
     let db_path_str: &str = db_path.to_str().ok_or_else(|| {
         sqlx::Error::Configuration(Box::new(std::io::Error::new(
             std::io::ErrorKind::Other,
@@ -52,9 +53,9 @@ fn build_connection_string() -> Result<String, sqlx::Error> {
 pub async fn get_all_flows(pool: &SqlitePool) -> Result<Vec<DataModel>, Error> {
     let query: &str = r#"
         SELECT 
-            src_ip, src_port_count, dst_ip, dst_port_count, protocol, 
-            total_bytes, total_packet_count,
-            start_time, last_updated_time, dur
+            src_ip, dst_ip, protocol, 
+            total_bytes, rate, avg_packet_size, total_packet_count, src_port_count, dst_port_count,
+            start_time, last_updated_time, duration
         FROM flows
     "#;
 
@@ -64,26 +65,21 @@ pub async fn get_all_flows(pool: &SqlitePool) -> Result<Vec<DataModel>, Error> {
         .into_iter()
         .map(|row: sqlx::sqlite::SqliteRow| DataModel {
             src_ip: Ipv4Addr::from_str(row.get::<String, _>("src_ip").as_str()).unwrap(),
-            src_port_count: row.get("src_port_count"),
             dst_ip: Ipv4Addr::from_str(row.get::<String, _>("dst_ip").as_str()).unwrap(),
-            dst_port_count: row.get("dst_port_count"),
             protocol: row.get("protocol"),
             total_bytes: row.get::<i64, _>("total_bytes") as u64,
-            total_packet_count: row.get("total_packet_count"),
+            rate: row.get("rate"),
+            avg_packet_size: row.get("avg_packet_size"),
+            total_packet_count: row.get::<i64, _>("total_packet_count") as u64,
+            src_port_count: row.get("src_port_count"),
+            dst_port_count: row.get("dst_port_count"),
             start_time: timestamp_to_system_time(row.get("start_time")),
             last_update_time: timestamp_to_system_time(row.get("last_updated_time")),
-            duration: row.get("dur"),
+            duration: row.get("duration"),
         })
         .collect();
 
     Ok(flows)
-}
-
-// Helper function to convert SystemTime to Unix timestamp (i64)
-pub fn system_time_to_timestamp(time: SystemTime) -> i64 {
-    time.duration_since(SystemTime::UNIX_EPOCH)
-        .map(|dur: std::time::Duration| dur.as_secs() as i64)
-        .unwrap_or(0) // fallback to 0 in case of error
 }
 
 pub fn timestamp_to_system_time(timestamp: i64) -> SystemTime {
