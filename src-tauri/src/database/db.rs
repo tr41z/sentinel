@@ -1,5 +1,6 @@
 use super::model::DataModel;
 use directories::ProjectDirs;
+use log::{error, info};
 use sqlx::{pool::PoolOptions, Error, Executor, Pool, Row, Sqlite, SqlitePool};
 use std::{fs, net::Ipv4Addr, str::FromStr, time::SystemTime};
 
@@ -7,7 +8,7 @@ pub async fn connect() -> Result<Pool<Sqlite>, Error> {
     let connection_string = build_connection_string()?;
 
     // Log the connection string
-    println!("Connecting to database at: {}", connection_string);
+    info!("Connecting to database at: {}", connection_string);
 
     let pool = PoolOptions::new()
         .max_connections(20)
@@ -90,11 +91,11 @@ pub async fn save_flow(pool: &SqlitePool, flow: DataModel) -> Result<(), Error> 
 
     match result {
         Err(e) => {
-            eprintln!("Error inserting flow: {:#?}!", flow);
-            eprintln!("Error message: [{}].", e);
+            error!("Error inserting flow: {:#?}!", flow);
+            error!("Error message: [{}].", e);
         }
         Ok(res) => {
-            println!(
+            info!(
                 "Flow inserted successfully! Rows affected: {}",
                 res.rows_affected()
             );
