@@ -1,7 +1,7 @@
-use sqlx::{pool::PoolOptions, Error, Executor, Pool, Row, Sqlite, SqlitePool};
-use std::{env, fs, net::Ipv4Addr, str::FromStr, time::SystemTime};
-
 use super::model::DataModel;
+use directories::ProjectDirs;
+use sqlx::{pool::PoolOptions, Error, Executor, Pool, Row, Sqlite, SqlitePool};
+use std::{fs, net::Ipv4Addr, str::FromStr, time::SystemTime};
 
 pub async fn connect() -> Result<Pool<Sqlite>, Error> {
     let connection_string = build_connection_string()?;
@@ -17,47 +17,50 @@ pub async fn connect() -> Result<Pool<Sqlite>, Error> {
     Ok(pool)
 }
 
-fn build_connection_string() -> Result<String, sqlx::Error> {
-    // Get the user's home directory
-    let home_dir: std::path::PathBuf = home::home_dir().ok_or_else(|| {
-        sqlx::Error::Configuration(Box::new(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "Unable to determine home directory",
-        )))
+fn ensure_sentinel_dir() -> Result<std::path::PathBuf, std::io::Error> {
+    let project_dirs = ProjectDirs::from("com", "sentinel", "app").ok_or_else(|| {
+        std::io::Error::new(
+            std::io::ErrorKind::NotFound,
+            "Unable to find project directories",
+        )
     })?;
 
-    // Create the hidden .sentinel directory in the home directory
-    let sentinel_dir: std::path::PathBuf = home_dir.join(".sentinel");
-    fs::create_dir_all(&sentinel_dir).map_err(sqlx::Error::Io)?;
+    let sentinel_dir = project_dirs.data_dir().to_path_buf();
 
-    // Create the full path to the SQLite database file in the .sentinel directory
-    let db_path: std::path::PathBuf = sentinel_dir.join("app_data.db");
-    let db_path_str: &str = db_path.to_str().ok_or_else(|| {
+    if !sentinel_dir.exists() {
+        fs::create_dir_all(&sentinel_dir)?;
+        println!("Created directory: {}", sentinel_dir.display());
+    }
+
+    Ok(sentinel_dir)
+}
+
+fn build_connection_string() -> Result<String, sqlx::Error> {
+    let sentinel_dir = ensure_sentinel_dir().map_err(sqlx::Error::Io)?;
+
+    let db_path = sentinel_dir.join("app_data.db");
+    let db_path_str = db_path.to_str().ok_or_else(|| {
         sqlx::Error::Configuration(Box::new(std::io::Error::new(
-            std::io::ErrorKind::Other,
+            std::io::ErrorKind::InvalidInput,
             "Invalid database path",
         )))
     })?;
 
-    // Ensure the database file exists
     if !db_path.exists() {
-        fs::File::create(&db_path).map_err(|e: std::io::Error| sqlx::Error::Io(e))?;
+        fs::File::create(&db_path).map_err(sqlx::Error::Io)?;
         println!("Created database file at: {}", db_path_str);
     }
 
-    // SQLite connection string with WAL mode enabled
     Ok(format!("sqlite://{}?mode=rwc&cache=shared", db_path_str))
 }
 
-async fn initialise_schema(pool: &SqlitePool) -> Result<(), Error> {
-    // Get the current directory
-    let current_dir: std::path::PathBuf = env::current_dir().map_err(Error::Io)?;
-    // Create the relative path to the schema.sql file
-    let schema_path: std::path::PathBuf = current_dir.join("src/database/migrations/schema.sql");
+fn get_schema() -> &'static str {
+    include_str!("migrations/schema.sql")
+}
 
-    let schema: String =
-        fs::read_to_string(schema_path).map_err(|e: std::io::Error| Error::Io(e))?;
-    pool.execute(schema.as_str()).await?;
+async fn initialise_schema(pool: &SqlitePool) -> Result<(), Error> {
+    let schema = get_schema();
+    pool.execute(schema).await?;
     Ok(())
 }
 
@@ -131,11 +134,10 @@ pub async fn get_all_flows(pool: &SqlitePool) -> Result<Vec<DataModel>, Error> {
     Ok(flows)
 }
 
-// Helper function to convert SystemTime to Unix timestamp (i64)
 pub fn system_time_to_timestamp(time: SystemTime) -> i64 {
     time.duration_since(SystemTime::UNIX_EPOCH)
         .map(|dur: std::time::Duration| dur.as_secs() as i64)
-        .unwrap_or(0) // fallback to 0 in case of error
+        .unwrap_or(0)
 }
 
 pub fn timestamp_to_system_time(timestamp: i64) -> SystemTime {
