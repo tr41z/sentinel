@@ -46,6 +46,12 @@ fn get_local_ip(interface: &NetworkInterface) -> Option<Ipv4Addr> {
 pub fn capture_packets(interface: NetworkInterface) {
     info!("Starting packet capture...");
 
+    // Check if the interface exists and is available
+    if !datalink::interfaces().contains(&interface) {
+        error!("The specified network interface does not exist or is not available: {}", interface.name);
+        panic!("The specified network interface does not exist or is not available: {}", interface.name);
+    }
+
     let db: Pool<Sqlite> = match task::block_on(database::db::connect()) {
         Ok(pool) => pool,
         Err(e) => {
