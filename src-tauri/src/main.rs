@@ -16,7 +16,7 @@ mod database;
 mod services;
 mod utils;
 
-use log::LevelFilter;
+use log::{error, LevelFilter};
 use simplelog::{Config, WriteLogger};
 use std::fs::File;
 
@@ -71,8 +71,14 @@ async fn fetch_flows() -> Result<Vec<DataModel>, String> {
     match connect().await {
         Ok(pool) => match commands::commands::get_flows(pool).await {
             Ok(flows) => Ok(flows), // return flows on success
-            Err(e) => Err(format!("Failed to fetch flows: {}", e)), // handle errors
+            Err(e) => {
+                error!("Failed to fetch flows: {}", e);
+                Err(format!("Failed to fetch flows: {}", e))
+            }
         },
-        Err(e) => Err(format!("Failed to connect to the database: {}", e)), // handle connection errors
+        Err(e) => {
+            error!("Failed to connect to the database: {}", e);
+            Err(format!("Failed to connect to the database: {}", e))
+        }
     }
 }
