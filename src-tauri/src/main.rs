@@ -28,7 +28,7 @@ fn main() {
     tauri::Builder::default()
         .setup(|app: &mut tauri::App| {
             // Get the current directory
-            let current_dir: std::path::PathBuf = env::current_dir().map_err(Error::Io)?;
+            let _current_dir: std::path::PathBuf = env::current_dir().map_err(Error::Io)?;
 
             // Create the relative path to the exec file
             // let exec_path: std::path::PathBuf = current_dir.join("bin/sniffer");
