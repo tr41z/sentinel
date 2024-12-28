@@ -47,7 +47,7 @@ else
 endif
 
 # Directories
-SNIFFER_DIR = sniffer-mod
+SNIFFER_DIR = sniffer-module
 SRC_DIR = src
 HEADER_DIR = include
 OBJ_DIR = $(SNIFFER_DIR)/_obj
