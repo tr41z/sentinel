@@ -22,6 +22,13 @@ pub mod commands {
             });
             handles.push(handle);
         }
+
+        // Join all threads to ensure they run to completion
+        for handle in handles {
+            if let Err(e) = handle.join() {
+                eprintln!("Thread error: {:?}", e);
+            }
+        }
     }
 
     // Retrieve all flows (async)
