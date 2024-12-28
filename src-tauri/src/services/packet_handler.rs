@@ -2,6 +2,7 @@ use std::sync::{Arc, Mutex, MutexGuard};
 use std::time::{Duration, SystemTime};
 use std::{collections::HashMap, net::Ipv4Addr};
 
+use log::{error, info};
 use pnet::packet::ip::IpNextHeaderProtocol;
 
 use sqlx::{Pool, Sqlite};
@@ -113,8 +114,12 @@ async fn save_flow_to_db(flow: &mut Flow, db: &Pool<Sqlite>, forced_duration: Op
     );
 
     match database::db::save_flow(db, data_model).await {
-        Ok(saved_flow) => println!("Flow saved successfully: {:#?}", saved_flow),
-        Err(e) => eprintln!("Failed to save flow: {:?}", e),
+        Ok(saved_flow) => {
+            info!("Flow saved successfully: {:#?}", saved_flow);
+        }
+        Err(e) => {
+            error!("Failed to save flow: {:?}", e);
+        }
     };
 }
 
