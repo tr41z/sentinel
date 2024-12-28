@@ -2,7 +2,9 @@
 use database::db::connect;
 use database::model::DataModel;
 
+use dirs::home_dir;
 use dotenv::Error;
+use std::path::PathBuf;
 use std::thread;
 
 use std::{env, process::Command};
@@ -14,12 +16,24 @@ mod database;
 mod services;
 mod utils;
 
+use log::LevelFilter;
+use simplelog::{Config, WriteLogger};
+use std::fs::File;
+
 fn main() {
     // Set the default log level to info
     env::set_var("RUST_LOG", "info");
 
     // Initialize logger
-    env_logger::init();
+    let log_file_path: PathBuf = home_dir().unwrap().join("sentinel_app.log");
+    
+    // Initialize logger
+    if let Err(e) = File::create(&log_file_path).map(|log_file| {
+        WriteLogger::init(LevelFilter::Info, Config::default(), log_file).unwrap();
+    }) {
+        eprintln!("Error initializing log file: {}", e);
+        return;
+    }
 
     // Run the sniffer immediately
     commands::commands::start_sniffer();
