@@ -29,13 +29,8 @@ jobs:
               exit 1
             fi
           elif [[ "$SOURCE_BRANCH" == "dev" ]]; then
-            if [[ "$TARGET_BRANCH" != "release" ]]; then
-              echo "'dev' can only merge into 'release'."
-              exit 1
-            fi
-          elif [[ "$SOURCE_BRANCH" == "release" ]]; then
             if [[ "$TARGET_BRANCH" != "main" ]]; then
-              echo "'release' can only merge into 'main'."
+              echo "'dev' can only merge into 'main'."
               exit 1
             fi
           else
