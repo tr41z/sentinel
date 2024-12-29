@@ -46,7 +46,6 @@ std::string local_ip_addr() {
   char buffer[80]; // Use a fixed-size buffer instead of dynamic allocation
   const char *p = inet_ntop(AF_INET, &name.sin_addr, buffer, sizeof(buffer));
   if (p != NULL) {
-    std::cout << "Local IP address is: " << buffer << std::endl;
     close(sock);
     return std::string(buffer); // Return as std::string
   } else {
