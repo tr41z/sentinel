@@ -11,7 +11,6 @@
 - **Real-time Recon Attack Detection**: Leverages machine learning algorithms to detect recon attacks and notifies users instantly.
 - **Network Flow Visualization**: Visualize network flow data in a user-friendly interface.
 - **Detailed Flow Browsing**: A dedicated route allows users to browse individual flows for granular analysis.
-- **Cross-platform Support**: Built using [Tauri](https://tauri.app/) for Rust-based desktop applications, compatible with Windows, macOS, and Linux.
 
 ## Built With
 - **Rust**: Core of the application.
