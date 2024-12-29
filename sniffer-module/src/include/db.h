@@ -20,7 +20,7 @@ extern "C" {
 #include <sys/types.h>
 #include <unistd.h>
 
-void connect_db(char *home_dir, sqlite3 **db);
+void connect_db(const char *home_dir, sqlite3 **db);
 void flows_table_build(int rc, sqlite3 *db);
 static inline char *get_home_dir() {
   struct passwd *pw = getpwuid(getuid());

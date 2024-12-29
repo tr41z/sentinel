@@ -40,6 +40,11 @@ struct FlowKey {
     return src_ip == other.src_ip && dst_ip == other.dst_ip &&
            protocol == other.protocol;
   }
+
+  // Comparison operator for FlowKey (Inequality)
+  bool operator!=(const FlowKey &other) const {
+    return !(*this == other); // calls the operator== and negates the result
+  }
 };
 
 // Custom hash function for FlowKey
