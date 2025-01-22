@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import './App.css'
 import FlowList from './components/FlowList'
 import { Flow } from './utils/props';
+import FlowChart from './components/FlowChart';
 
 function App() {  
     const [flows, setFlows] = useState<Flow[]>([]);
@@ -23,6 +24,7 @@ function App() {
 
     return (
       <div>
+        <FlowChart flows={flows}/>
         <FlowList flows={flows}/>
       </div>
     )

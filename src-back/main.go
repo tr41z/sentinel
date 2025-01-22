@@ -19,7 +19,7 @@ func main() {
     go executable.Invoke() // async invoke of sniffer process
 
     c := cors.New(cors.Options{
-        AllowedOrigins: []string{"http://localhost:5173"},
+        AllowedOrigins: []string{"http://localhost:5173", "http://localhost:5174"},
         AllowCredentials: true,
     })
 
