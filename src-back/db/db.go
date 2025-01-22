@@ -1,0 +1,80 @@
+package db
+
+import (
+	"database/sql"
+	"encoding/json"
+	"log"
+	"net/http"
+	"os"
+
+	_ "github.com/mattn/go-sqlite3"
+)
+
+type Flow struct {
+	ID                 int     `json:"id"`
+	SourceIp           string  `json:"source_ip"`
+	DestinationIp      string  `json:"destination_ip"`
+	SourcePorts        string  `json:"source_ports"`
+	DestinationPorts   string  `json:"destination_ports"`
+	Protocol           int8    `json:"protocol"`
+	TotalBytes         int     `json:"total_bytes"`
+	Rate               float64 `json:"rate"`
+	AveragePacketSize  float64 `json:"average_packet_size"`
+	TotalPacketCount   int     `json:"total_packet_count"`
+	StartTime          int     `json:"start_time"`
+	LastUpdatedTime    int     `json:"last_updated_time"`
+	Duration           int     `json:"duration"`
+}
+
+// Global variable for SQLite database connection
+var DB *sql.DB
+
+func get_home_dir() string {
+	dirname, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatal(err)
+	}
+	full_dir := dirname + "\\.sentinel\\sentinel.db"
+	return full_dir
+}
+
+func InitDB() {
+	dir := get_home_dir()
+	var err error
+	DB, err = sql.Open("sqlite3", dir)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func FetchFlows(w http.ResponseWriter, r *http.Request) {
+	rows, err := DB.Query("SELECT id, src_ip, dst_ip, src_ports, " +
+		"dst_ports, protocol, total_bytes, rate, " +
+		"avg_packet_size, total_packet_count, start_time, last_updated_time, duration " +
+		"FROM flows")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	flows := []Flow{} // Slice to store flows
+	for rows.Next() {
+		var flow Flow
+		if err := rows.Scan(&flow.ID, &flow.SourceIp, &flow.DestinationIp, &flow.SourcePorts, &flow.DestinationPorts,
+			&flow.Protocol, &flow.TotalBytes, &flow.Rate, &flow.AveragePacketSize, &flow.TotalPacketCount,
+			&flow.StartTime, &flow.LastUpdatedTime, &flow.Duration); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		flows = append(flows, flow)
+	}
+
+	// Set the response content type to JSON
+	w.Header().Set("Content-Type", "application/json")
+
+	// Write the JSON response
+	if err := json.NewEncoder(w).Encode(flows); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
