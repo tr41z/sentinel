@@ -29,15 +29,6 @@ type Flow struct {
 // Global variable for SQLite database connection
 var DB *sql.DB
 
-func get_home_dir() string {
-	dirname, err := os.UserHomeDir()
-	if err != nil {
-		log.Fatal(err)
-	}
-	full_dir := dirname + "\\.sentinel\\sentinel.db"
-	return full_dir
-}
-
 func InitDB() {
 	dir := get_home_dir()
 	var err error
@@ -77,4 +68,13 @@ func FetchFlows(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(flows); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+}
+
+func get_home_dir() string {
+	dirname, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatal(err)
+	}
+	full_dir := dirname + "\\.sentinel\\sentinel.db"
+	return full_dir
 }

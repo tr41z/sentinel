@@ -2,6 +2,52 @@
 
 set -e
 
+# Function to install Golang on Debian-based systems
+install_golang_debian() {
+    echo "Installing Golang on Debian-based system..."
+    sudo apt update
+    sudo apt install -y golang
+}
+
+# Function to install Golang on Red Hat-based systems
+install_golang_redhat() {
+    echo "Installing Golang on Red Hat-based system..."
+    if command -v dnf >/dev/null 2>&1; then
+        sudo dnf install -y golang
+    else
+        sudo yum install -y golang
+    fi
+}
+
+# Function to install Golang on macOS
+install_golang_macos() {
+    echo "Installing Golang on macOS..."
+    brew install go
+}
+
+# Function to install Node.js and NPM on Debian-based systems
+install_node_debian() {
+    echo "Installing Node.js and NPM on Debian-based system..."
+    sudo apt update
+    sudo apt install -y nodejs npm
+}
+
+# Function to install Node.js and NPM on Red Hat-based systems
+install_node_redhat() {
+    echo "Installing Node.js and NPM on Red Hat-based system..."
+    if command -v dnf >/dev/null 2>&1; then
+        sudo dnf install -y nodejs npm
+    else
+        sudo yum install -y nodejs npm
+    fi
+}
+
+# Function to install Node.js and NPM on macOS
+install_node_macos() {
+    echo "Installing Node.js and NPM on macOS..."
+    brew install node
+}
+
 # Function to install CMake on Debian-based systems
 install_cmake_debian() {
     echo "Installing CMake on Debian-based system..."
@@ -32,35 +78,24 @@ install_cmake_macos() {
     brew install cmake gcc
 }
 
-# Function to install .NET 9 SDK on Linux
-install_dotnet9() {
-    echo "Installing .NET 9 SDK..."
-
-    # Add Microsoft package repository
-    wget https://packages.microsoft.com/config/ubuntu/22.04/prod.list
-    sudo mv prod.list /etc/apt/sources.list.d/microsoft-prod.list
-
-    # Import Microsoft GPG key
-    wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | sudo apt-key add -
-
-    # Update apt and install .NET 9 SDK
-    sudo apt update
-    sudo apt install -y dotnet-sdk-9.0
-}
-
 # Main script logic
 echo "Detecting platform..."
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     if command -v apt >/dev/null 2>&1; then
+        install_golang_debian
+        install_node_debian
         install_cmake_debian
-        install_dotnet9
     elif command -v yum >/dev/null 2>&1 || command -v dnf >/dev/null 2>&1; then
+        install_golang_redhat
+        install_node_redhat
         install_cmake_redhat
     else
-        echo "Unsupported Linux distribution. Please install CMake manually."
+        echo "Unsupported Linux distribution. Please install Golang, Node.js, and CMake manually."
         exit 1
     fi
 elif [[ "$OSTYPE" == "darwin"* ]]; then
+    install_golang_macos
+    install_node_macos
     install_cmake_macos
 else
     echo "Unsupported platform: $OSTYPE. This script only supports macOS and Linux."
@@ -69,17 +104,13 @@ fi
 
 # Verify installations
 echo "Verifying installations..."
-if command -v cmake >/dev/null 2>&1 && command -v g++ >/dev/null 2>&1; then
+if command -v go >/dev/null 2>&1 && command -v node >/dev/null 2>&1 && command -v npm >/dev/null 2>&1 && command -v cmake >/dev/null 2>&1 && command -v g++ >/dev/null 2>&1; then
+    go version
+    node --version
+    npm --version
     cmake --version
     g++ --version
 else
-    echo "CMake or C++ compiler installation failed. Please check the log and install manually."
-    exit 1
-fi
-
-if command -v dotnet >/dev/null 2>&1; then
-    dotnet --version
-else
-    echo ".NET SDK installation failed. Please check the log and install manually."
+    echo "Golang, Node.js, NPM, CMake, or C++ compiler installation failed. Please check the log and install manually."
     exit 1
 fi
