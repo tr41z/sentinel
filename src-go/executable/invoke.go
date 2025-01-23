@@ -7,18 +7,17 @@ import (
 	"os"
 	"os/exec"
 	"time"
+
+	"backend/utils"
 )
 
 // Global condition variable
 var Expired bool
 
 func Invoke() {
-	// Path to the sniffer executable
-	snifferPath := "../sniffer-mod/build/sniffer.exe"
-
 	// Check if the executable exists
-	if _, err := os.Stat(snifferPath); os.IsNotExist(err) {
-		fmt.Printf("Error: Sniffer executable not found at %s\n", snifferPath)
+	if _, err := os.Stat(utils.EXECUTABLE_PATH); os.IsNotExist(err) {
+		fmt.Printf("Error: Sniffer executable not found at %s\n", utils.EXECUTABLE_PATH)
 		os.Exit(1)
 	}
 
@@ -27,7 +26,7 @@ func Invoke() {
 	defer cancel()
 
 	// Run the executable with context
-	cmd := exec.CommandContext(ctx, snifferPath)
+	cmd := exec.CommandContext(ctx, utils.EXECUTABLE_PATH)
 
 	// Capture the output and error streams
 	var stdout, stderr bytes.Buffer
