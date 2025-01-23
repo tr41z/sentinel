@@ -8,8 +8,8 @@ interface FlowListProps {
 const FlowChart = ({ flows }: FlowListProps) => {
 
 const data = [
-    { name: 'TCP', uv: 600},
-    { name: 'UDP', uv: 1000},
+  { name: 'TCP', uv: flows.filter((flow) => flow.protocol === 6).length },
+  { name: 'UDP', uv: flows.filter((flow) => flow.protocol === 17).length },
 ];
 
   return (
