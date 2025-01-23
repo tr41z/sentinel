@@ -10,7 +10,7 @@ import (
 )
 
 // Global condition variable
-var expired bool
+var Expired bool
 
 func Invoke() {
 	// Path to the sniffer executable
@@ -44,13 +44,13 @@ func Invoke() {
 	// Start a goroutine to switch expired to true after 5 seconds to imitate bool switch
 	go func() {
 		time.Sleep(150 * time.Second)
-		expired = true
+		Expired = true
 	}()
 
 	// Check the global condition in a separate goroutine
 	go func() {
 		for {
-			if expired {
+			if Expired {
 				fmt.Println("Condition met, killing the sniffer process...")
 				cancel()
 				return

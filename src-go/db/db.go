@@ -9,6 +9,8 @@ import (
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
+
+	"backend/executable"
 )
 
 type Flow struct {
@@ -39,7 +41,7 @@ func InitDB() {
 	}
 }
 
-func checkIfExpired(w http.ResponseWriter, r *http.Request) {
+func checkIfExpired(w http.ResponseWriter) {
 	row := DB.QueryRow("SELECT FIRST last_updated_time FROM flows")
 	now := time.Now()
 	var lastUpdatedTime int64
@@ -50,6 +52,7 @@ func checkIfExpired(w http.ResponseWriter, r *http.Request) {
 	lastUpdated := time.Unix(lastUpdatedTime, 0)
 	
 	if now.Sub(lastUpdated).Seconds() >= 7200 {
+		executable.Expired = true;
 		/* 
 		 - Pause sniffer module
 		 - Export data to external DB
