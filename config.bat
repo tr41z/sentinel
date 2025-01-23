@@ -25,9 +25,25 @@ where go >nul 2>nul
 if %ERRORLEVEL% EQU 0 (
     go version
     echo Golang installation complete.
-    pause
 ) else (
     echo Golang installation failed. Please install manually.
+    pause
+    exit /b 1
+)
+
+:: Install Node.js and NPM using Chocolatey
+echo Installing Node.js and NPM using Chocolatey...
+choco install nodejs -y
+
+:: Verify Node.js and NPM installation
+echo Verifying Node.js and NPM installation...
+where node >nul 2>nul
+if %ERRORLEVEL% EQU 0 (
+    node --version
+    npm --version
+    echo Node.js and NPM installation complete.
+) else (
+    echo Node.js and NPM installation failed. Please install manually.
     pause
     exit /b 1
 )
