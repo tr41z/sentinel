@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -37,6 +38,31 @@ func InitDB() {
 		log.Fatal(err)
 	}
 }
+
+func checkIfExpired(w http.ResponseWriter, r *http.Request) {
+	row := DB.QueryRow("SELECT FIRST last_updated_time FROM flows")
+	now := time.Now()
+	var lastUpdatedTime int64
+	if err := row.Scan(&lastUpdatedTime); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	lastUpdated := time.Unix(lastUpdatedTime, 0)
+	
+	if now.Sub(lastUpdated).Seconds() >= 7200 {
+		/* 
+		 - Pause sniffer module
+		 - Export data to external DB
+		 - Ensure it was sent
+		 - Delete db locally
+		 - Create new db
+		*/
+	}
+}
+
+func createDB() {}
+
+func deleteDB() {}
 
 func FetchFlows(w http.ResponseWriter, r *http.Request) {
 	rows, err := DB.Query("SELECT id, src_ip, dst_ip, src_ports, " +
