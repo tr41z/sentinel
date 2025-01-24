@@ -1,22 +1,14 @@
 import { motion } from 'framer-motion';
-import { LucideIcon } from 'lucide-react';
 import clsx from 'clsx';
 import { Save } from 'lucide-react';
-
-interface StatCardProps {
-  name: string;
-  icon: LucideIcon;
-  value: number | string;
-  color: string;
-  iconSize?: number; // Make icon size customizable
-}
+import { StatCardProps } from '../utils/props';
 
 const StatCard = ({ name, icon: IconComponent, value, color, iconSize = 22 }: StatCardProps) => {
   // Animation configurations for hover
   const hoverEffect = {
     y: -5,
     boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.1)',
-    scale: 1.05,  // Subtle scale increase
+    scale: 1.05, 
   };
 
   return (
