@@ -75,5 +75,5 @@ Ensure the following are installed or follow steps below:
 - **Inspector**: Analyze specific data points for deeper insights.
 - **Notifications**: Stay informed of potential threats in real-time.
 
-# Approach
+## Approach
 [Learn More!](https://github.com/tr41z/sentinel/blob/main/APPROACH.md)
