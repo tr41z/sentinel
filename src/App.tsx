@@ -19,7 +19,11 @@ function App() {
     }
 
     useEffect(() => {
-      fetchFlows();
+      const interval = setInterval(() => {
+        fetchFlows();
+      }, 1000);
+
+      return () => clearInterval(interval);
     }, [])
 
     return (

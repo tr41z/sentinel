@@ -40,11 +40,11 @@ func Invoke() {
 		os.Exit(1)
 	}
 
-	// Start a goroutine to switch expired to true after 5 seconds to imitate bool switch
-	go func() {
-		time.Sleep(150 * time.Second)
-		Expired = true
-	}()
+	// // Start a goroutine to switch expired to true after 5 seconds to imitate bool switch
+	// go func() {
+	// 	time.Sleep(150 * time.Second)
+	// 	Expired = true
+	// }()
 
 	// Check the global condition in a separate goroutine
 	go func() {

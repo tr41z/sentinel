@@ -6,15 +6,12 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/rs/cors"
 )
 
 func main() {
     go executable.Invoke() // async invoke of sniffer process
-
-    time.Sleep(5 * time.Second)
 
     db.InitDB()
     
