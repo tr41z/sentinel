@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -34,6 +35,7 @@ var DB *sql.DB
 
 func InitDB() {
 	dir := get_home_dir()
+	fmt.Println(dir)
 	var err error
 	DB, err = sql.Open("sqlite3", dir)
 	if err != nil {
