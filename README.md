@@ -74,3 +74,6 @@ Ensure the following are installed or follow steps below:
 - **Dashboard**: View an overview of network activity and detected threats.
 - **Inspector**: Analyze specific data points for deeper insights.
 - **Notifications**: Stay informed of potential threats in real-time.
+
+# Approach
+[Learn More!](https://github.com/tr41z/sentinel/blob/main/APPROACH.md)
