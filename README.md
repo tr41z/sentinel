@@ -16,7 +16,7 @@ Sentinel is a machine learning-based Intrusion Detection System (IDS) designed t
 
 ### Prerequisites
 
-Ensure the following are installed:
+Ensure the following are installed or follow steps below:
 
 - **C++ Compiler** (e.g., GCC or MSVC)
 - **CMake**
