@@ -12,6 +12,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 
 	"backend/executable"
+	"backend/utils"
 )
 
 type Flow struct {
@@ -106,6 +107,6 @@ func get_home_dir() string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	full_dir := dirname + "\\.sentinel\\sentinel.db"
+	full_dir := dirname + utils.DB_PATH
 	return full_dir
 }
