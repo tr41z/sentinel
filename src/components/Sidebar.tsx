@@ -1,10 +1,11 @@
-import { BarChart2, Check, HeartPulse, Menu, SearchCheck, Star, User } from 'lucide-react'
+import { BarChart2, Check, HeartPulse, Home, Menu, SearchCheck, Star, User } from 'lucide-react'
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 
 const SIDEBAR_ITEMS = [
-    { name: "Dashboard", icon: BarChart2, color: "#6366f1", path: "/" },
+    { name: "Home", icon: Home, color: "4cc9f0", path: "/"},
+    { name: "Dashboard", icon: BarChart2, color: "#6366f1", path: "/dashboard" },
     { name: "Inspector", icon: SearchCheck, color: "#EC4899", path: "/flows/inspector"},
     { name: "Dummy", icon: Check, color: "#c77dff", path: "/flows/inspector"},
     { name: "Dummy", icon: Star, color: "#2ec4b6", path: "/flows/inspector"},

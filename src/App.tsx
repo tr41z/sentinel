@@ -5,6 +5,7 @@ import { Route, Routes } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import InspectorPage from './pages/InspectorPage';
 import Sidebar from './components/Sidebar';
+import DashboardPage from './pages/DashboardPage';
 
 function App() {  
     const [flows, setFlows] = useState<Flow[]>([]);
@@ -61,8 +62,9 @@ function App() {
         <Sidebar />
 
         <Routes>
-          <Route path='/' element={
-            <HomePage 
+          <Route path='/' element={<HomePage />}/>
+          <Route path='/dashboard' element={
+            <DashboardPage 
                 totalFlows={totalFlows} 
                 avgFlowSize={avgFlowSize.toFixed(2)} 
                 avgFlowRate={avgFlowRate.toFixed(2)}
