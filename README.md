@@ -1,50 +1,78 @@
-# React + TypeScript + Vite
+# sentinel
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Sentinel is a machine learning-based Intrusion Detection System (IDS) designed to provide real-time threat detection. It integrates a sniffer module (C++), a backend server (Golang), a frontend interface (React + Vite), and a machine learning module (Python). The system also includes a notification feature to alert users about detected threats.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Sniffer Module**: Captures and analyzes network traffic.
+- **Backend Server**: Manages data flow and communication between modules.
+- **Frontend Interface**: User-friendly React app for visualization and threat inspection.
+- **Machine Learning Module**: Enhances threat detection using AI.
+- **Notification System**: Notifies users of potential threats.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## Setup Instructions
 
-- Configure the top-level `parserOptions` property like this:
+### Prerequisites
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+Ensure the following are installed or follow steps below:
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+- **C++ Compiler** (e.g., GCC or MSVC)
+- **CMake**
+- **Golang**
+- **Node.js & npm**
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+### Steps
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/sentinel.git
+   cd sentinel
+   ```
+2. Run the configuration script:
+   - **Linux/Mac**:
+     ```bash
+     sh config.sh
+     ```
+     or
+     
+     ```bash
+     bash config.sh
+     ```
+    - **Windows**:
+      Right click on `config.bat` file and open it as administor
+   
+3. Build the Sniffer Module:
+   ```bash
+   cd sniffer-mod
+   mkdir build
+   cd build
+   ```
+    - **For Linux/Mac**:
+      ```bash
+      cmake ..
+      make
+      ```
+    - **For Windows**:
+      ```bash
+      cmake -G "Unix Makefiles" ..
+      make
+      ```
+4. Run the Backend Server: Open a new terminal and navigate to the src-go directory:
+   ```bash
+   cd sentinel/src-go
+   go run main.go
+   ```
+5. Start the Frontend: Open another terminal in the sentinel directory:
+   ```bash
+   npm run dev
+   ```
+6. Access the Application: After starting the frontend, a URL will be displayed in the terminal (e.g., http://localhost:3000). Open it in your browser to use the app.
+
+## Usage
+- **Dashboard**: View an overview of network activity and detected threats.
+- **Inspector**: Analyze specific data points for deeper insights.
+- **Notifications**: Stay informed of potential threats in real-time.
+
+## Learn more about approach [here!](https://github.com/tr41z/sentinel/blob/main/APPROACH.md)

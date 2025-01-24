@@ -1,12 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import './App.css'
-import FlowList from './components/FlowList'
 import { Flow } from './utils/props';
-import FlowChart from './components/FlowChart';
+import { Route, Routes } from 'react-router-dom';
+import HomePage from './pages/HomePage';
+import InspectorPage from './pages/InspectorPage';
+import Sidebar from './components/Sidebar';
+import DashboardPage from './pages/DashboardPage';
 
 function App() {  
     const [flows, setFlows] = useState<Flow[]>([]);
-    
+  
     const fetchFlows = async () => {
       const res = await fetch("http://localhost:8080/api/v1/flows");
       
@@ -19,13 +22,58 @@ function App() {
     }
 
     useEffect(() => {
-      fetchFlows();
+      const interval = setInterval(() => {
+        fetchFlows();
+      }, 4000);
+
+      return () => clearInterval(interval);
     }, [])
 
+    // Calculate totalBytes and other derived values
+    const totalFlows = flows.length;
+    const totalBytes = useMemo(() => 
+        flows.reduce((sum, flow) => sum + flow.total_bytes, 0), 
+        [flows]
+    );
+
+    const avgFlowRate = useMemo(() => {
+      const { totalData, totalDuration } = flows.reduce(
+          (acc, flow) => {
+              acc.totalData += flow.rate * flow.duration; // Total data transferred
+              acc.totalDuration += flow.duration;        // Total duration
+              return acc;
+          },
+          { totalData: 0, totalDuration: 0 } // Initial accumulator values
+      );
+      return totalDuration > 0 ? totalData / totalDuration : 0; // Avoid divide by zero
+  }, [flows]);
+
+    const avgFlowSize = totalFlows > 0 ? totalBytes / totalFlows : 0;
+
     return (
-      <div>
-        <FlowChart flows={flows}/>
-        <FlowList flows={flows}/>
+      <div className='flex h-screen bg-[#000814] text-gray-200 overflow-hidden'>
+
+        {/* Background */}
+        <div className='fixed inset-0 z-0'>
+          <div className='absolute inset-0 bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 opacity-80'/>
+          <div className='absolute inset-0 backdrop-blur-sm'/>
+        </div>
+
+        <Sidebar />
+
+        <Routes>
+          <Route path='/' element={<HomePage />}/>
+          <Route path='/dashboard' element={
+            <DashboardPage 
+                totalFlows={totalFlows} 
+                avgFlowSize={avgFlowSize.toFixed(2)} 
+                avgFlowRate={avgFlowRate.toFixed(2)}
+                totalBytes={totalBytes}
+                flows={flows}
+              />
+          }/>
+          <Route path='/flows/inspector' element={<InspectorPage/>}/>
+        </Routes>
       </div>
     )
 }
