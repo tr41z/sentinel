@@ -1,4 +1,4 @@
-# Sentinel
+# sentinel
 
 Sentinel is a machine learning-based Intrusion Detection System (IDS) designed to provide real-time threat detection. It integrates a sniffer module (C++), a backend server (Golang), a frontend interface (React + Vite), and a machine learning module (Python). The system also includes a notification feature to alert users about detected threats.
 
