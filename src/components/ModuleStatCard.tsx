@@ -32,11 +32,11 @@ const ModuleStatCard = ({ moduleName, icon: IconComponent, statistics, color }: 
   return (
     <motion.div
       className={clsx(
-        "relative bg-[#1A1A1A] bg-opacity-90 backdrop-blur-md shadow-2xl rounded-2xl border border-gray-900 overflow-hidden transition-transform duration-300"
+        "relative bg-[#1A1A1A] bg-opacity-90 backdrop-blur-md shadow-2xl rounded-2xl border border-gray-800 overflow-hidden transition-transform duration-300"
       )}
       whileHover={hoverEffect}
     >
-      {/* Save Button */}
+      {/* Play/Pause Button */}
       <motion.button
         whileHover={{ scale: 1.2 }}
         className="absolute top-3 right-3 p-2 rounded-full bg-gray-700 hover:bg-gray-600 text-white shadow-md z-10"
@@ -61,7 +61,7 @@ const ModuleStatCard = ({ moduleName, icon: IconComponent, statistics, color }: 
         </div>
 
         {/* Statistics */}
-        <div className="space-y-4 mt-6">
+        <div className="space-y-6 mt-6">
           {statistics.map((stat, index) => (
             <div key={index} className="relative">
               <div className="flex justify-between items-center">
