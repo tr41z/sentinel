@@ -7,7 +7,7 @@ import ProtocolDistributionChart from '../components/ProtocolDistributionChart';
 import { DashboardPageProps } from '../utils/props';
 
 const DashboardPage = ({ totalFlows, avgFlowSize, avgFlowRate, totalBytes, flows }: DashboardPageProps) => {
-    const totalBytesInMB = (totalBytes / (1024 * 1024)).toFixed(2); // Convert bytes to MB and format to 2 decimal places
+    const totalBytesInMB = (totalBytes / (1024 * 1024)).toFixed(2);
 
     return (
         <div className='flex-1 overflow-auto relative z-10'>
