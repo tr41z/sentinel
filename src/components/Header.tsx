@@ -1,3 +1,6 @@
+import { Moon } from "lucide-react";
+import { motion } from "framer-motion";
+
 interface HeaderProps {
     title: string;
 }
@@ -9,6 +12,13 @@ const Header = ({ title }: HeaderProps) => {
                 <h1 className='uppercase tracking-wider text-3xl font-thin text-gray-200 hover:text-gray-50 transition duration-300'>
                     {title}
                 </h1>
+                <motion.button
+                    whileHover={{ scale: 1.2 }}
+                    className="absolute top-6 right-8 p-2 rounded-full"
+                    aria-label="Save Stat"
+                >
+                    <Moon/>
+                </motion.button>
             </div>
         </header>
     );
