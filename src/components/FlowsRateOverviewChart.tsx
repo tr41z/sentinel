@@ -36,7 +36,7 @@ const FlowsRateOverviewChart = ({ flows }: FlowsRateOverviewChartProps) => {
 
   return (
     <motion.div
-      className='bg-[#1A1A1A] bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-900'
+      className='bg-[#1A1A1A] bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-800'
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}

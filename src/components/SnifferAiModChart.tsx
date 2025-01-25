@@ -16,7 +16,7 @@ interface SnifferAiModChartProps {
 
 const SnifferAiModChart = ({ flows }: SnifferAiModChartProps) => {
   const data = flows.reduce(
-    (acc: { hour: string; snifferFlows: number }[], flow) => {
+    (acc: { hour: string; snifferFlows: number, potentialThreats: number }[], flow) => {
       // Convert Unix timestamp (seconds) to milliseconds
       const date = new Date(flow.last_updated_time * 1000);
 
@@ -30,7 +30,7 @@ const SnifferAiModChart = ({ flows }: SnifferAiModChartProps) => {
       if (existing) {
         existing.snifferFlows += 1; // Increment snifferFlows count
       } else {
-        acc.push({ hour: hourString, snifferFlows: 1 }); // Add new hour entry
+        acc.push({ hour: hourString, snifferFlows: 1, potentialThreats: 0}); // Add new hour entry
       }
 
       return acc;
@@ -40,7 +40,7 @@ const SnifferAiModChart = ({ flows }: SnifferAiModChartProps) => {
 
   return (
     <motion.div
-      className="bg-[#1A1A1A] bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-900"
+      className="bg-[#1A1A1A] bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-800"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
@@ -71,7 +71,7 @@ const SnifferAiModChart = ({ flows }: SnifferAiModChartProps) => {
             />
             <Line
               type="monotone"
-              dataKey="aiThreats"
+              dataKey="potentialThreats"
               name="Threats Detected"
               stroke="#ef233c"
               strokeWidth={3}
