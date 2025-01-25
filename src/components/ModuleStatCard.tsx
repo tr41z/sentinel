@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import clsx from "clsx";
-import { Dot, Pause } from "lucide-react";
+import { Dot, Pause, Play } from "lucide-react";
 import { ModuleStatCardProps } from "../utils/props";
 
 const ModuleStatCard = ({ moduleName, icon: IconComponent, statistics, color }: ModuleStatCardProps) => {
@@ -8,6 +8,25 @@ const ModuleStatCard = ({ moduleName, icon: IconComponent, statistics, color }: 
     y: -5,
     boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.2)",
     scale: 1.02,
+  };
+
+  const toggleSniffer = async (isRunning: boolean) => {
+    const endpoint = isRunning ? "/api/v1/sniffer/stop" : "/api/v1/sniffer/start";
+    const method = "POST";
+
+    try {
+      const response = await fetch(`http://localhost:8080${endpoint}`, {
+        method,
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        alert(`Error: ${error.message}`);
+      }
+    } catch (error) {
+      console.error("Failed to toggle sniffer:", error);
+    }
   };
 
   return (
@@ -22,8 +41,15 @@ const ModuleStatCard = ({ moduleName, icon: IconComponent, statistics, color }: 
         whileHover={{ scale: 1.2 }}
         className="absolute top-3 right-3 p-2 rounded-full bg-gray-700 hover:bg-gray-600 text-white shadow-md z-10"
         aria-label="Save Stat"
+        onClick={() => toggleSniffer(statistics[0]?.value === "running")}
       >
-        <Pause size={20} />
+        {statistics.map((stat, index) => (
+          <div key={index}>
+            {index === 0 && (
+              stat.value === "running" ? <Pause size={20} /> : <Play size={20} />
+            )}
+          </div>
+        ))}
       </motion.button>
 
       {/* Card Content */}
@@ -41,7 +67,7 @@ const ModuleStatCard = ({ moduleName, icon: IconComponent, statistics, color }: 
               <div className="flex justify-between items-center">
                 <p className="text-sm font-medium text-gray-300">{stat.name}</p>
                 <span className="text-sm font-semibold text-gray-100">
-                  {index !== 0 ? stat.value : null}
+                  {index != 0 ? stat.value : null}
                 </span>
               </div>
 

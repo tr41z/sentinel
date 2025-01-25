@@ -49,4 +49,5 @@ export interface HomePageProps {
     snifferUptime: number;
     snifferErrorCount: number;
     flows: Flow[];
+    bandwidth: number;
 }

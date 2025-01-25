@@ -60,6 +60,11 @@ function App() {
         [flows]
     );
 
+    const totalDuration = useMemo(() => 
+      flows.reduce((sum, flow) => sum + flow.duration, 0),
+      [flows]
+    )
+
     const avgFlowRate = useMemo(() => {
       const { totalData, totalDuration } = flows.reduce(
           (acc, flow) => {
@@ -73,6 +78,7 @@ function App() {
   }, [flows]);
 
     const avgFlowSize = totalFlows > 0 ? totalBytes / totalFlows : 0;
+    const bandwidth = totalDuration > 0 ? totalBytes / totalDuration : 0;
 
     return (
       <div className='flex h-screen bg-[#000814] text-gray-200 overflow-hidden'>
@@ -92,6 +98,7 @@ function App() {
                 snifferUptime={snifferUptime} 
                 snifferErrorCount={snifferErrorCount} 
                 flows={flows}
+                bandwidth={bandwidth}
               />
           }/>
           <Route path='/dashboard' element={

@@ -44,7 +44,7 @@ const FlowsOverviewChart = () => {
                     }}
                     itemStyle={{ color: "#E5E7EB"}}
                     />
-                    <Line type='monotone' dataKey='flowCount' stroke='#4cc9f0' strokeWidth={3} dot={{ fill: "#4cc9f0", strokeWidth: 2, r: 6}} activeDot={{ r: 8, strokeWidth: 2 }}/>
+                    <Line type='monotone' dataKey='flowCount' stroke='#4cc9f0' strokeWidth={3} dot={{ fill: "#4cc9f0", strokeWidth: 2, r: 6}} activeDot={{ r: 8, strokeWidth: 2 }} name='Flow Count'/>
                 </LineChart>
             </ResponsiveContainer>
         </div>

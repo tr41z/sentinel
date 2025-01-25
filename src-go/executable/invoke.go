@@ -53,67 +53,64 @@ func updateHealthStatus(status string, lastActive time.Time, incrementError bool
 }
 
 func Invoke() {
-	// Initialize sniffer health
-	health = SnifferHealth{
-		Status:     "initializing",
-		ErrorCount: 0,
-	}
-	snifferStart = time.Now()
+    // Reinitialize sniffer health
+    healthMutex.Lock()
+    health = SnifferHealth{
+        Status:     "initializing",
+        ErrorCount: 0,
+    }
+    snifferStart = time.Now()
+    healthMutex.Unlock()
 
-	// Check if the executable exists
-	if _, err := os.Stat(utils.EXECUTABLE_PATH); os.IsNotExist(err) {
-		updateHealthStatus("error", time.Time{}, true)
-		fmt.Printf("Error: Sniffer executable not found at %s\n", utils.EXECUTABLE_PATH)
-		os.Exit(1)
-	}
+    // Check if the executable exists
+    if _, err := os.Stat(utils.EXECUTABLE_PATH); os.IsNotExist(err) {
+        updateHealthStatus("error", time.Time{}, true)
+        fmt.Printf("Error: Sniffer executable not found at %s\n", utils.EXECUTABLE_PATH)
+        return
+    }
 
-	// Create a context with cancel function
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+    // Create a context with cancel function
+    ctx, cancel := context.WithCancel(context.Background())
+    defer cancel()
 
-	cmd := exec.CommandContext(ctx, utils.EXECUTABLE_PATH)
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
+    cmd := exec.CommandContext(ctx, utils.EXECUTABLE_PATH)
+    var stdout, stderr bytes.Buffer
+    cmd.Stdout = &stdout
+    cmd.Stderr = &stderr
 
-	// Start the command
-	fmt.Println("Running the sniffer executable...")
-	updateHealthStatus("running", time.Now(), false)
+    // Start the command
+    fmt.Println("Running the sniffer executable...")
+    updateHealthStatus("running", time.Now(), false)
 
-	if err := cmd.Start(); err != nil {
-		updateHealthStatus("error", time.Now(), true)
-		fmt.Printf("Error starting sniffer: %s\n", err)
-		os.Exit(1)
-	}
+    if err := cmd.Start(); err != nil {
+        updateHealthStatus("error", time.Now(), true)
+        fmt.Printf("Error starting sniffer: %s\n", err)
+        return
+    }
 
-	// Monitor for global condition
-	go func() {
-		for {
-			if Expired {
-				fmt.Println("Condition met, stopping the sniffer...")
-				updateHealthStatus("stopping", time.Now(), false)
-				cancel()
-				return
-			}
-			time.Sleep(1 * time.Second)
-		}
-	}()
+    // Monitor for global condition
+    go func() {
+        for {
+            if Expired {
+                fmt.Println("Condition met, stopping the sniffer...")
+                updateHealthStatus("stopping", time.Now(), false)
+                cancel()
+                return
+            }
+            time.Sleep(1 * time.Second)
+        }
+    }()
 
-	go func() {
-		time.Sleep(30 * time.Second)
-		Expired = true;
-	}()
+    // Wait for the command to finish
+    err := cmd.Wait()
+    if ctx.Err() == context.Canceled {
+        fmt.Println("Sniffer process terminated by user or condition.")
+    } else if err != nil {
+        updateHealthStatus("error", time.Now(), true)
+        fmt.Printf("Error running sniffer: %s\n", err)
+    } else {
+        fmt.Println("Sniffer process completed successfully.")
+    }
 
-	// Wait for the command to finish
-	err := cmd.Wait()
-	if ctx.Err() == context.Canceled {
-		fmt.Println("Sniffer process terminated by user or condition.")
-	} else if err != nil {
-		updateHealthStatus("error", time.Now(), true)
-		fmt.Printf("Error running sniffer: %s\n", err)
-	} else {
-		fmt.Println("Sniffer process completed successfully.")
-	}
-
-	updateHealthStatus("stopped", time.Now(), false)
+    updateHealthStatus("stopped", time.Now(), false)
 }
