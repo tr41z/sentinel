@@ -6,6 +6,7 @@ import HomePage from './pages/HomePage';
 import InspectorPage from './pages/InspectorPage';
 import Sidebar from './components/Sidebar';
 import DashboardPage from './pages/DashboardPage';
+import SettingsPage from './pages/SettingsPage';
 
 function App() {  
     const [flows, setFlows] = useState<Flow[]>([]);
@@ -85,7 +86,14 @@ function App() {
         <Sidebar />
 
         <Routes>
-          <Route path='/' element={<HomePage snifferStatus={snifferStatus} snifferUptime={snifferUptime} snifferErrorCount={snifferErrorCount} flows={flows}/>}/>
+          <Route path='/' element={
+            <HomePage 
+                snifferStatus={snifferStatus} 
+                snifferUptime={snifferUptime} 
+                snifferErrorCount={snifferErrorCount} 
+                flows={flows}
+              />
+          }/>
           <Route path='/dashboard' element={
             <DashboardPage 
                 totalFlows={totalFlows} 
@@ -96,6 +104,7 @@ function App() {
               />
           }/>
           <Route path='/flows/inspector' element={<InspectorPage/>}/>
+          <Route path='/settings' element={<SettingsPage/>}/>
         </Routes>
       </div>
     )

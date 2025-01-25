@@ -57,7 +57,7 @@ const HomePage = ({ snifferStatus, snifferUptime, snifferErrorCount, flows }: Ho
                       },
                       {
                         name: "Uptime",
-                        value: 200
+                        value: 0
                       },
                       {
                         name: "IPs Flagged",
@@ -69,7 +69,7 @@ const HomePage = ({ snifferStatus, snifferUptime, snifferErrorCount, flows }: Ho
                       },
                       {
                         name: "Error Count",
-                        value: 10
+                        value: 0
                       }
                     ]}
                  />

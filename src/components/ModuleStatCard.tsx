@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import clsx from "clsx";
-import { Dot, Inspect, InspectionPanel, Save, Search } from "lucide-react";
+import { Dot, Pause } from "lucide-react";
 import { ModuleStatCardProps } from "../utils/props";
 
 const ModuleStatCard = ({ moduleName, icon: IconComponent, statistics, color }: ModuleStatCardProps) => {
@@ -23,7 +23,7 @@ const ModuleStatCard = ({ moduleName, icon: IconComponent, statistics, color }: 
         className="absolute top-3 right-3 p-2 rounded-full bg-gray-700 hover:bg-gray-600 text-white shadow-md z-10"
         aria-label="Save Stat"
       >
-        <Search size={20} />
+        <Pause size={20} />
       </motion.button>
 
       {/* Card Content */}
