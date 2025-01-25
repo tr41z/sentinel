@@ -3,7 +3,7 @@ import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recha
 import { useMemo } from 'react';
 import { Flow } from '../utils/props';
 
-const COLORS = ["#4cc9f0", "#ef233c"];
+const COLORS = ["#39FF14", "#ff0000"];
 
 interface FlowListProps {
     flows: Flow[];
@@ -28,7 +28,7 @@ const ProtocolDistributionChart = ({ flows }: FlowListProps) => {
 
     return (
         <motion.div
-            className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700"
+            className="bg-[#1A1A1A] bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-900"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}

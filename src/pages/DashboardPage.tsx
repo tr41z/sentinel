@@ -2,7 +2,7 @@ import Header from '../components/Header';
 import { motion } from 'framer-motion';
 import StatCard from '../components/StatCard';
 import { Activity, Percent, Weight, Zap } from 'lucide-react';
-import FlowsOverviewChart from '../components/FlowsOverviewChart';
+import FlowsRateOverviewChart from '../components/FlowsRateOverviewChart';
 import ProtocolDistributionChart from '../components/ProtocolDistributionChart';
 import { DashboardPageProps } from '../utils/props';
 
@@ -21,10 +21,10 @@ const DashboardPage = ({ totalFlows, avgFlowSize, avgFlowRate, totalBytes, flows
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 1 }}
                 >
-                    <StatCard name="Total Flows" icon={Zap} value={totalFlows} color='#4cc9f0'/>
-                    <StatCard name="Average Flow Size" icon={Weight} value={`${avgFlowSize} bytes`} color='#ef233c'/>
-                    <StatCard name="Average Flow Rate" icon={Activity} value={`${avgFlowRate} b/s`} color='#38b000'/>
-                    <StatCard name="Total Size Exchanged" icon={Percent} value={`${totalBytesInMB} MB`} color='#EC4899'/>
+                    <StatCard name="Total Flows" icon={Zap} value={totalFlows} color='#deff1c'/>
+                    <StatCard name="Average Flow Size" icon={Weight} value={`${avgFlowSize} bytes`} color='#ff0000'/>
+                    <StatCard name="Average Flow Rate" icon={Activity} value={`${avgFlowRate} b/s`} color='#39FF14'/>
+                    <StatCard name="Total Size Exchanged" icon={Percent} value={`${totalBytesInMB} MB`} color='#00ffff'/>
                 </motion.div>
 
                 {/* Charts Section */}
@@ -34,7 +34,7 @@ const DashboardPage = ({ totalFlows, avgFlowSize, avgFlowRate, totalBytes, flows
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
                 >
-                    <FlowsOverviewChart />
+                    <FlowsRateOverviewChart flows={flows}/>
                     <ProtocolDistributionChart flows={flows} />
                 </motion.div>
             </main>

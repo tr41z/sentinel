@@ -3,15 +3,7 @@ import { motion } from "framer-motion";
 import ModuleStatCard from "../components/ModuleStatCard";
 import { Bot, HeartPulse } from "lucide-react";
 import { HomePageProps } from "../utils/props";
-import {
-  CartesianGrid,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import SnifferAiModChart from "../components/SnifferAiModChart";
 
 const HomePage = ({
   snifferStatus,
@@ -20,46 +12,6 @@ const HomePage = ({
   flows,
   bandwidth,
 }: HomePageProps) => {
-  // const data = [
-  //   { hour: "00:00", snifferFlows: 34, aiThreats: 3 },
-  //   { hour: "01:00", snifferFlows: 67, aiThreats: 5 },
-  //   { hour: "02:00", snifferFlows: 54, aiThreats: 4 },
-  //   { hour: "03:00", snifferFlows: 23, aiThreats: 2 },
-  //   { hour: "04:00", snifferFlows: 89, aiThreats: 8 },
-  //   { hour: "05:00", snifferFlows: 45, aiThreats: 4 },
-  //   { hour: "06:00", snifferFlows: 78, aiThreats: 6 },
-  //   { hour: "07:00", snifferFlows: 56, aiThreats: 3 },
-  //   { hour: "08:00", snifferFlows: 34, aiThreats: 1 },
-  //   { hour: "09:00", snifferFlows: 90, aiThreats: 9 },
-  //   { hour: "10:00", snifferFlows: 87, aiThreats: 7 },
-  //   { hour: "11:00", snifferFlows: 43, aiThreats: 2 },
-  //   { hour: "12:00", snifferFlows: 21, aiThreats: 0 },
-  //   { hour: "13:00", snifferFlows: 65, aiThreats: 4 },
-  //   { hour: "14:00", snifferFlows: 76, aiThreats: 5 },
-  // ];
-
-  const data = flows.reduce((acc: { hour: string; snifferFlows: number }[], flow) => {
-    // Convert the Unix timestamp (seconds) to milliseconds by multiplying by 1000
-    const date = new Date(flow.last_updated_time * 1000);
-  
-    // Use the local hours for grouping
-    const hour = date.getHours();
-    const hourString = hour < 10 ? `0${hour}:00` : `${hour}:00`;
-  
-    // Check if the hour already exists in the accumulator
-    const existing = acc.find(item => item.hour === hourString);
-  
-    if (existing) {
-      existing.snifferFlows += 1; // Increment snifferFlows count
-    } else {
-      acc.push({ hour: hourString, snifferFlows: 1 }); // Add new hour entry with count 1
-    }
-  
-    return acc;
-  }, []);
-  
-  console.log(data);
-  
   
   return (
     <div className="flex-1 overflow-auto relative z-10">
@@ -76,12 +28,12 @@ const HomePage = ({
           <ModuleStatCard
             moduleName="Network Sniffer Module"
             icon={HeartPulse}
-            color="#4cc9f0"
+            color="#39FF14"
             statistics={[
               { name: "Status", value: snifferStatus },
               { name: "Uptime", value: snifferUptime },
               { name: "Flows Processed", value: flows.length },
-              { name: "Bandwidth", value: `${bandwidth.toFixed(1)} Mbps` },
+              { name: "Bandwidth", value: `${bandwidth.toFixed(1)} kbps` },
               { name: "Error Count", value: snifferErrorCount },
             ]}
           />
@@ -89,7 +41,7 @@ const HomePage = ({
           <ModuleStatCard
             moduleName="AI Module"
             icon={Bot}
-            color="#ef233c"
+            color="#ff0000"
             statistics={[
               { name: "Status", value: 0 },
               { name: "Uptime", value: 0 },
@@ -101,51 +53,7 @@ const HomePage = ({
         </motion.div>
 
         {/* Flows Overview Chart */}
-        <motion.div
-          className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <h2 className="text-lg font-medium mb-4 text-gray-200">
-            Flows Overview
-          </h2>
-
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={data}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#4B5563" />
-                <XAxis dataKey="hour" />
-                <YAxis stroke="#9ca3af" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "rgba(31, 41, 55, 0.8)",
-                    borderColor: "#4B5563",
-                  }}
-                  itemStyle={{ color: "#E5E7EB" }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="snifferFlows"
-                  name="Flows Processed"
-                  stroke="#4cc9f0"
-                  strokeWidth={3}
-                  dot={{ fill: "#4cc9f0", strokeWidth: 2, r: 6 }}
-                  activeDot={{ r: 8, strokeWidth: 2 }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="aiThreats"
-                  name="Threats Detected"
-                  stroke="#ef233c"
-                  strokeWidth={3}
-                  dot={{ fill: "#ef233c", strokeWidth: 2, r: 6 }}
-                  activeDot={{ r: 8, strokeWidth: 2 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </motion.div>
+        <SnifferAiModChart flows={flows}/>
       </main>
     </div>
   );

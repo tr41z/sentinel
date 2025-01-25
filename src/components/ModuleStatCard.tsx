@@ -32,7 +32,7 @@ const ModuleStatCard = ({ moduleName, icon: IconComponent, statistics, color }: 
   return (
     <motion.div
       className={clsx(
-        "relative bg-gray-800 bg-opacity-90 backdrop-blur-md shadow-2xl rounded-2xl border border-gray-700 overflow-hidden transition-transform duration-300"
+        "relative bg-[#1A1A1A] bg-opacity-90 backdrop-blur-md shadow-2xl rounded-2xl border border-gray-900 overflow-hidden transition-transform duration-300"
       )}
       whileHover={hoverEffect}
     >
