@@ -66,7 +66,7 @@ func main() {
 	mux.HandleFunc("/api/v1/sniffer/stop", StopSnifferHandler)
 
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:5173", "http://localhost:5174"},
+		AllowedOrigins:   []string{"http://localhost:*"},
 		AllowCredentials: true,
 	})
 
