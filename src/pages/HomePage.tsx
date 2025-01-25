@@ -18,6 +18,7 @@ const HomePage = ({
       <Header title="Home" />
 
       <main className="max-w-7xl mx-auto py-6 px-4 lg:px-8">
+        
         {/* Module Stat Cards Section */}
         <motion.div
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8 mb-8"

@@ -21,7 +21,7 @@ const StatCard = ({ name, icon: IconComponent, value, color, iconSize = 22 }: St
     >
       {/* Save Button */}
       <motion.button
-        whileHover={{ scale: 1.2 }}  // Button hover effect
+        whileHover={{ scale: 1.2 }}
         className="absolute top-3 right-3 p-2 rounded-full bg-gray-700 text-white"
         aria-label="Save Stat"
       >

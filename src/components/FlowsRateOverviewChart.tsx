@@ -31,7 +31,7 @@ const FlowsRateOverviewChart = ({ flows }: FlowsRateOverviewChartProps) => {
   // Calculate rate as bytes per hour
   const finalData = data.map(item => ({
     ...item,
-    rate: Number((item.totalBytes / 3600).toFixed(1)), // Ensure 'rate' is a number
+    rate: Number((item.totalBytes / 3600).toFixed(1)),
   }));
 
   return (

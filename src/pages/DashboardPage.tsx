@@ -14,6 +14,7 @@ const DashboardPage = ({ totalFlows, avgFlowSize, avgFlowRate, totalBytes, flows
             <Header title="Dashboard" />
 
             <main className='max-w-7xl mx-auto py-6 px-4 lg:px-8'>
+                
                 {/* Stat Cards Section */}
                 <motion.div
                     className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8'

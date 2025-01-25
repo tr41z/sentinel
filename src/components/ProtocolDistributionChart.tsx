@@ -44,7 +44,7 @@ const ProtocolDistributionChart = ({ flows }: FlowListProps) => {
                             cx="50%"
                             cy="50%"
                             labelLine={false}
-                            outerRadius="80%" // Adjust radius dynamically for better responsiveness
+                            outerRadius="80%"
                             fill="#8884d8"
                             dataKey="value"
                         >
@@ -59,7 +59,7 @@ const ProtocolDistributionChart = ({ flows }: FlowListProps) => {
                                 borderRadius: '8px',
                             }}
                             itemStyle={{ color: "#E5E7EB" }}
-                            labelStyle={{ color: '#E5E7EB', fontWeight: 'bold' }} // Improve tooltip label contrast
+                            labelStyle={{ color: '#E5E7EB', fontWeight: 'bold' }} 
                         />
                         <Legend
                             iconType="circle"
