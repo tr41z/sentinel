@@ -7,10 +7,10 @@ const SIDEBAR_ITEMS = [
     { name: "Home", icon: Home, color: "4cc9f0", path: "/"},
     { name: "Dashboard", icon: BarChart2, color: "#6366f1", path: "/dashboard" },
     { name: "Inspector", icon: SearchCheck, color: "#EC4899", path: "/flows/inspector"},
-    { name: "Dummy", icon: Check, color: "#c77dff", path: "/flows/inspector"},
-    { name: "Dummy", icon: Star, color: "#2ec4b6", path: "/flows/inspector"},
-    { name: "Dummy", icon: HeartPulse, color: "#ffe066", path: "/flows/inspector"},
-    { name: "Dummy", icon: User, color: "#c1121f", path: "/flows/inspector"},
+    { name: "Dummy", icon: Check, color: "#c77dff", path: "/dummy1"},
+    { name: "Dummy", icon: Star, color: "#2ec4b6", path: "/dummy2"},
+    { name: "Dummy", icon: HeartPulse, color: "#ffe066", path: "dummy3"},
+    { name: "Dummy", icon: User, color: "#c1121f", path: "dummy4"},
 ]
 
 const Sidebar = () => {

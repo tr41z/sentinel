@@ -45,7 +45,8 @@ export interface DashboardPageProps {
 }
 
 export interface HomePageProps {
-    status: string;
-    uptime: number;
-    errorCount: number;
+    snifferStatus: string;
+    snifferUptime: number;
+    snifferErrorCount: number;
+    flows: Flow[];
 }

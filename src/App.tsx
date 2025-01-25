@@ -9,9 +9,9 @@ import DashboardPage from './pages/DashboardPage';
 
 function App() {  
     const [flows, setFlows] = useState<Flow[]>([]);
-    const [status, setStatus] = useState("");
-    const [uptime, setUptime] = useState(0);
-    const [errorCount, setErrorCount] = useState(0);
+    const [snifferStatus, setSnifferStatus] = useState("");
+    const [snifferUptime, setSnifferUptime] = useState(0);
+    const [snifferErrorCount, setSnifferErrorCount] = useState(0);
   
     const fetchFlows = async () => {
       const res = await fetch("http://localhost:8080/api/v1/flows");
@@ -29,9 +29,9 @@ function App() {
 
       if (res.ok) {
         const data = await res.json();
-        setStatus(data.status);
-        setUptime(data.uptime);
-        setErrorCount(data.error_count);
+        setSnifferStatus(data.status);
+        setSnifferUptime(data.uptime);
+        setSnifferErrorCount(data.error_count);
       } else {
         console.error("There was an error while fetching health data!");
       }
@@ -85,7 +85,7 @@ function App() {
         <Sidebar />
 
         <Routes>
-          <Route path='/' element={<HomePage status={status} uptime={uptime} errorCount={errorCount}/>}/>
+          <Route path='/' element={<HomePage snifferStatus={snifferStatus} snifferUptime={snifferUptime} snifferErrorCount={snifferErrorCount} flows={flows}/>}/>
           <Route path='/dashboard' element={
             <DashboardPage 
                 totalFlows={totalFlows} 

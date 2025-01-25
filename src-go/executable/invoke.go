@@ -33,7 +33,7 @@ func GetSnifferHealth() SnifferHealth {
 	defer healthMutex.Unlock()
 
 	if health.Status == "running" {
-		health.Uptime = fmt.Sprintf("%.0f", time.Since(snifferStart).Seconds())
+		health.Uptime = fmt.Sprintf("%.0f s", time.Since(snifferStart).Seconds())
 	}
 
 	return health
