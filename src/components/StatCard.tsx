@@ -14,14 +14,14 @@ const StatCard = ({ name, icon: IconComponent, value, color, iconSize = 22 }: St
   return (
     <motion.div
       className={clsx(
-        'bg-gray-800 bg-opacity-90 backdrop-blur-md overflow-hidden shadow-lg rounded-xl border border-gray-700 relative',  // 'relative' for positioning the button
+        'bg-[#1A1A1A] bg-opacity-90 backdrop-blur-md overflow-hidden shadow-lg rounded-xl border border-gray-900 relative',  // 'relative' for positioning the button
       )}
       whileHover={hoverEffect}
       transition={{ type: 'spring', stiffness: 400 }}
     >
       {/* Save Button */}
       <motion.button
-        whileHover={{ scale: 1.2 }}  // Button hover effect
+        whileHover={{ scale: 1.2 }}
         className="absolute top-3 right-3 p-2 rounded-full bg-gray-700 text-white"
         aria-label="Save Stat"
       >

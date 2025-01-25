@@ -6,6 +6,7 @@ import HomePage from './pages/HomePage';
 import InspectorPage from './pages/InspectorPage';
 import Sidebar from './components/Sidebar';
 import DashboardPage from './pages/DashboardPage';
+import SettingsPage from './pages/SettingsPage';
 
 function App() {  
     const [flows, setFlows] = useState<Flow[]>([]);
@@ -59,6 +60,11 @@ function App() {
         [flows]
     );
 
+    const totalDuration = useMemo(() => 
+      flows.reduce((sum, flow) => sum + flow.duration, 0),
+      [flows]
+    )
+
     const avgFlowRate = useMemo(() => {
       const { totalData, totalDuration } = flows.reduce(
           (acc, flow) => {
@@ -72,20 +78,29 @@ function App() {
   }, [flows]);
 
     const avgFlowSize = totalFlows > 0 ? totalBytes / totalFlows : 0;
+    const bandwidth = totalDuration > 0 ? (totalBytes * 8.0) / (totalDuration * 1000) : 0;
 
     return (
-      <div className='flex h-screen bg-[#000814] text-gray-200 overflow-hidden'>
+      <div className='flex h-screen bg-[#040404] text-gray-200 overflow-hidden'>
 
         {/* Background */}
         <div className='fixed inset-0 z-0'>
-          <div className='absolute inset-0 bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 opacity-80'/>
+          <div className='absolute inset-0 bg-gradient-to-b from-[#040404] via-[#121212] to-gray-[#040404] opacity-80'/>
           <div className='absolute inset-0 backdrop-blur-sm'/>
         </div>
 
         <Sidebar />
 
         <Routes>
-          <Route path='/' element={<HomePage snifferStatus={snifferStatus} snifferUptime={snifferUptime} snifferErrorCount={snifferErrorCount} flows={flows}/>}/>
+          <Route path='/' element={
+            <HomePage 
+                snifferStatus={snifferStatus} 
+                snifferUptime={snifferUptime} 
+                snifferErrorCount={snifferErrorCount} 
+                flows={flows}
+                bandwidth={bandwidth}
+              />
+          }/>
           <Route path='/dashboard' element={
             <DashboardPage 
                 totalFlows={totalFlows} 
@@ -96,6 +111,7 @@ function App() {
               />
           }/>
           <Route path='/flows/inspector' element={<InspectorPage/>}/>
+          <Route path='/settings' element={<SettingsPage/>}/>
         </Routes>
       </div>
     )
