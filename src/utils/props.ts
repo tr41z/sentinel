@@ -24,10 +24,28 @@ export interface StatCardProps {
     iconSize?: number; 
 }
 
+interface Stats {
+    name: string;
+    value: number | string;
+}
+
+export interface ModuleStatCardProps {
+    moduleName: string;
+    icon: LucideIcon;
+    color: string;
+    statistics: Stats[];
+}
+
 export interface DashboardPageProps {
     totalFlows: number;
     avgFlowSize: string;
     avgFlowRate: string;
     totalBytes: number;
     flows: Flow[];
+}
+
+export interface HomePageProps {
+    status: string;
+    uptime: number;
+    errorCount: number;
 }

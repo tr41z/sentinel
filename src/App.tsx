@@ -9,6 +9,9 @@ import DashboardPage from './pages/DashboardPage';
 
 function App() {  
     const [flows, setFlows] = useState<Flow[]>([]);
+    const [status, setStatus] = useState("");
+    const [uptime, setUptime] = useState(0);
+    const [errorCount, setErrorCount] = useState(0);
   
     const fetchFlows = async () => {
       const res = await fetch("http://localhost:8080/api/v1/flows");
@@ -21,12 +24,32 @@ function App() {
       }
     }
 
+    const fetchStats = async () => {
+      const res = await fetch("http://localhost:8080/api/v1/health");
+
+      if (res.ok) {
+        const data = await res.json();
+        setStatus(data.status);
+        setUptime(data.uptime);
+        setErrorCount(data.error_count);
+      } else {
+        console.error("There was an error while fetching health data!");
+      }
+    }
+
     useEffect(() => {
-      const interval = setInterval(() => {
+      const flowsInterval = setInterval(() => {
         fetchFlows();
       }, 4000);
 
-      return () => clearInterval(interval);
+      const healthInterval = setInterval(() => {
+        fetchStats();
+      }, 1000);
+
+      return () => {
+        clearInterval(flowsInterval);
+        clearInterval(healthInterval);
+      };
     }, [])
 
     // Calculate totalBytes and other derived values
@@ -62,7 +85,7 @@ function App() {
         <Sidebar />
 
         <Routes>
-          <Route path='/' element={<HomePage />}/>
+          <Route path='/' element={<HomePage status={status} uptime={uptime} errorCount={errorCount}/>}/>
           <Route path='/dashboard' element={
             <DashboardPage 
                 totalFlows={totalFlows} 
