@@ -99,14 +99,21 @@ func Invoke() {
 		}
 	}()
 
+	go func() {
+		time.Sleep(30 * time.Second)
+		Expired = true;
+	}()
+
 	// Wait for the command to finish
-	if err := cmd.Wait(); err != nil {
+	err := cmd.Wait()
+	if ctx.Err() == context.Canceled {
+		fmt.Println("Sniffer process terminated by user or condition.")
+	} else if err != nil {
 		updateHealthStatus("error", time.Now(), true)
 		fmt.Printf("Error running sniffer: %s\n", err)
-		fmt.Printf("stderr: %s\n", stderr.String())
-		os.Exit(1)
+	} else {
+		fmt.Println("Sniffer process completed successfully.")
 	}
 
 	updateHealthStatus("stopped", time.Now(), false)
-	fmt.Printf("Sniffer output:\n%s\n", stdout.String())
 }

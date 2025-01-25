@@ -30,7 +30,7 @@ const ModuleStatCard = ({ moduleName, icon: IconComponent, statistics, color }: 
       <div className="px-6 py-6 sm:p-8 relative">
         {/* Header */}
         <div className="flex items-center space-x-3">
-            <IconComponent size={24} color={color}/>
+          <IconComponent size={24} color={color} />
           <h2 className="text-lg font-semibold text-gray-200">{moduleName}</h2>
         </div>
 
@@ -40,7 +40,9 @@ const ModuleStatCard = ({ moduleName, icon: IconComponent, statistics, color }: 
             <div key={index} className="relative">
               <div className="flex justify-between items-center">
                 <p className="text-sm font-medium text-gray-300">{stat.name}</p>
-                <span className="text-sm font-semibold text-gray-100">{index !== 0 ? stat.value : null}</span>
+                <span className="text-sm font-semibold text-gray-100">
+                  {index !== 0 ? stat.value : null}
+                </span>
               </div>
 
               {/* Dot for status */}
@@ -49,7 +51,11 @@ const ModuleStatCard = ({ moduleName, icon: IconComponent, statistics, color }: 
                   size={45}
                   className={clsx(
                     "absolute -right-4 -top-3",
-                    stat.value === "running" ? "text-green-500" : "text-red-500"
+                    stat.value === "running"
+                      ? "text-green-500"
+                      : stat.value === "stopped"
+                      ? "text-orange-500"
+                      : "text-red-500"
                   )}
                 />
               )}
