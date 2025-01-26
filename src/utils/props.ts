@@ -46,8 +46,8 @@ export interface DashboardPageProps {
 
 export interface HomePageProps {
     snifferStatus: string;
-    snifferUptime: number;
-    snifferErrorCount: number;
+    snifferUptime: number | 0;
+    snifferErrorCount: number | 0;
     flows: Flow[];
-    bandwidth: number;
+    bandwidth: number | 0;
 }
