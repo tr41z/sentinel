@@ -15,7 +15,6 @@ int main() {
   // Create a thread to run terminate_and_save_flows
   std::thread terminate_thread(terminate_and_save_flows, db);
 
-  // Start the sniffer in the main thread (or in another thread if needed)
   start_multithreaded_sniffing();
 
   terminate_thread.join();
