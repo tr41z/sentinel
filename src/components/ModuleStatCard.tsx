@@ -7,7 +7,7 @@ const ModuleStatCard = ({ moduleName, icon: IconComponent, statistics, color }: 
   const hoverEffect = {
     y: -5,
     boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.2)",
-    scale: 1.02,
+    scale: 1.01,
   };
 
   const toggleSniffer = async (isRunning: boolean) => {
