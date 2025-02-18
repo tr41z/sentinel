@@ -1,31 +1,41 @@
-# sentinel
+# 🚨 Sentinel
 
-Sentinel is a machine learning-based Intrusion Detection System (IDS) designed to provide real-time threat detection. It integrates a sniffer module (C++), a backend server (Golang), a frontend interface (React + Vite), and a machine learning module (Python). The system also includes a notification feature to alert users about detected threats.
+Sentinel is a **machine learning-based Intrusion Detection System (IDS)** designed to provide **real-time threat detection**. It integrates the following components:
 
-## Features
-
-- **Sniffer Module**: Captures and analyzes network traffic.
-- **Backend Server**: Manages data flow and communication between modules.
-- **Frontend Interface**: User-friendly React app for visualization and threat inspection.
-- **Machine Learning Module**: Enhances threat detection using AI.
-- **Notification System**: Notifies users of potential threats.
+- 🕵️ **Sniffer Module** (C++): Captures and analyzes network traffic.
+- ⚙️ **Backend Server** (Golang): Manages data flow and communication between modules.
+- 💻 **Frontend Interface** (React + Vite): User-friendly app for visualization and threat inspection.
+- 🧠 **Machine Learning Module** (Python): Enhances threat detection using AI.
+- 🔔 **Notification System**: Alerts users about detected threats.
 
 ---
 
-## Setup Instructions
+## 🌟 Features
 
-### Prerequisites
+- **Sniffer Module**: Captures and analyzes network traffic.
+- **Backend Server**: Ensures smooth communication between modules.
+- **Frontend Interface**: Provides an intuitive interface for users.
+- **Machine Learning Module**: Implements AI to detect threats.
+- **Notification System**: Real-time alerts to users.
 
-Ensure the following are installed or follow steps below:
+---
+
+## 🛠️ Setup Instructions
+
+### 📋 Prerequisites
+
+Ensure the following tools are installed:
 
 - **C++ Compiler** (e.g., GCC or MSVC)
 - **CMake**
 - **Golang**
 - **Node.js & npm**
 
-### Steps
+---
 
-1. Clone the repository:
+### ⚙️ Steps
+
+1. **Clone the repository**:
    ```bash
    git clone https://github.com/your-username/sentinel.git
    cd sentinel
@@ -59,18 +69,30 @@ Ensure the following are installed or follow steps below:
       cmake -G "Unix Makefiles" ..
       make
       ```
-4. Run the Backend Server: Open a new terminal and navigate to the src-go directory:
+
+4. Install dependencies:
+   ```bash
+   npm install
+   ```
+   
+5. Run backend and frontend concurrently:
+   ```bash
+   npm start
+   ```
+**OR** manually start each:
+
+Run the Backend Server: Open a new terminal and navigate to the src-go directory:
    ```bash
    cd sentinel/src-go
    go run main.go
    ```
-5. Start the Frontend: Open another terminal in the sentinel directory:
+Start the Frontend: Open another terminal in the sentinel directory:
    ```bash
    npm run dev
    ```
 6. Access the Application: After starting the frontend, a URL will be displayed in the terminal (e.g., http://localhost:3000). Open it in your browser to use the app.
 
-## Usage
+## 📊 Usage
 - **Dashboard**: View an overview of network activity and detected threats.
 - **Inspector**: Analyze specific data points for deeper insights.
 - **Notifications**: Stay informed of potential threats in real-time.
