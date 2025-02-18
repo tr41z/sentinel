@@ -110,3 +110,4 @@ func get_home_dir() string {
 	full_dir := dirname + utils.DB_PATH
 	return full_dir
 }
+

@@ -1,7 +1,7 @@
 package executable
 
 import (
-	"bytes"
+	"bufio"
 	"context"
 	"fmt"
 	"os"
@@ -74,9 +74,20 @@ func Invoke() {
     defer cancel()
 
     cmd := exec.CommandContext(ctx, utils.EXECUTABLE_PATH)
-    var stdout, stderr bytes.Buffer
-    cmd.Stdout = &stdout
-    cmd.Stderr = &stderr
+
+    // Get pipes for stdout and stderr
+    stdoutPipe, err := cmd.StdoutPipe()
+    if err != nil {
+        updateHealthStatus("error", time.Now(), true)
+        fmt.Printf("Error creating stdout pipe: %s\n", err)
+        return
+    }
+    stderrPipe, err := cmd.StderrPipe()
+    if err != nil {
+        updateHealthStatus("error", time.Now(), true)
+        fmt.Printf("Error creating stderr pipe: %s\n", err)
+        return
+    }
 
     // Start the command
     fmt.Println("Running the sniffer executable...")
@@ -87,6 +98,29 @@ func Invoke() {
         fmt.Printf("Error starting sniffer: %s\n", err)
         return
     }
+
+    // Goroutines to read stdout and stderr
+    go func() {
+        scanner := bufio.NewScanner(stdoutPipe)
+        for scanner.Scan() {
+            fmt.Printf("STDOUT: %s\n", scanner.Text())
+            // Handle or process stdout data here
+        }
+        if err := scanner.Err(); err != nil {
+            fmt.Printf("Error reading stdout: %s\n", err)
+        }
+    }()
+
+    go func() {
+        scanner := bufio.NewScanner(stderrPipe)
+        for scanner.Scan() {
+            fmt.Printf("STDERR: %s\n", scanner.Text())
+            // Handle or process stderr data here
+        }
+        if err := scanner.Err(); err != nil {
+            fmt.Printf("Error reading stderr: %s\n", err)
+        }
+    }()
 
     // Monitor for global condition
     go func() {
@@ -102,7 +136,7 @@ func Invoke() {
     }()
 
     // Wait for the command to finish
-    err := cmd.Wait()
+    err = cmd.Wait()
     if ctx.Err() == context.Canceled {
         fmt.Println("Sniffer process terminated by user or condition.")
     } else if err != nil {

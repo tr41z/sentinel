@@ -1,8 +1,8 @@
 #include "include/sniffer.h"
 
 #ifdef _WIN32
-#include <winsock2.h> // Include Winsock2 header
-#include <ws2tcpip.h> // Include for inet_ntop
+#include <winsock2.h> 
+#include <ws2tcpip.h> 
 
 // Link with the Winsock library
 #pragma comment(lib, "ws2_32.lib")
@@ -76,7 +76,7 @@ void *sniffer_thread(void *args) {
   free(thread_args->device_name);
   free(thread_args);
   pthread_exit(NULL);
-  return NULL; // Add this return statement
+  return NULL;
 }
 
 // Function to start sniffing on all available devices using threads
