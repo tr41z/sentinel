@@ -34,6 +34,8 @@ func GetSnifferHealth() SnifferHealth {
 
 	if health.Status == "running" {
 		health.Uptime = fmt.Sprintf("%.0f s", time.Since(snifferStart).Seconds())
+	} else {
+		health.Uptime = "0"
 	}
 
 	return health
