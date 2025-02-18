@@ -1,1 +1,1 @@
-# 🔎 Approach of sentinel
+# 🔎 Approach of Sentinel
