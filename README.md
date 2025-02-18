@@ -40,18 +40,19 @@ Ensure the following tools are installed:
    git clone https://github.com/your-username/sentinel.git
    cd sentinel
    ```
+   
 2. Run the configuration script:
    - **Linux/Mac**:
      ```bash
-     sh config.sh
+     sh scripts/config.sh
      ```
      or
      
      ```bash
-     bash config.sh
+     bash scripts/config.sh
      ```
     - **Windows**:
-      Right click on `config.bat` file and open it as administor
+      Right click on `scripts/config.bat` file and open it as administor
    
 3. Build the Sniffer Module:
    ```bash
