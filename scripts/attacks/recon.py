@@ -21,7 +21,7 @@ def run_nmap(target_ip):
 
 # Function to run Gobuster (subdomain brute force)
 def run_gobuster(target_domain):
-    gobuster_cmd = f"gobuster dir -u http://{target_domain} -w /path/to/wordlist.txt"
+    gobuster_cmd = f"gobuster dir -u http://{target_domain} -w /usr/share/wordlists/dirb/common.txt"
     print(f"Running Gobuster for domain {target_domain}...")
     os.system(gobuster_cmd)
     time.sleep(random.randint(5, 10))
@@ -35,21 +35,15 @@ def run_recon_ng(target_domain):
 
 # Function to run Sublist3r (subdomain enumeration)
 def run_sublist3r(target_domain):
-    sublist3r_cmd = f"sublist3r -d {target_domain} -o subdomains.txt"
+    sublist3r_cmd = f"sublist3r -d {target_domain}"
     print(f"Running Sublist3r for {target_domain}...")
     os.system(sublist3r_cmd)
     time.sleep(random.randint(5, 10))
 
-# Function to run TheHarvester (email and domain enumeration)
-def run_theharvester(target_domain):
-    theharvester_cmd = f"theharvester -d {target_domain} -b google -l 100"
-    print(f"Running TheHarvester for {target_domain}...")
-    os.system(theharvester_cmd)
-    time.sleep(random.randint(5, 10))
 
 # Function to run Amass (subdomain enumeration and OSINT)
 def run_amass(target_domain):
-    amass_cmd = f"amass enum -d {target_domain} -o amass_output.txt"
+    amass_cmd = f"amass enum -d {target_domain}"
     print(f"Running Amass for {target_domain}...")
     os.system(amass_cmd)
     time.sleep(random.randint(5, 10))
@@ -70,8 +64,8 @@ def run_shodan(target_ip):
 
 # Main function to run reconnaissance tools at random intervals
 def main():
-    target_ip = "192.168.1.101"  # Replace with your target IP for Nmap, Nikto, Shodan
-    target_domain = "example.com"  # Replace with your target domain for subdomain enumeration, etc.
+    target_ip = "192.168.1.102"  # Replace with your target IP for Nmap, Nikto, Shodan
+    target_domain = "http://192.168.1.102:80"  # Replace with your target domain for subdomain enumeration, etc.
 
     # Run reconnaissance tools in an infinite loop with random intervals
     print(f"Running reconnaissance attacks on {target_domain} and {target_ip}...")
