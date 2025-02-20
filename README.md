@@ -73,7 +73,7 @@ or follow steps below
       make
       ```
 
-4. Install dependencies:
+4. Open other console and install dependencies:
    ```bash
    npm install
    ```
