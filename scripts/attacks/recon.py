@@ -120,7 +120,7 @@ def main():
             tool(target_ip) 
 
         # Random delay between 10 to 30 minutes (600 to 1800 seconds)
-        random_delay = random.randint(600, 1800)
+        random_delay = random.randint(120, 600)
         print(f"Waiting for {random_delay} seconds before running another attack...")
         time.sleep(random_delay)
 
