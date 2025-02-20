@@ -68,6 +68,13 @@ run_masscan() {
     sleep $((RANDOM % 6 + 5))  
 }
 
+run_dirgo() {
+    local target_ip=$1
+    echo "Running dirgo for $target_ip..."
+    ./dirgo -u $target_domain -w /usr/share/wordlists/dirb/common.txt -t 20
+    sleep $((RANDOM % 6 + 5))
+}
+
 # Main function to run reconnaissance tools at random intervals
 main() {
     local target_ip="192.168.1.102"
