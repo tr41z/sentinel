@@ -60,22 +60,21 @@ func checkIfExpired(w http.ResponseWriter, r *http.Request) {
 		handlers.StopSnifferHandler(w, r)
 		/* 
 		 - Pause sniffer module
-		 - Export data to external DB
-		 - Ensure it was sent
-		 - Delete db locally
-		 - Create new db
+		 - Export statistics to another table (same db)
+		 - Ensure it was saved
+		 - Delete flows table
+		 - Re-create flows table
 		 - Resume sniffer module
 		*/
 	}
 }
 
 // TODO: Delete db and re-create db functions
-func createDB() {}
-func deleteDB() {}
+func createTable() {}
+func deleteTable() {}
 
-// TODO: Format data in suitable format and send to external db
-func formatData() {}
-func sendData() {}
+// TODO: Save statistics to new table
+func saveStatistics() {}
 
 func FetchFlows(w http.ResponseWriter, r *http.Request) {
 	checkIfExpired(w, r)
