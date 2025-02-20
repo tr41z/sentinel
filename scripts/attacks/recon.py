@@ -62,13 +62,6 @@ def run_masscan(target_ip):
     os.system(masscan_cmd)
     time.sleep(random.randint(5, 10))
 
-# Function to run WhatWeb (web application fingerprinting)
-def run_whatweb(target_ip):
-    whatweb_cmd = f"whatweb {target_ip}"
-    print(f"Running WhatWeb for {target_ip}...")
-    os.system(whatweb_cmd)
-    time.sleep(random.randint(5, 10))
-
 # Main function to run reconnaissance tools at random intervals
 def main():
     target_ip = "192.168.1.102"  
@@ -84,7 +77,6 @@ def main():
         run_amass,
         run_nikto,
         run_masscan, 
-        run_whatweb, 
     ]
 
     while True:
@@ -106,8 +98,6 @@ def main():
             tool(target_ip)
         elif tool == run_masscan:
             tool(target_ip)  
-        elif tool == run_whatweb:
-            tool(target_ip) 
 
         # Random delay between 10 to 30 minutes (600 to 1800 seconds)
         random_delay = random.randint(120, 360)
