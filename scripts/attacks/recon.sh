@@ -28,14 +28,6 @@ run_gobuster() {
     sleep $((RANDOM % 6 + 5))  
 }
 
-# Function to run Recon-ng
-run_recon_ng() {
-    local target_domain=$1
-    echo "Running Recon-ng for $target_domain..."
-    recon-ng -t $target_domain
-    sleep $((RANDOM % 6 + 5))  
-}
-
 # Function to run Sublist3r (subdomain enumeration)
 run_sublist3r() {
     local target_domain=$1
@@ -83,7 +75,7 @@ main() {
     # Run reconnaissance tools in an infinite loop with random intervals
     echo "Running reconnaissance attacks on $target_domain and $target_ip..."
 
-    tools=("run_nmap" "run_gobuster" "run_recon_ng" "run_sublist3r" "run_amass" "run_nikto" "run_masscan")
+    tools=("run_nmap" "run_gobuster" "run_sublist3r" "run_amass" "run_nikto" "run_masscan")
 
     while true; do
         # Randomly select a tool to run
