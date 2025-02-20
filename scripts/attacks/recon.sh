@@ -44,14 +44,6 @@ run_amass() {
     sleep $((RANDOM % 6 + 5)) 
 }
 
-# Function to run Nikto (web vulnerability scanner)
-run_nikto() {
-    local target_ip=$1
-    echo "Running Nikto for $target_ip..."
-    nikto -h $target_ip
-    sleep $((RANDOM % 6 + 5))
-}
-
 # Function to run Masscan (fast port scanning)
 run_masscan() {
     local target_ip=$1
@@ -75,7 +67,7 @@ main() {
     # Run reconnaissance tools in an infinite loop with random intervals
     echo "Running reconnaissance attacks on $target_domain and $target_ip..."
 
-    tools=("run_nmap" "run_gobuster" "run_sublist3r" "run_amass" "run_nikto" "run_masscan")
+    tools=("run_nmap" "run_gobuster" "run_sublist3r" "run_amass" "run_masscan")
 
     while true; do
         # Randomly select a tool to run
