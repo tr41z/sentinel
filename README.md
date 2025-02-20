@@ -24,12 +24,14 @@ Sentinel is a **machine learning-based Intrusion Detection System (IDS)** design
 
 ### 📋 Prerequisites
 
-Ensure the following tools are installed or follow steps below:
+Ensure the following tools are installed:
 
 - **C++ Compiler** (e.g., GCC or MSVC)
 - **CMake**
 - **Golang**
 - **Node.js & npm**
+
+or follow steps below
 
 ---
 
