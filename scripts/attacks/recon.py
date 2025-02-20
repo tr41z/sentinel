@@ -54,13 +54,6 @@ def run_nikto(target_ip):
     print(f"Running Nikto for {target_ip}...")
     os.system(nikto_cmd)
     time.sleep(random.randint(5, 10))
-
-# Function to run Shodan (OSINT & IoT search engine)
-def run_shodan(target_ip):
-    shodan_cmd = f"shodan host {target_ip}"
-    print(f"Running Shodan for {target_ip}...")
-    os.system(shodan_cmd)
-    time.sleep(random.randint(5, 10))
     
 # Function to run Masscan (fast port scanning)
 def run_masscan(target_ip):
@@ -90,7 +83,6 @@ def main():
         run_sublist3r,
         run_amass,
         run_nikto,
-        run_shodan,
         run_masscan, 
         run_whatweb, 
     ]
@@ -111,8 +103,6 @@ def main():
         elif tool == run_amass:
             tool(target_domain)
         elif tool == run_nikto:
-            tool(target_ip)
-        elif tool == run_shodan:
             tool(target_ip)
         elif tool == run_masscan:
             tool(target_ip)  
