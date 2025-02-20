@@ -21,7 +21,7 @@ def run_nmap(target_ip):
 
 # Function to run Gobuster (subdomain brute force)
 def run_gobuster(target_domain):
-    gobuster_cmd = f"gobuster dir -u http://{target_domain} -w /usr/share/wordlists/dirb/common.txt"
+    gobuster_cmd = f"gobuster dir -u {target_domain} -w /usr/share/wordlists/dirb/common.txt"
     print(f"Running Gobuster for domain {target_domain}...")
     os.system(gobuster_cmd)
     time.sleep(random.randint(5, 10))
