@@ -72,7 +72,7 @@ main() {
     # Run reconnaissance tools in an infinite loop with random intervals
     echo "Running reconnaissance attacks on $target_domain and $target_ip..."
 
-    tools=("run_nmap" "run_gobuster" "run_masscan" "run_dirgo" "run_wfuzz" "run_metasploit_scan", "run_nikto")
+    tools=("run_nmap" "run_gobuster" "run_masscan" "run_dirgo" "run_wfuzz" "run_metasploit_scan" "run_nikto")
 
     while true; do
         # Randomly select a tool to run
