@@ -82,7 +82,7 @@ main() {
         $tool $target_ip $target_domain
 
         # Random delay between 2 to 6 minutes (120 to 360 seconds)
-        random_delay=$((RANDOM % 241 + 120))
+        random_delay=$((RANDOM % 121 + 60))
         echo "Waiting for $random_delay seconds before running another attack..."
         sleep $random_delay
     done
