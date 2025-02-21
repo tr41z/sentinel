@@ -6,18 +6,28 @@ run_nmap() {
     nmap_flags=(
         "-sS"  # SYN scan
         "-sU"  # UDP scan
-        "-p-"   # Scan all ports
+        "-p-"  # Scan all ports
         "-A"   # Aggressive scan (OS detection, version detection, script scanning)
         "-O"   # OS detection
         "-sV"  # Version detection
         "-T4"  # Faster scan
     )
 
-        for flag in "${nmap_flags[@]}"; do
-        echo "Running Nmap with flag: $flag"
-        nmap $flag $target_ip
-        sleep $((RANDOM % 6 + 5))  
+    # Randomly select between 2 to 4 flags
+    selected_flags=()
+    num_flags=$((RANDOM % 3 + 2)) # Random number between 2 and 4
+
+    for ((i = 0; i < num_flags; i++)); do
+        flag=${nmap_flags[RANDOM % ${#nmap_flags[@]}]}
+        # Ensure the flag is not duplicated
+        [[ " ${selected_flags[@]} " =~ " $flag " ]] || selected_flags+=("$flag")
     done
+
+    echo "Running Nmap with flags: ${selected_flags[*]}"
+    nmap "${selected_flags[@]}" $target_ip
+
+    # Random delay between 5 and 10 seconds
+    sleep $((RANDOM % 6 + 5))
 }
 
 # Function to run Gobuster (subdomain brute force)
