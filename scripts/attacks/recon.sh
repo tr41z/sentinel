@@ -13,7 +13,7 @@ run_nmap() {
         "-T4"  # Faster scan
     )
 
-    for flag in "${nmap_flags[@]}"; do
+        for flag in "${nmap_flags[@]}"; do
         echo "Running Nmap with flag: $flag"
         nmap $flag $target_ip
         sleep $((RANDOM % 6 + 5))  
@@ -28,22 +28,6 @@ run_gobuster() {
     sleep $((RANDOM % 6 + 5))  
 }
 
-# Function to run Sublist3r (subdomain enumeration)
-run_sublist3r() {
-    local target_domain=$1
-    echo "Running Sublist3r for $target_domain..."
-    sublist3r -d $target_domain
-    sleep $((RANDOM % 6 + 5))  
-}
-
-# Function to run Amass (subdomain enumeration and OSINT)
-run_amass() {
-    local target_domain=$1
-    echo "Running Amass for $target_domain..."
-    amass enum -d $target_domain
-    sleep $((RANDOM % 6 + 5)) 
-}
-
 # Function to run Masscan (fast port scanning)
 run_masscan() {
     local target_ip=$1
@@ -55,19 +39,40 @@ run_masscan() {
 run_dirgo() {
     local target_ip=$1
     echo "Running dirgo for $target_ip..."
-    ./dirgo -u $target_domain -w /usr/share/wordlists/dirb/common.txt -t 20
+    ./dirgo -u $target_domain:80 -w /usr/share/wordlists/dirb/common.txt -t 20
+    sleep $((RANDOM % 6 + 5))
+}
+
+run_wfuzz() {
+    local target_domain=$1
+    echo "Running WFuzz for domain $target_domain..."
+    wfuzz -c -z file,/usr/share/wordlists/dirb/common.txt --hc 404 $target_domain/FUZZ
+    sleep $((RANDOM % 6 + 5))
+}
+
+run_metasploit_scan() {
+    local target_ip=$1
+    echo "Running Metasploit auxiliary scanner for $target_ip..."
+    msfconsole -q -x "use auxiliary/scanner/portscan/tcp; set RHOSTS $target_ip; run; exit"
+    sleep $((RANDOM % 6 + 5))
+}
+
+run_nikto() {
+    local target_domain=$1
+    echo "Running Nikto for domain $target_domain..."
+    echo "n" | nikto -h $target_domain -nointeractive
     sleep $((RANDOM % 6 + 5))
 }
 
 # Main function to run reconnaissance tools at random intervals
 main() {
     local target_ip="192.168.1.102"
-    local target_domain="http://192.168.1.102:80"
+    local target_domain="http://192.168.1.102"
 
     # Run reconnaissance tools in an infinite loop with random intervals
     echo "Running reconnaissance attacks on $target_domain and $target_ip..."
 
-    tools=("run_nmap" "run_gobuster" "run_sublist3r" "run_amass" "run_masscan")
+    tools=("run_nmap" "run_gobuster" "run_masscan" "run_dirgo" "run_wfuzz" "run_metasploit_scan", "run_nikto")
 
     while true; do
         # Randomly select a tool to run
