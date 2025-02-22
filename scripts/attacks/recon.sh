@@ -76,8 +76,8 @@ run_nikto() {
 
 # Main function to run reconnaissance tools at random intervals
 main() {
-    local target_ip="192.168.1.102"
-    local target_domain="http://192.168.1.102"
+    local target_ip="192.168.36.1"
+    local target_domain="http://192.168.36.1"
 
     # Run reconnaissance tools in an infinite loop with random intervals
     echo "Running reconnaissance attacks on $target_domain and $target_ip..."
@@ -92,7 +92,7 @@ main() {
         $tool $target_ip $target_domain
 
         # Random delay between 60 and 120 seconds
-        random_delay=$((RANDOM % 61 + 60))
+        random_delay=$((RANDOM % 21 + 20))
         echo "Waiting for $random_delay seconds before running another attack..."
         sleep $random_delay
     done
