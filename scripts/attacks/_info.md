@@ -1,0 +1,3 @@
+**Important Notice:**
+
+**Please be aware that running any scripts in the current directory is done entirely at your own risk. Ensure you understand the functionality and potential impact of each script before execution. The authors and maintainers of these scripts are not responsible for any damage or unintended consequences that may arise from their use. Always review and test scripts in a controlled environment before deploying them in a production setting or running against any targets.**
