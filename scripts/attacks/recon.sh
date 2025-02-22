@@ -76,8 +76,8 @@ run_nikto() {
 
 # Main function to run reconnaissance tools at random intervals
 main() {
-    local target_ip="192.168.1.102"
-    local target_domain="http://192.168.1.102"
+    local target_ip="192.168.36.1"
+    local target_domain="http://192.168.36.1"
 
     # Run reconnaissance tools in an infinite loop with random intervals
     echo "Running reconnaissance attacks on $target_domain and $target_ip..."
