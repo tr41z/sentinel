@@ -84,8 +84,8 @@ main() {
         # Execute the selected attack
         $ATTACK
 
-        # Random delay between 2 to 6 minutes (120 to 360 seconds)
-        RANDOM_DELAY=$((RANDOM % 31 + 30))
+        # Random delay between 2 to 6 minutes (200 to 300 seconds)
+        RANDOM_DELAY=$((RANDOM % 101 + 200))
         echo "Waiting for $RANDOM_DELAY seconds before running another attack..."
         sleep $RANDOM_DELAY
     done
