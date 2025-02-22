@@ -20,7 +20,8 @@ extern "C" {
 #include <string.h>
 #include <time.h>
 
-#define PACKET_ARRIVAL_THRESHOLD 20
+/* !!!DATA COLLECTION ONLY!!! DEFAULT: 20 */
+#define PACKET_ARRIVAL_THRESHOLD 600
 
 typedef uint32_t u_int;   /* Define u_int as uint32_t */
 typedef uint16_t u_short; /* Define u_short as uint16_t */
