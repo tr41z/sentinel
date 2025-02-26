@@ -99,15 +99,28 @@ FetchContent_Declare(
     DOWNLOAD_EXTRACT_TIMESTAMP true
 )
 
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
+)
+# For Windows: Prevent overriding the parent project's compiler/linker settings
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
 # Make the content available
+FetchContent_MakeAvailable(googletest)
 FetchContent_MakeAvailable(sqlite3)
 
 # Create static library from sqlite3.c
 add_library(sqlite3 STATIC ${sqlite3_SOURCE_DIR}/sqlite3.c)
 target_include_directories(sqlite3 PUBLIC ${sqlite3_SOURCE_DIR})
 
+enable_testing()
+
+include_directories(${gtest_SOURCE_DIR}/include ${gtest_BINARY_DIR})
+
 # Executable for sniffer
 add_executable(sniffer ${SNIFFER_SOURCES})
+add_executable(tests "src/tests/sniffer_tests.cpp" "src/prep.cpp")
 
 if(APPLE)
     # Ensure sniffer depends on build_pcap
@@ -116,10 +129,14 @@ endif()
 
 # Link libraries (SQLite and platform-specific)
 target_link_libraries(sniffer pthread sqlite3 ${PLATFORM_LIBS} ${PCAP_LIBRARIES})
+target_link_libraries(tests PRIVATE gtest gtest_main)
 
 if(WIN32)
     target_link_libraries(sniffer ws2_32)
 endif()
+
+include(GoogleTest)
+gtest_discover_tests(tests)
 
 # Generate Makefile
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

@@ -3,7 +3,7 @@ import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recha
 import { useMemo } from 'react';
 import { Flow } from '../utils/props';
 
-const COLORS = ["#4cc9f0", "#ef233c"];
+const COLORS = ["#39FF14", "#ff0000"];
 
 interface FlowListProps {
     flows: Flow[];
@@ -28,7 +28,7 @@ const ProtocolDistributionChart = ({ flows }: FlowListProps) => {
 
     return (
         <motion.div
-            className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700"
+            className="bg-[#1A1A1A] bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-800"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
@@ -44,7 +44,7 @@ const ProtocolDistributionChart = ({ flows }: FlowListProps) => {
                             cx="50%"
                             cy="50%"
                             labelLine={false}
-                            outerRadius="80%" // Adjust radius dynamically for better responsiveness
+                            outerRadius="80%"
                             fill="#8884d8"
                             dataKey="value"
                         >
@@ -59,7 +59,7 @@ const ProtocolDistributionChart = ({ flows }: FlowListProps) => {
                                 borderRadius: '8px',
                             }}
                             itemStyle={{ color: "#E5E7EB" }}
-                            labelStyle={{ color: '#E5E7EB', fontWeight: 'bold' }} // Improve tooltip label contrast
+                            labelStyle={{ color: '#E5E7EB', fontWeight: 'bold' }} 
                         />
                         <Legend
                             iconType="circle"
