@@ -120,7 +120,7 @@ include_directories(${gtest_SOURCE_DIR}/include ${gtest_BINARY_DIR})
 
 # Executable for sniffer
 add_executable(sniffer ${SNIFFER_SOURCES})
-add_executable(tests "src/tests/sniffer_tests.cpp")
+add_executable(tests "src/tests/sniffer_tests.cpp" "src/prep.cpp")
 
 if(APPLE)
     # Ensure sniffer depends on build_pcap
