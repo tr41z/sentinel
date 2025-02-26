@@ -77,7 +77,7 @@ func deleteTable() {}
 func saveStatistics() {}
 
 func FetchFlows(w http.ResponseWriter, r *http.Request) {
-	checkIfExpired(w, r)
+	// checkIfExpired(w, r)
 	rows, err := DB.Query("SELECT id, src_ip, dst_ip, src_ports, " +
 		"dst_ports, protocol, total_bytes, rate, " +
 		"avg_packet_size, total_packet_count, start_time, last_updated_time, duration " +
