@@ -1,7 +1,6 @@
 package executable
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"os"
@@ -33,7 +32,9 @@ func GetSnifferHealth() SnifferHealth {
 	defer healthMutex.Unlock()
 
 	if health.Status == "running" {
-		health.Uptime = time.Since(snifferStart).String()
+		health.Uptime = fmt.Sprintf("%.0f s", time.Since(snifferStart).Seconds())
+	} else {
+		health.Uptime = "0"
 	}
 
 	return health
@@ -53,18 +54,20 @@ func updateHealthStatus(status string, lastActive time.Time, incrementError bool
 }
 
 func Invoke() {
-	// Initialize sniffer health
+	// Reinitialize sniffer health
+	healthMutex.Lock()
 	health = SnifferHealth{
 		Status:     "initializing",
 		ErrorCount: 0,
 	}
 	snifferStart = time.Now()
+	healthMutex.Unlock()
 
 	// Check if the executable exists
 	if _, err := os.Stat(utils.EXECUTABLE_PATH); os.IsNotExist(err) {
 		updateHealthStatus("error", time.Time{}, true)
 		fmt.Printf("Error: Sniffer executable not found at %s\n", utils.EXECUTABLE_PATH)
-		os.Exit(1)
+		return
 	}
 
 	// Create a context with cancel function
@@ -72,9 +75,10 @@ func Invoke() {
 	defer cancel()
 
 	cmd := exec.CommandContext(ctx, utils.EXECUTABLE_PATH)
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
+
+	// Suppress stdout and stderr to avoid executable output
+	cmd.Stdout = nil
+	cmd.Stderr = nil
 
 	// Start the command
 	fmt.Println("Running the sniffer executable...")
@@ -83,7 +87,7 @@ func Invoke() {
 	if err := cmd.Start(); err != nil {
 		updateHealthStatus("error", time.Now(), true)
 		fmt.Printf("Error starting sniffer: %s\n", err)
-		os.Exit(1)
+		return
 	}
 
 	// Monitor for global condition
@@ -100,13 +104,15 @@ func Invoke() {
 	}()
 
 	// Wait for the command to finish
-	if err := cmd.Wait(); err != nil {
+	err := cmd.Wait()
+	if ctx.Err() == context.Canceled {
+		fmt.Println("Sniffer process terminated by user or condition.")
+	} else if err != nil {
 		updateHealthStatus("error", time.Now(), true)
 		fmt.Printf("Error running sniffer: %s\n", err)
-		fmt.Printf("stderr: %s\n", stderr.String())
-		os.Exit(1)
+	} else {
+		// No output from the sniffer is expected, so no need for logs here
 	}
 
 	updateHealthStatus("stopped", time.Now(), false)
-	fmt.Printf("Sniffer output:\n%s\n", stdout.String())
 }

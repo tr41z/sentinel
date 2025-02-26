@@ -11,8 +11,8 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 
-	"backend/executable"
 	"backend/utils"
+	"backend/handlers"
 )
 
 type Flow struct {
@@ -44,8 +44,8 @@ func InitDB() {
 	}
 }
 
-func checkIfExpired(w http.ResponseWriter) {
-	row := DB.QueryRow("SELECT FIRST last_updated_time FROM flows")
+func checkIfExpired(w http.ResponseWriter, r *http.Request) {
+	row := DB.QueryRow("SELECT last_updated_time FROM flows LIMIT 3")
 	now := time.Now()
 	var lastUpdatedTime int64
 	if err := row.Scan(&lastUpdatedTime); err != nil {
@@ -53,24 +53,31 @@ func checkIfExpired(w http.ResponseWriter) {
 		return
 	}
 	lastUpdated := time.Unix(lastUpdatedTime, 0)
-	
-	if now.Sub(lastUpdated).Seconds() >= 7200 {
-		executable.Expired = true;
+	fmt.Println(now.Sub(lastUpdated).Seconds())
+
+	// If first time diff between first row and now is larger than 1 day
+	if now.Sub(lastUpdated).Seconds() >= 86400 {
+		handlers.StopSnifferHandler(w, r)
 		/* 
 		 - Pause sniffer module
-		 - Export data to external DB
-		 - Ensure it was sent
-		 - Delete db locally
-		 - Create new db
+		 - Export statistics to another table (same db)
+		 - Ensure it was saved
+		 - Delete flows table
+		 - Re-create flows table
+		 - Resume sniffer module
 		*/
 	}
 }
 
-func createDB() {}
+// TODO: Delete db and re-create db functions
+func createTable() {}
+func deleteTable() {}
 
-func deleteDB() {}
+// TODO: Save statistics to new table
+func saveStatistics() {}
 
 func FetchFlows(w http.ResponseWriter, r *http.Request) {
+	checkIfExpired(w, r)
 	rows, err := DB.Query("SELECT id, src_ip, dst_ip, src_ports, " +
 		"dst_ports, protocol, total_bytes, rate, " +
 		"avg_packet_size, total_packet_count, start_time, last_updated_time, duration " +
@@ -110,3 +117,4 @@ func get_home_dir() string {
 	full_dir := dirname + utils.DB_PATH
 	return full_dir
 }
+

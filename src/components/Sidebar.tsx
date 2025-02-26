@@ -1,25 +1,22 @@
-import { BarChart2, Check, HeartPulse, Home, Menu, SearchCheck, Star, User } from 'lucide-react'
+import { BarChart2, Home, Menu, SearchCheck, Settings } from 'lucide-react'
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 
 const SIDEBAR_ITEMS = [
-    { name: "Home", icon: Home, color: "4cc9f0", path: "/"},
-    { name: "Dashboard", icon: BarChart2, color: "#6366f1", path: "/dashboard" },
-    { name: "Inspector", icon: SearchCheck, color: "#EC4899", path: "/flows/inspector"},
-    { name: "Dummy", icon: Check, color: "#c77dff", path: "/flows/inspector"},
-    { name: "Dummy", icon: Star, color: "#2ec4b6", path: "/flows/inspector"},
-    { name: "Dummy", icon: HeartPulse, color: "#ffe066", path: "/flows/inspector"},
-    { name: "Dummy", icon: User, color: "#c1121f", path: "/flows/inspector"},
+    { name: "Home", icon: Home, color: "#39FF14", path: "/"},
+    { name: "Dashboard", icon: BarChart2, color: "#39FF14", path: "/dashboard" },
+    { name: "Inspector", icon: SearchCheck, color: "#39FF14", path: "/flows/inspector"},
+    { name: "Settings", icon: Settings, color: "#39FF14", path: "/settings"},
 ]
 
 const Sidebar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   return (
     <motion.div className={`relative z-10 transition-all duration-300 ease-in-out flex-shrink-0 ${isSidebarOpen ? 'w-64' : 'w-20'}`}
-    animate={{ width: isSidebarOpen ? 256 : 80 }}
+        animate={{ width: isSidebarOpen ? 256 : 80 }}
     >
-        <div className='h-full bg-gray-800 bg-opacity-50 backdrop-blur-md p-4 flex flex-col border-r border-gray-700'>
+        <div className='h-full bg-[#040404] bg-opacity-50 backdrop-blur-md p-4 flex flex-col border-r border-gray-800'>
             <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
@@ -40,11 +37,11 @@ const Sidebar = () => {
                             <AnimatePresence>
                                 {isSidebarOpen && (
                                     <motion.span
-                                    className="ml-4 whitespace-nowrap"
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    transition={{ duration: 0.2, delay: 0.3 }}
+                                        className="ml-4 whitespace-nowrap"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        transition={{ duration: 0.2, delay: 0.3 }}
                                     >
                                         {item.name}
                                     </motion.span>
@@ -53,6 +50,19 @@ const Sidebar = () => {
                         </motion.div>
                     </Link>
                 ))}
+                <AnimatePresence>
+                    {isSidebarOpen && (
+                        <motion.span
+                            className="absolute bottom-7 right-[35%]"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2, delay: 0.3 }}
+                            >
+                                <p className='uppercase tracking-widest text-lg'>sentinel</p>
+                        </motion.span>
+                    )}
+                </AnimatePresence>
             </nav>
         </div>
     </motion.div>
