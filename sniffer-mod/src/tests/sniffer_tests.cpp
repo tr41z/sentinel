@@ -56,7 +56,7 @@ TEST(PREPROCESS_TESTS_ROUND_TO, Normal) {
    double value = 10.241258125491230542149;
    double res = round_to(value, DECIMAL_PLACES);
 
-   ASSERT_EQ(10.24126, res);
+   ASSERT_EQ(10.24125813, res);
 }
 
 TEST(PREPROCESS_TESTS_PACKETS_PER_SEC, Normal) {
@@ -72,7 +72,7 @@ TEST(PREPROCESS_TESTS_PACKETS_PER_SEC, ZeroDivision) {
     int duration = 0;
 
     double res = calculate_pps(packet_count, duration);
-    ASSERT_EQ(955, res);
+    ASSERT_EQ(0, res);
 }
 
 TEST(PREPROCESS_TESTS_PACKETS_PER_SEC, MaxValues) {
