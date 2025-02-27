@@ -2,12 +2,6 @@
 #include "include/flow.h"
 #include "include/ip.h"
 
-#ifdef _WIN32
-    #define PATH_SEPARATOR "\\"
-#else
-    #define PATH_SEPARATOR "/"
-#endif
-
 void connect_db(const char *home_dir, sqlite3 **db) {
   int rc;
   char *connection_string;
