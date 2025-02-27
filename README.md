@@ -69,8 +69,8 @@ or follow steps below
       ```
     - **For Windows**:
       ```bash
-      cmake -G "Unix Makefiles" ..
-      make
+      cmake -G “MinGW Makefiles” ..
+      cmake —build .
       ```
 
 4. Open other console and install dependencies:
