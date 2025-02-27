@@ -97,7 +97,7 @@ main() {
             while true; do
                 tool=${tools[$RANDOM % ${#tools[@]}]}
                 $tool "$target_ip" "$target_domain"
-                random_delay=$((RANDOM % 61 + 60))
+                random_delay=$((RANDOM % 81 + 100))
                 echo "[$target_ip] Waiting for $random_delay seconds before running another attack..." | tee -a "$LOG_FILE"
                 sleep $random_delay
             done
