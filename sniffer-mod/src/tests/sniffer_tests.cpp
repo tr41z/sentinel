@@ -3,7 +3,7 @@
 #include "../include/prep.h"
 
 TEST(PREPROCESS_TESTS_COUNT_PORTS, WellKnownPortRange) {
-    portSet set {22, 53, 80, 8080, 443, 5432, 3258, 2489, 9944};
+    std::unordered_set<uint16_t> set {22, 53, 80, 8080, 443, 5432, 3258, 2489, 9944};
     int low = 0;
     int high = 1023;
     
@@ -12,7 +12,7 @@ TEST(PREPROCESS_TESTS_COUNT_PORTS, WellKnownPortRange) {
 }
 
 TEST(PREPROCESS_TESTS_COUNT_PORTS, RegisteredPortRange) {
-    portSet set {22, 53, 80, 8080, 443, 5432, 3258, 2489, 9944};
+    std::unordered_set<uint16_t> set {22, 53, 80, 8080, 443, 5432, 3258, 2489, 9944};
     int low = 1024;
     int high = 49151;
     
@@ -21,7 +21,7 @@ TEST(PREPROCESS_TESTS_COUNT_PORTS, RegisteredPortRange) {
 }
 
 TEST(PREPROCESS_TESTS_COUNT_PORTS, DynamicPortRange) {
-    portSet set {22, 53, 80, 8080, 443, 5432, 3258, 2489, 9944};
+    std::unordered_set<uint16_t> set {22, 53, 80, 8080, 443, 5432, 3258, 2489, 9944};
     int low = 49152;
     int high = 65535;
     
@@ -30,7 +30,7 @@ TEST(PREPROCESS_TESTS_COUNT_PORTS, DynamicPortRange) {
 }
 
 TEST(PREPROCESS_TESTS_COUNT_PORTS, MaxRange) {
-    portSet set;
+    std::unordered_set<uint16_t> set;
     int low = 0;
     int high = 65535;
 
@@ -44,12 +44,19 @@ TEST(PREPROCESS_TESTS_COUNT_PORTS, MaxRange) {
 }
 
 TEST(PREPROCESS_TESTS_COUNT_PORTS, MinRange) {
-    portSet set {};
+    std::unordered_set<uint16_t> set {};
     int low = 0;
     int high = 1023;
 
     int res = count_ports_in_range(set, low, high);
     ASSERT_EQ(0, res);
+}
+
+TEST(PREPROCESS_TESTS_ROUND_TO, Normal) {
+   double value = 10.241258125491230542149;
+   double res = round_to(value, DECIMAL_PLACES);
+
+   ASSERT_EQ(10.24126, res);
 }
 
 TEST(PREPROCESS_TESTS_PACKETS_PER_SEC, Normal) {
@@ -80,5 +87,13 @@ TEST(PREPROCESS_TESTS_PACKETS_PER_SEC, MaxValues) {
     
     ASSERT_NEAR(47721858.82222222, pRes, 0.01);
     ASSERT_NEAR(0.46156346819, dRes, 0.001);
+}
+
+TEST(PREPROCESS_TESTS_PACKETS_PER_SEC, MinValues) {
+    int packet_count = 0;
+    int duration = 1;
+
+    double res = calculate_pps(packet_count, duration);
+    ASSERT_EQ(0, res);
 }
 

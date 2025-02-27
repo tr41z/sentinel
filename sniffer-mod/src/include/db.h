@@ -24,6 +24,12 @@ extern "C" {
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#ifdef _WIN32
+    #define PATH_SEPARATOR "\\"
+#else
+    #define PATH_SEPARATOR "/"
+#endif
+
 void connect_db(const char *home_dir, sqlite3 **db);
 void flows_table_build(int rc, sqlite3 *db);
 static inline char *get_home_dir() {
@@ -71,4 +77,4 @@ static inline char *connect_string(const char *s1, const char *s2) {
 }
 #endif
 
-#endif
+#endif /* DB_H */

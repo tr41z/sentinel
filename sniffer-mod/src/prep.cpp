@@ -6,7 +6,7 @@ double round_to(double value, int decimal_places) {
     return std::round(value * factor) / factor;
 } 
 
-int count_ports_in_range(portSet ports, int low, int high) {
+int count_ports_in_range(std::unordered_set<uint16_t> ports, int low, int high) {
     if (ports.empty()) {
         return 0;
     }
@@ -22,7 +22,7 @@ int count_ports_in_range(portSet ports, int low, int high) {
 
 double calculate_pps(int total_packet_count, int duration) {
     return duration > 0 ?
-        round_to(static_cast<double>(total_packet_count) / duration, 5) 
+        round_to(static_cast<double>(total_packet_count) / duration, DECIMAL_PLACES) 
         : total_packet_count; 
 }
 
