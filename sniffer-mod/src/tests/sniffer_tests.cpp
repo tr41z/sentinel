@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <limits>
+#include <climits>
 #include "../include/prep.h"
 
 TEST(PREPROCESS_TESTS_COUNT_PORTS, WellKnownPortRange) {
