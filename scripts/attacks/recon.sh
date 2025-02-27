@@ -76,26 +76,34 @@ run_nikto() {
 
 # Main function to run reconnaissance tools at random intervals
 main() {
-    local target_ip="192.168.36.1"
-    local target_domain="http://192.168.36.1"
+    local target_ips=("192.168.68.80" "192.168.68.71" "192.168.68.77") 
+    local target_domains=("http://192.168.68.80" "http://192.168.68.71" "http://192.168.68.77")
 
-    # Run reconnaissance tools in an infinite loop with random intervals
-    echo "Running reconnaissance attacks on $target_domain and $target_ip..."
+    echo "Running reconnaissance attacks on ${target_ips[*]}..."
 
     tools=("run_nmap" "run_gobuster" "run_masscan" "run_dirgo" "run_wfuzz" "run_metasploit_scan" "run_nikto")
 
-    while true; do
-        # Randomly select a tool to run
-        tool=${tools[$RANDOM % ${#tools[@]}]}
+    for i in "${!target_ips[@]}"; do
+        (
+            local target_ip="${target_ips[$i]}"
+            local target_domain="${target_domains[$i]}"
 
-        # Run the selected tool
-        $tool $target_ip $target_domain
+            while true; do
+                # Randomly select a tool to run
+                tool=${tools[$RANDOM % ${#tools[@]}]}
+                
+                # Run the selected tool
+                $tool "$target_ip" "$target_domain"
 
-        # Random delay between 60 and 120 seconds
-        random_delay=$((RANDOM % 21 + 20))
-        echo "Waiting for $random_delay seconds before running another attack..."
-        sleep $random_delay
+                # Random delay between 60 and 120 seconds
+                random_delay=$((RANDOM % 21 + 20))
+                echo "[$target_ip] Waiting for $random_delay seconds before running another attack..."
+                sleep $random_delay
+            done
+        ) & 
     done
+
+    wait 
 }
 
 # Run the main function
