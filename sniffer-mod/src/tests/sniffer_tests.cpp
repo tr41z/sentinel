@@ -2,6 +2,13 @@
 #include <climits>
 #include "../include/prep.h"
 
+TEST(PREPROCESS_TESTS_ROUND_TO, Normal) {
+   double value = 10.241258125491230542149;
+   double res = round_to(value, DECIMAL_PLACES);
+
+   ASSERT_EQ(10.24125813, res);
+}
+
 TEST(PREPROCESS_TESTS_COUNT_PORTS, WellKnownPortRange) {
     std::unordered_set<uint16_t> set {22, 53, 80, 8080, 443, 5432, 3258, 2489, 9944};
     int low = 0;
@@ -52,13 +59,6 @@ TEST(PREPROCESS_TESTS_COUNT_PORTS, MinRange) {
     ASSERT_EQ(0, res);
 }
 
-TEST(PREPROCESS_TESTS_ROUND_TO, Normal) {
-   double value = 10.241258125491230542149;
-   double res = round_to(value, DECIMAL_PLACES);
-
-   ASSERT_EQ(10.24125813, res);
-}
-
 TEST(PREPROCESS_TESTS_PACKETS_PER_SEC, Normal) {
     int packet_count = 84;
     int duration = 5;
@@ -66,6 +66,8 @@ TEST(PREPROCESS_TESTS_PACKETS_PER_SEC, Normal) {
     double res = calculate_pps(packet_count, duration);
     ASSERT_EQ(16.8, res);
 }
+
+// TODO: ADD MORE PPS FUNCTION TESTS
 
 TEST(PREPROCESS_TESTS_PACKETS_PER_SEC, ZeroDivision) {
     int packet_count = 955;
@@ -97,3 +99,10 @@ TEST(PREPROCESS_TESTS_PACKETS_PER_SEC, MinValues) {
     ASSERT_EQ(0, res);
 }
 
+TEST(PREPROCESS_TESTS_IS_BRUTE_TARGET, AllPossible) {
+    std::unordered_set<uint16_t> ports 
+        {23, 22, 1, 503, 454, 123, 21, 3389, 445, 5900, 9988};
+
+    int res = is_brute_target(ports);
+    ASSERT_EQ(1, res);
+}
