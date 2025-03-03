@@ -38,8 +38,8 @@ void save_flow(sqlite3 *db, const Flow &flow) {
   sqlite3_stmt *stmt;
   const char *insert_sql =
       "INSERT INTO flows (src_ip, dst_ip, src_ports, dst_ports, protocol, total_bytes, rate,"
-      "avg_packet_size, total_packet_count, src_system_ports_count, src_registered_ports_count, src_dynamic_ports_count, dst_system_ports_count, dst_registered_ports_count, dst_dynamic_ports_count, packets_per_sec, start_time, last_updated_time, duration) "
-      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+      "avg_packet_size, total_packet_count, src_system_ports_count, src_registered_ports_count, src_dynamic_ports_count, dst_system_ports_count, dst_registered_ports_count, dst_dynamic_ports_count, packets_per_sec, is_brute_target, is_dos_target, start_time, last_updated_time, duration) "
+      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
   int rc = sqlite3_prepare_v3(db, insert_sql, -1, 0, &stmt, NULL);
   if (rc != SQLITE_OK) {
@@ -74,6 +74,9 @@ void save_flow(sqlite3 *db, const Flow &flow) {
   double flow_rate = calculate_rate(flow.total_bytes, flow.duration.count());
   double flow_avg_packet_size = calculate_bpp(flow.total_bytes, flow.packet_count);
   double pps = calculate_pps(flow.packet_count, flow.duration.count());
+
+  int is_brute = is_brute_target(flow.dst_ports);
+  int is_dos = is_dos_target(flow.dst_ports);
   
   // Bind actual flow values
   sqlite3_bind_text(stmt, 1, ip_to_str(flow.src_ip).c_str(), -1, SQLITE_STATIC);
@@ -92,9 +95,11 @@ void save_flow(sqlite3 *db, const Flow &flow) {
   sqlite3_bind_int(stmt, 14, dst_registered_ports_count);
   sqlite3_bind_int(stmt, 15, dst_dynamic_ports_count);
   sqlite3_bind_double(stmt, 16, pps);
-  sqlite3_bind_int64(stmt, 17, std::chrono::system_clock::to_time_t(flow.start_time));
-  sqlite3_bind_int64(stmt, 18, std::chrono::system_clock::to_time_t(flow.last_update_time));
-  sqlite3_bind_int(stmt, 19, flow.duration.count());
+  sqlite3_bind_int(stmt, 17, is_brute);
+  sqlite3_bind_int(stmt, 18, is_dos);
+  sqlite3_bind_int64(stmt, 19, std::chrono::system_clock::to_time_t(flow.start_time));
+  sqlite3_bind_int64(stmt, 20, std::chrono::system_clock::to_time_t(flow.last_update_time));
+  sqlite3_bind_int(stmt, 21, flow.duration.count());
 
   // Execute the statement
   rc = sqlite3_step(stmt);
@@ -127,6 +132,8 @@ void flows_table_build(int rc, sqlite3 *db) {
       "dst_registered_ports_count INT,"
       "dst_dynamic_ports_count INT,"
       "packets_per_sec INT,"
+      "is_brute_target INT,"
+      "is_dos_target INT,"
       "start_time            INTEGER,"
       "last_updated_time     INTEGER,"
       "duration              INT);";
