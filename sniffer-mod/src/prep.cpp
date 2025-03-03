@@ -8,11 +8,8 @@ double round_to(double value, int decimal_places) {
 } 
 
 int count_ports_in_range(std::unordered_set<uint16_t> ports, int low, int high) {
-    if (ports.empty()) {
-        return 0;
-    }
-
     int count = 0;
+    
     for (int i = low; i <= high; i++) {
         if (ports.find(i) != ports.end()) {
             count++;
@@ -56,5 +53,11 @@ int is_dos_target(std::unordered_set<uint16_t> ports) {
     std::vector<int> commonDosPorts 
         {80, 443, 53, 25, 143, 110, 22, 23, 3389, 21, 161, 162, 5060, 5061, 27015, 3074};
    
+    for (int i = 0; i <= commonDosPorts.size(); i++) {
+        if (ports.find(commonDosPorts[i]) != ports.end()) {
+            return 1;
+        }
+    }
+
     return 0;
 }
