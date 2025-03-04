@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Log file with timestamp
-LOG_FILE="recon_log_$(date '+%Y%m%d_%H%M%S').txt"
+# Log file with date-based timestamp
+LOG_FILE="recon_log_$(date '+%Y%m%d').txt"
 
 # Function to log attacks
 log_attack() {
