@@ -19,15 +19,12 @@ void connect_db(const char *home_dir, sqlite3 **db) {
     fprintf(stderr, "Cant open database: %s\n", sqlite3_errmsg(*db));
     sqlite3_close(*db); // Ensure resources are cleaned up
     *db = nullptr;
+    free(connection_string);
+    free(hidden_dir);
+    return;
   } else {
     std::cout << "Successfully connected to database.\n";
     flows_table_build(rc, *db);
-  }
-
-  // Ensure resources are cleaned up in case of an error
-  if (rc != SQLITE_OK) {
-    sqlite3_close(*db);
-    *db = nullptr;
   }
 
   free(connection_string);
@@ -79,10 +76,10 @@ void save_flow(sqlite3 *db, const Flow &flow) {
   int is_dos = is_dos_target(flow.dst_ports);
   
   // Bind actual flow values
-  sqlite3_bind_text(stmt, 1, ip_to_str(flow.src_ip).c_str(), -1, SQLITE_STATIC);
-  sqlite3_bind_text(stmt, 2, ip_to_str(flow.dst_ip).c_str(), -1, SQLITE_STATIC);
-  sqlite3_bind_text(stmt, 3, src_ports_str.c_str(), -1, SQLITE_STATIC);
-  sqlite3_bind_text(stmt, 4, dst_ports_str.c_str(), -1, SQLITE_STATIC);
+  sqlite3_bind_text(stmt, 1, ip_to_str(flow.src_ip).c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 2, ip_to_str(flow.dst_ip).c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 3, src_ports_str.c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 4, dst_ports_str.c_str(), -1, SQLITE_TRANSIENT);
   sqlite3_bind_int(stmt, 5, flow.protocol);
   sqlite3_bind_int(stmt, 6, flow.total_bytes);
   sqlite3_bind_double(stmt, 7, flow_rate);
@@ -104,7 +101,7 @@ void save_flow(sqlite3 *db, const Flow &flow) {
   // Execute the statement
   rc = sqlite3_step(stmt);
   if (rc == SQLITE_DONE) {
-    std::cout << "Flow successfully saved to DB.\n";
+    // std::cout << "Flow successfully saved to DB.\n";
   } else {
     fprintf(stderr, "Failed to insert data: %s (Code: %d)\n", sqlite3_errmsg(db), rc);
   }

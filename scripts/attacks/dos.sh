@@ -4,7 +4,7 @@
 TARGET_IP="192.168.36.1"
 
 # Log file with timestamped name
-LOG_FILE="dos_log_$(date '+%Y%m%d_%H%M%S').txt"
+LOG_FILE="dos_log_$(date '+%Y%m%d').txt"
 
 # Function to log attacks
 log_attack() {

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Log file with timestamp
-LOG_FILE="recon_log_$(date '+%Y%m%d_%H%M%S').txt"
+# Log file with date-based timestamp
+LOG_FILE="recon_log_$(date '+%Y%m%d').txt"
 
 # Function to log attacks
 log_attack() {
@@ -77,8 +77,8 @@ run_nikto() {
 
 # Main function to run reconnaissance tools at random intervals
 main() {
-    local target_ips=("192.168.68.80" "192.168.68.71" "192.168.68.77") 
-    local target_domains=("http://192.168.68.80" "http://192.168.68.71" "http://192.168.68.77")
+    local target_ips=("192.168.0.18" "192.168.0.15") 
+    local target_domains=("http://192.168.0.18" "http://192.168.0.15")
 
     echo "Logging reconnaissance scans to $LOG_FILE"
 
