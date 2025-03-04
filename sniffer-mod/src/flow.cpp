@@ -30,9 +30,9 @@ void terminate_and_save_flows(sqlite3 *db) {
             std::chrono::system_clock::now() - it->second.start_time);
 
         if (idle_time.count() >= IDLE_DURATION_MAX_THRESHOLD) {
-          std::cout << "Terminating flow due to idle timeout: "
-                    << ip_to_str(it->second.src_ip) << " -> "
-                    << ip_to_str(it->second.dst_ip) << "\n";
+          // std::cout << "Terminating flow due to idle timeout: "
+          //           << ip_to_str(it->second.src_ip) << " -> "
+          //           << ip_to_str(it->second.dst_ip) << "\n";
 
           save_flow(db, it->second);
           if (db == nullptr) {
@@ -42,9 +42,9 @@ void terminate_and_save_flows(sqlite3 *db) {
 
           it = flows_map.erase(it);
         } else if (working_time.count() >= DURATION_MAX_THRESHOLD) {
-          std::cout << "Terminating flow due to reaching max threshold: "
-                    << ip_to_str(it->second.src_ip) << " -> "
-                    << ip_to_str(it->second.dst_ip) << "\n";
+          // std::cout << "Terminating flow due to reaching max threshold: "
+          //           << ip_to_str(it->second.src_ip) << " -> "
+          //           << ip_to_str(it->second.dst_ip) << "\n";
 
           save_flow(db, it->second);
           if (db == nullptr) {
@@ -66,7 +66,7 @@ void terminate_and_save_flows(sqlite3 *db) {
     }
 
     // Print the number of flows left in the map after each round of termination
-    std::cout << "Flows left: " << flows_map.size() << "\n";
+    // std::cout << "Flows left: " << flows_map.size() << "\n";
   }
 }
 
@@ -78,9 +78,9 @@ void flow_add_or_update(uint32_t src_ip, uint32_t dst_ip, uint16_t src_port,
 
   /* !!!DATA COLLECTION ONLY INCLUDES CUSTOM IP!!! */
   if (ip_to_str(dst_ip) != local_addr && ip_to_str(dst_ip) != "192.168.36.1") {
-    printf("Skipping flow... (dst IP is not the local IP)\n");
-    std::cout << "dst_ip: " << ip_to_str(dst_ip) << std::endl;
-    std::cout << "local ip: " << local_addr << std::endl; 
+    // printf("Skipping flow... (dst IP is not the local IP)\n");
+    // std::cout << "dst_ip: " << ip_to_str(dst_ip) << std::endl;
+    // std::cout << "local ip: " << local_addr << std::endl; 
     return;
   }
 
@@ -101,7 +101,7 @@ void flow_add_or_update(uint32_t src_ip, uint32_t dst_ip, uint16_t src_port,
     it->second.src_ports.insert(src_port);
     it->second.dst_ports.insert(dst_port);
 
-    std::cout << "Flow Updated!\n";
+    // std::cout << "Flow Updated!\n";
   } else {
     // Create new flow with uint32_t for IPs
     Flow flow;
@@ -120,7 +120,7 @@ void flow_add_or_update(uint32_t src_ip, uint32_t dst_ip, uint16_t src_port,
     flow.dst_ports.insert(dst_port);
 
     flows_map.insert({key, flow});
-    std::cout << "Flow Created!\n";
+    // std::cout << "Flow Created!\n";
   }
 
   // Print flow details
@@ -129,27 +129,27 @@ void flow_add_or_update(uint32_t src_ip, uint32_t dst_ip, uint16_t src_port,
   auto last_update_time =
       std::chrono::system_clock::to_time_t(value.last_update_time);
 
-  std::cout << "src_ip: " << ip_to_str(value.src_ip) << "\n"
-            << "dst_ip: " << ip_to_str(value.dst_ip) << "\n"
-            << "protocol: " << static_cast<int>(value.protocol) << "\n"
-            << "total_bytes: " << value.total_bytes << "\n"
-            << "packet_count: " << value.packet_count << "\n"
-            << "src_port: " << src_port << "\n"
-            << "dst_port: " << dst_port << "\n"
-            << "start_time: "
-            << std::put_time(std::localtime(&start_time), "%Y-%m-%d %H:%M:%S")
-            << "\n"
-            << "last_update_time: "
-            << std::put_time(std::localtime(&last_update_time),
-                             "%Y-%m-%d %H:%M:%S")
-            << "\n"
-            << "src_ports: ";
-  for (const auto &port : value.src_ports) {
-    std::cout << port << " ";
-  }
-  std::cout << "\ndst_ports: ";
-  for (const auto &port : value.dst_ports) {
-    std::cout << port << " ";
-  }
-  std::cout << "\n";
+  // std::cout << "src_ip: " << ip_to_str(value.src_ip) << "\n"
+  //           << "dst_ip: " << ip_to_str(value.dst_ip) << "\n"
+  //           << "protocol: " << static_cast<int>(value.protocol) << "\n"
+  //           << "total_bytes: " << value.total_bytes << "\n"
+  //           << "packet_count: " << value.packet_count << "\n"
+  //           << "src_port: " << src_port << "\n"
+  //           << "dst_port: " << dst_port << "\n"
+  //           << "start_time: "
+  //           << std::put_time(std::localtime(&start_time), "%Y-%m-%d %H:%M:%S")
+  //           << "\n"
+  //           << "last_update_time: "
+  //           << std::put_time(std::localtime(&last_update_time),
+  //                            "%Y-%m-%d %H:%M:%S")
+  //           << "\n"
+  //           << "src_ports: ";
+  // for (const auto &port : value.src_ports) {
+  //   std::cout << port << " ";
+  // }
+  // std::cout << "\ndst_ports: ";
+  // for (const auto &port : value.dst_ports) {
+  //   std::cout << port << " ";
+  // }
+  // std::cout << "\n";
 }

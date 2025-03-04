@@ -101,7 +101,7 @@ void save_flow(sqlite3 *db, const Flow &flow) {
   // Execute the statement
   rc = sqlite3_step(stmt);
   if (rc == SQLITE_DONE) {
-    std::cout << "Flow successfully saved to DB.\n";
+    // std::cout << "Flow successfully saved to DB.\n";
   } else {
     fprintf(stderr, "Failed to insert data: %s (Code: %d)\n", sqlite3_errmsg(db), rc);
   }
