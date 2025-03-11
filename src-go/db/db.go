@@ -56,7 +56,7 @@ func checkIfExpired(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(now.Sub(lastUpdated).Seconds())
 
 	// If first time diff between first row and now is larger than 1 day
-	if now.Sub(lastUpdated).Seconds() >= 86400 {
+	if now.Sub(lastUpdated).Seconds() >= 86400000 {
 		handlers.StopSnifferHandler(w, r)
 		/* 
 		 - Pause sniffer module

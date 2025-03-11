@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import clsx from "clsx";
-import { Save } from "lucide-react";
 import { StatCardProps } from "../utils/props";
 
 const StatCard = ({
@@ -25,15 +24,6 @@ const StatCard = ({
       whileHover={hoverEffect}
       transition={{ type: "spring", stiffness: 400 }}
     >
-      {/* Save Button */}
-      <motion.button
-        whileHover={{ scale: 1.2 }}
-        className="absolute top-3 right-3 p-2 rounded-full bg-gray-700 text-white"
-        aria-label="Save Stat"
-      >
-        <Save size={20} />
-      </motion.button>
-
       <div className="px-6 py-6 sm:p-8">
         <span className="flex items-center text-sm font-medium text-gray-200">
           <div className="mr-2">
