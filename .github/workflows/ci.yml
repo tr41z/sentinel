@@ -15,6 +15,7 @@ jobs:
 
       - name: Run Config Script
         run: |
+          cd scripts
           chmod +x config.sh
           ./config.sh
         shell: bash
