@@ -1,12 +1,7 @@
 #include "include/db.h"
 #include "include/flow.h"
 #include "include/ip.h"
-
-#ifdef _WIN32
-    #define PATH_SEPARATOR "\\"
-#else
-    #define PATH_SEPARATOR "/"
-#endif
+#include "include/prep.h"
 
 void connect_db(const char *home_dir, sqlite3 **db) {
   int rc;
@@ -24,15 +19,12 @@ void connect_db(const char *home_dir, sqlite3 **db) {
     fprintf(stderr, "Cant open database: %s\n", sqlite3_errmsg(*db));
     sqlite3_close(*db); // Ensure resources are cleaned up
     *db = nullptr;
+    free(connection_string);
+    free(hidden_dir);
+    return;
   } else {
     std::cout << "Successfully connected to database.\n";
     flows_table_build(rc, *db);
-  }
-
-  // Ensure resources are cleaned up in case of an error
-  if (rc != SQLITE_OK) {
-    sqlite3_close(*db);
-    *db = nullptr;
   }
 
   free(connection_string);
@@ -43,20 +35,14 @@ void save_flow(sqlite3 *db, const Flow &flow) {
   sqlite3_stmt *stmt;
   const char *insert_sql =
       "INSERT INTO flows (src_ip, dst_ip, src_ports, dst_ports, protocol, total_bytes, rate,"
-      "avg_packet_size, total_packet_count, start_time, last_updated_time, duration) "
-      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+      "avg_packet_size, total_packet_count, src_system_ports_count, src_registered_ports_count, src_dynamic_ports_count, dst_system_ports_count, dst_registered_ports_count, dst_dynamic_ports_count, packets_per_sec, is_brute_target, is_dos_target, start_time, last_updated_time, duration) "
+      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
   int rc = sqlite3_prepare_v3(db, insert_sql, -1, 0, &stmt, NULL);
   if (rc != SQLITE_OK) {
     fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db));
     return;
   }
-
-  // Ensure duration and packet_count are not zero to avoid division by zero
-  double flow_rate = (flow.duration.count() > 0) ? 
-                     static_cast<double>(flow.total_bytes) / flow.duration.count() : 0.0;
-  double flow_avg_packet_size = (flow.packet_count > 0) ? 
-                                static_cast<double>(flow.total_bytes) / flow.packet_count : 0.0;
 
   // Convert port sets to comma-separated strings
   std::string src_ports_str;
@@ -75,24 +61,47 @@ void save_flow(sqlite3 *db, const Flow &flow) {
     dst_ports_str.pop_back(); 
   }
 
+  int src_system_ports_count = count_ports_in_range(flow.src_ports, 0, 1023);
+  int src_registered_ports_count = count_ports_in_range(flow.src_ports, 1024, 49151);
+  int src_dynamic_ports_count = count_ports_in_range(flow.src_ports, 49152, 65535);
+  int dst_system_ports_count = count_ports_in_range(flow.dst_ports, 0, 1023);
+  int dst_registered_ports_count = count_ports_in_range(flow.dst_ports, 1024, 49151);
+  int dst_dynamic_ports_count = count_ports_in_range(flow.dst_ports, 49152, 65535);
+
+  double flow_rate = calculate_rate(flow.total_bytes, flow.duration.count());
+  double flow_avg_packet_size = calculate_bpp(flow.total_bytes, flow.packet_count);
+  double pps = calculate_pps(flow.packet_count, flow.duration.count());
+
+  int is_brute = is_brute_target(flow.dst_ports);
+  int is_dos = is_dos_target(flow.dst_ports);
+  
   // Bind actual flow values
-  sqlite3_bind_text(stmt, 1, ip_to_str(flow.src_ip).c_str(), -1, SQLITE_STATIC);
-  sqlite3_bind_text(stmt, 2, ip_to_str(flow.dst_ip).c_str(), -1, SQLITE_STATIC);
-  sqlite3_bind_text(stmt, 3, src_ports_str.c_str(), -1, SQLITE_STATIC);
-  sqlite3_bind_text(stmt, 4, dst_ports_str.c_str(), -1, SQLITE_STATIC);
+  sqlite3_bind_text(stmt, 1, ip_to_str(flow.src_ip).c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 2, ip_to_str(flow.dst_ip).c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 3, src_ports_str.c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 4, dst_ports_str.c_str(), -1, SQLITE_TRANSIENT);
   sqlite3_bind_int(stmt, 5, flow.protocol);
   sqlite3_bind_int(stmt, 6, flow.total_bytes);
   sqlite3_bind_double(stmt, 7, flow_rate);
   sqlite3_bind_double(stmt, 8, flow_avg_packet_size);
   sqlite3_bind_int(stmt, 9, flow.packet_count);
-  sqlite3_bind_int64(stmt, 10, std::chrono::system_clock::to_time_t(flow.start_time));
-  sqlite3_bind_int64(stmt, 11, std::chrono::system_clock::to_time_t(flow.last_update_time));
-  sqlite3_bind_int(stmt, 12, flow.duration.count());
+  sqlite3_bind_int(stmt, 10, src_system_ports_count);
+  sqlite3_bind_int(stmt, 11, src_registered_ports_count);
+  sqlite3_bind_int(stmt, 12, src_dynamic_ports_count);
+  sqlite3_bind_int(stmt, 13, dst_system_ports_count);
+  sqlite3_bind_int(stmt, 14, dst_registered_ports_count);
+  sqlite3_bind_int(stmt, 15, dst_dynamic_ports_count);
+  sqlite3_bind_double(stmt, 16, pps);
+  sqlite3_bind_int(stmt, 17, is_brute);
+  sqlite3_bind_int(stmt, 18, is_dos);
+  sqlite3_bind_int64(stmt, 19, std::chrono::system_clock::to_time_t(flow.start_time));
+  sqlite3_bind_int64(stmt, 20, std::chrono::system_clock::to_time_t(flow.last_update_time));
+  sqlite3_bind_int(stmt, 21, flow.duration.count());
 
   // Execute the statement
   rc = sqlite3_step(stmt);
   if (rc == SQLITE_DONE) {
-    std::cout << "Flow successfully saved to DB.\n";
+    // std::cout << "Flow successfully saved to DB.\n";
   } else {
     fprintf(stderr, "Failed to insert data: %s (Code: %d)\n", sqlite3_errmsg(db), rc);
   }
@@ -113,6 +122,15 @@ void flows_table_build(int rc, sqlite3 *db) {
       "rate                  FLOAT,"
       "avg_packet_size       FLOAT,"
       "total_packet_count    INT,"
+      "src_system_ports_count INT,"
+      "src_registered_ports_count INT,"
+      "src_dynamic_ports_count INT,"
+      "dst_system_ports_count INT,"
+      "dst_registered_ports_count INT,"
+      "dst_dynamic_ports_count INT,"
+      "packets_per_sec INT,"
+      "is_brute_target INT,"
+      "is_dos_target INT,"
       "start_time            INTEGER,"
       "last_updated_time     INTEGER,"
       "duration              INT);";

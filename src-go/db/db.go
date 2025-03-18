@@ -56,7 +56,7 @@ func checkIfExpired(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(now.Sub(lastUpdated).Seconds())
 
 	// If first time diff between first row and now is larger than 1 day
-	if now.Sub(lastUpdated).Seconds() >= 86400 {
+	if now.Sub(lastUpdated).Seconds() >= 86400000 {
 		handlers.StopSnifferHandler(w, r)
 		/* 
 		 - Pause sniffer module
@@ -77,7 +77,7 @@ func deleteTable() {}
 func saveStatistics() {}
 
 func FetchFlows(w http.ResponseWriter, r *http.Request) {
-	checkIfExpired(w, r)
+	// checkIfExpired(w, r)
 	rows, err := DB.Query("SELECT id, src_ip, dst_ip, src_ports, " +
 		"dst_ports, protocol, total_bytes, rate, " +
 		"avg_packet_size, total_packet_count, start_time, last_updated_time, duration " +

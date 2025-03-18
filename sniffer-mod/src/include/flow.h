@@ -87,4 +87,4 @@ void flow_add_or_update(uint32_t src_ip, uint32_t dst_ip, uint16_t src_port,
 }
 #endif
 
-#endif
+#endif /* FLOW_H */
