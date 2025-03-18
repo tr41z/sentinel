@@ -26,7 +26,7 @@ function App() {
     }
 
     const fetchStats = async () => {
-      const res = await fetch("http://localhost:8080/api/v1/health");
+      const res = await fetch("http://localhost:8080/api/v1/sniffer/health");
 
       if (res.ok) {
         const data = await res.json();

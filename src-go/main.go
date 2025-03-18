@@ -15,7 +15,9 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/api/v1/flows", db.FetchFlows)
-	mux.HandleFunc("/api/v1/health", handlers.HealthHandler)
+
+	// Sniffer specific
+	mux.HandleFunc("/api/v1/sniffer/health", handlers.HealthHandler)
 	mux.HandleFunc("/api/v1/sniffer/start", handlers.StartSnifferHandler)
 	mux.HandleFunc("/api/v1/sniffer/stop", handlers.StopSnifferHandler)
 
