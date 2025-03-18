@@ -1,0 +1,40 @@
+name: Build and Test Sniffer Module
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Run Config Script
+        run: |
+          cd scripts
+          chmod +x config.sh
+          ./config.sh
+        shell: bash
+
+      - name: Create Build Directory
+        run: |
+          cd sniffer-mod
+          mkdir build
+        shell: bash
+
+      - name: Build with CMake
+        run: |
+          cd sniffer-mod/build
+          cmake ..
+          make
+        shell: bash
+
+      - name: Run Tests
+        run: |
+          cd sniffer-mod/build
+          ./tests
+        shell: bash
