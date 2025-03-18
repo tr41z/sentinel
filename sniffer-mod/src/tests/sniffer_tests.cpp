@@ -1,9 +1,16 @@
 #include <gtest/gtest.h>
-#include <limits>
+#include <climits>
 #include "../include/prep.h"
 
+TEST(PREPROCESS_TESTS_ROUND_TO, Normal) {
+   double value = 10.241258125491230542149;
+   double res = round_to(value, DECIMAL_PLACES);
+
+   ASSERT_EQ(10.24125813, res);
+}
+
 TEST(PREPROCESS_TESTS_COUNT_PORTS, WellKnownPortRange) {
-    portSet set {22, 53, 80, 8080, 443, 5432, 3258, 2489, 9944};
+    std::unordered_set<uint16_t> set {22, 53, 80, 8080, 443, 5432, 3258, 2489, 9944};
     int low = 0;
     int high = 1023;
     
@@ -12,7 +19,7 @@ TEST(PREPROCESS_TESTS_COUNT_PORTS, WellKnownPortRange) {
 }
 
 TEST(PREPROCESS_TESTS_COUNT_PORTS, RegisteredPortRange) {
-    portSet set {22, 53, 80, 8080, 443, 5432, 3258, 2489, 9944};
+    std::unordered_set<uint16_t> set {22, 53, 80, 8080, 443, 5432, 3258, 2489, 9944};
     int low = 1024;
     int high = 49151;
     
@@ -21,7 +28,7 @@ TEST(PREPROCESS_TESTS_COUNT_PORTS, RegisteredPortRange) {
 }
 
 TEST(PREPROCESS_TESTS_COUNT_PORTS, DynamicPortRange) {
-    portSet set {22, 53, 80, 8080, 443, 5432, 3258, 2489, 9944};
+    std::unordered_set<uint16_t> set {22, 53, 80, 8080, 443, 5432, 3258, 2489, 9944};
     int low = 49152;
     int high = 65535;
     
@@ -30,7 +37,7 @@ TEST(PREPROCESS_TESTS_COUNT_PORTS, DynamicPortRange) {
 }
 
 TEST(PREPROCESS_TESTS_COUNT_PORTS, MaxRange) {
-    portSet set;
+    std::unordered_set<uint16_t> set;
     int low = 0;
     int high = 65535;
 
@@ -44,7 +51,7 @@ TEST(PREPROCESS_TESTS_COUNT_PORTS, MaxRange) {
 }
 
 TEST(PREPROCESS_TESTS_COUNT_PORTS, MinRange) {
-    portSet set {};
+    std::unordered_set<uint16_t> set {};
     int low = 0;
     int high = 1023;
 
@@ -65,7 +72,7 @@ TEST(PREPROCESS_TESTS_PACKETS_PER_SEC, ZeroDivision) {
     int duration = 0;
 
     double res = calculate_pps(packet_count, duration);
-    ASSERT_EQ(955, res);
+    ASSERT_EQ(0, res);
 }
 
 TEST(PREPROCESS_TESTS_PACKETS_PER_SEC, MaxValues) {
@@ -82,3 +89,56 @@ TEST(PREPROCESS_TESTS_PACKETS_PER_SEC, MaxValues) {
     ASSERT_NEAR(0.46156346819, dRes, 0.001);
 }
 
+TEST(PREPROCESS_TESTS_PACKETS_PER_SEC, MinValues) {
+    int packet_count = 0;
+    int duration = 1;
+
+    double res = calculate_pps(packet_count, duration);
+    ASSERT_EQ(0, res);
+}
+
+TEST(PREPROCESS_TESTS_IS_BRUTE_TARGET, AllPossible) {
+    std::unordered_set<uint16_t> ports 
+        {23, 22, 1, 503, 454, 123, 21, 3389, 445, 5900, 9988};
+
+    int res = is_brute_target(ports);
+    ASSERT_EQ(1, res);
+}
+
+TEST(PREPROCESS_TESTS_IS_BRUTE_TARGET, None) {
+    std::unordered_set<uint16_t> ports
+        {8080, 4444, 3333, 2222, 2821, 5823, 1292};
+
+    int res = is_brute_target(ports);
+    ASSERT_EQ(0, res);
+}
+
+TEST(PREPROCESS_TESTS_IS_BRUTE_TARGET, EmptyPorts) {
+    std::unordered_set<uint16_t> ports {};
+
+    int res = is_brute_target(ports);
+    ASSERT_EQ(0, res);
+}
+
+TEST(PREPROCESS_TESTS_IS_DOS_TARGET, AllPossible) {
+    std::unordered_set<uint16_t> ports 
+        {80, 443, 53, 25, 143, 110, 22, 23, 3389, 21, 161, 162, 5060, 5061, 27015, 3074};
+
+    int res = is_dos_target(ports);
+    ASSERT_EQ(1, res);
+}
+
+TEST(PREPROCESS_TESTS_IS_DOS_TARGET, None) {
+    std::unordered_set<uint16_t> ports
+        {8080, 4444, 3333, 2222, 2821, 5823, 1292};
+
+    int res = is_dos_target(ports);
+    ASSERT_EQ(0, res);
+}
+
+TEST(PREPROCESS_TESTS_IS_DOS_TARGET, EmptyPorts) {
+    std::unordered_set<uint16_t> ports {};
+
+    int res = is_dos_target(ports);
+    ASSERT_EQ(0, res);
+}
