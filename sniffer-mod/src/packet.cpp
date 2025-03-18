@@ -208,7 +208,7 @@ void packet_handler(u_char *args, const struct pcap_pkthdr *header,
     eth_header = (struct ether_header *)packet;
 
     if (ntohs(eth_header->ether_type) != ETHERTYPE_IP) {
-      printf("Not an IP packet. Skipping....\n\n");
+      // printf("Not an IP packet. Skipping....\n\n");
       return;
     }
 
@@ -217,7 +217,7 @@ void packet_handler(u_char *args, const struct pcap_pkthdr *header,
     ipPtr new_ip_header = handle_ip_header(ip_header, packet);
 
     if (!new_ip_header) {
-      fprintf(stderr, "Failed to handle IP header.\n");
+      // fprintf(stderr, "Failed to handle IP header.\n");
       return;
     }
 
@@ -229,16 +229,16 @@ void packet_handler(u_char *args, const struct pcap_pkthdr *header,
 
     switch (new_ip_header->protocol) {
     case IPPROTO_UDP:
-      printf("======================== UDP ===========================\n");
+      // printf("======================== UDP ===========================\n");
 
       new_ip_header_udp = handle_ip_header(ip_header, packet);
       if (!new_ip_header_udp) {
-        fprintf(stderr, "Failed to handle UDP IP header.\n");
+        // fprintf(stderr, "Failed to handle UDP IP header.\n");
         break;
       }
       new_udp_header = handle_udp_header(packet, new_ip_header_udp);
       if (!new_udp_header) {
-        fprintf(stderr, "Failed to handle UDP header.\n");
+        // fprintf(stderr, "Failed to handle UDP header.\n");
         break;
       }
 
@@ -254,16 +254,16 @@ void packet_handler(u_char *args, const struct pcap_pkthdr *header,
       break;
 
     case IPPROTO_TCP:
-      printf("======================== TCP ===========================\n");
+      // printf("======================== TCP ===========================\n");
 
       new_ip_header_tcp = handle_ip_header(ip_header, packet);
       if (!new_ip_header_tcp) {
-        fprintf(stderr, "Failed to handle TCP IP header.\n");
+        // fprintf(stderr, "Failed to handle TCP IP header.\n");
         break;
       }
       new_tcp_header = handle_tcp_header(packet, new_ip_header_tcp);
       if (!new_tcp_header) {
-        fprintf(stderr, "Failed to handle TCP header.\n");
+        // fprintf(stderr, "Failed to handle TCP header.\n");
         break;
       }
 
@@ -279,7 +279,7 @@ void packet_handler(u_char *args, const struct pcap_pkthdr *header,
       break;
 
     default:
-      fprintf(stderr, "Unknown protocol: %d\n", new_ip_header->protocol);
+      // fprintf(stderr, "Unknown protocol: %d\n", new_ip_header->protocol);
       break;
     }
 

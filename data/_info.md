@@ -12,7 +12,7 @@ The data will be collected throughout the days, as the naming convention suggest
   ___________________________________________
   |                                           |
   |               Reconnaissance              |
-  |       MALICIOUS IP IS: 192.168.1.100      |
+  |       MALICIOUS IP IS: 192.168.0.19      |
   |___________________________________________|
   ```
 

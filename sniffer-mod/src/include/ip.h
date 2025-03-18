@@ -40,4 +40,4 @@ std::string local_ip_addr();
 std::string ip_to_str(uint32_t ip);
 #endif
 
-#endif
+#endif /* IP_H */
