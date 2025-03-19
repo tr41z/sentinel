@@ -64,9 +64,9 @@ func Invoke() {
 	healthMutex.Unlock()
 
 	// Check if the executable exists
-	if _, err := os.Stat(utils.EXECUTABLE_PATH); os.IsNotExist(err) {
+	if _, err := os.Stat(utils.SNIFFER_EXECUTABLE_PATH); os.IsNotExist(err) {
 		updateHealthStatus("error", time.Time{}, true)
-		fmt.Printf("Error: Sniffer executable not found at %s\n", utils.EXECUTABLE_PATH)
+		fmt.Printf("Error: Sniffer executable not found at %s\n", utils.SNIFFER_EXECUTABLE_PATH)
 		return
 	}
 
@@ -74,7 +74,7 @@ func Invoke() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	cmd := exec.CommandContext(ctx, utils.EXECUTABLE_PATH)
+	cmd := exec.CommandContext(ctx, utils.SNIFFER_EXECUTABLE_PATH)
 
 	// Suppress stdout and stderr to avoid executable output
 	cmd.Stdout = nil
