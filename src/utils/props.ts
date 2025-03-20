@@ -14,6 +14,7 @@ export interface Flow {
     start_time: number;
     last_updated_time: number;
     duration: number;
+    potential_threats?: number;
 }
 
 export interface StatCardProps {
@@ -32,6 +33,7 @@ interface Stats {
 export interface ModuleStatCardProps {
     moduleName: string;
     icon: LucideIcon;
+    moduleType: string;
     color: string;
     statistics: Stats[];
 }
@@ -44,10 +46,20 @@ export interface DashboardPageProps {
     flows: Flow[];
 }
 
+export interface AIStats {
+    status: string;
+    uptime: number;
+    ips_flagged: number;
+    error_count: number;
+    threatCount: number;
+    threats_detected: number;
+}
+
 export interface HomePageProps {
     snifferStatus: string;
     snifferUptime: number | 0;
     snifferErrorCount: number | 0;
     flows: Flow[];
     bandwidth: number | 0;
+    aiStats: AIStats;
 }

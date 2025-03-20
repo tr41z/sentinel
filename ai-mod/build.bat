@@ -1,7 +1,7 @@
 @echo off
 
 :: Activate the virtual environment
-call .\venv\Scripts\activate
+call .\.venv\Scripts\activate
 
 :: Define source and destination directories
 set SRC_DIR=src

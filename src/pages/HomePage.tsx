@@ -4,6 +4,7 @@ import ModuleStatCard from "../components/ModuleStatCard";
 import { Bot, HeartPulse } from "lucide-react";
 import { HomePageProps } from "../utils/props";
 import SnifferAiModChart from "../components/SnifferAiModChart";
+import { useEffect, useState } from "react";
 
 const HomePage = ({
   snifferStatus,
@@ -11,7 +12,22 @@ const HomePage = ({
   snifferErrorCount,
   flows,
   bandwidth,
+  aiStats: newAiStats, // New AI stats from props
 }: HomePageProps) => {
+  const [aiStats, setAiStats] = useState(newAiStats);
+
+  useEffect(() => {  
+    if (newAiStats) {
+      setAiStats(prev => ({
+        ...prev,
+        ...newAiStats,
+        threatCount: Math.max(prev?.threatCount ?? 0, newAiStats.threatCount ?? 0),
+        ips_flagged: Math.max(prev?.ips_flagged ?? 0, newAiStats.ips_flagged ?? 0),
+        error_count: Math.max(prev?.error_count ?? 0, newAiStats.error_count ?? 0),
+      }));
+    }
+  }, [newAiStats])  
+
   return (
     <div className="flex-1 overflow-auto relative z-10">
       <Header title="Home" />
@@ -26,6 +42,7 @@ const HomePage = ({
         >
           <ModuleStatCard
             moduleName="Network Sniffer Module"
+            moduleType="sniffer"            
             icon={HeartPulse}
             color="#39FF14"
             statistics={[
@@ -39,20 +56,21 @@ const HomePage = ({
 
           <ModuleStatCard
             moduleName="AI Module"
+            moduleType="ai"
             icon={Bot}
             color="#ff0000"
             statistics={[
-              { name: "Status", value: 0 },
-              { name: "Uptime", value: 0 },
-              { name: "IPs Flagged", value: 0 },
-              { name: "Threats Detected", value: 0 },
-              { name: "Error Count", value: 0 },
+              { name: "Status", value: aiStats?.status || aiStats?.status !== undefined ? aiStats?.status : "Loading..." }, 
+              { name: "Uptime", value: aiStats?.uptime ?? "Loading..." }, 
+              { name: "IPs Flagged", value: aiStats?.ips_flagged ?? "Loading..." },
+              { name: "Threats Detected", value: Number.isInteger(aiStats?.threatCount) ? aiStats?.threatCount : 0 },
+              { name: "Error Count", value: aiStats?.error_count ?? "Loading..." },
             ]}
           />
         </motion.div>
 
         {/* Flows Overview Chart */}
-        <SnifferAiModChart flows={flows} />
+        <SnifferAiModChart flows={flows} aiStats={aiStats} />
       </main>
     </div>
   );

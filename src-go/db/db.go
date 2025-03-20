@@ -11,24 +11,24 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 
-	"backend/utils"
 	"backend/handlers"
+	"backend/utils"
 )
 
 type Flow struct {
-	ID                 int     `json:"id"`
-	SourceIp           string  `json:"source_ip"`
-	DestinationIp      string  `json:"destination_ip"`
-	SourcePorts        string  `json:"source_ports"`
-	DestinationPorts   string  `json:"destination_ports"`
-	Protocol           int8    `json:"protocol"`
-	TotalBytes         int     `json:"total_bytes"`
-	Rate               float64 `json:"rate"`
-	AveragePacketSize  float64 `json:"average_packet_size"`
-	TotalPacketCount   int     `json:"total_packet_count"`
-	StartTime          int     `json:"start_time"`
-	LastUpdatedTime    int     `json:"last_updated_time"`
-	Duration           int     `json:"duration"`
+	ID                int     `json:"id"`
+	SourceIp          string  `json:"source_ip"`
+	DestinationIp     string  `json:"destination_ip"`
+	SourcePorts       string  `json:"source_ports"`
+	DestinationPorts  string  `json:"destination_ports"`
+	Protocol          int8    `json:"protocol"`
+	TotalBytes        int     `json:"total_bytes"`
+	Rate              float64 `json:"rate"`
+	AveragePacketSize float64 `json:"average_packet_size"`
+	TotalPacketCount  int     `json:"total_packet_count"`
+	StartTime         int     `json:"start_time"`
+	LastUpdatedTime   int     `json:"last_updated_time"`
+	Duration          int     `json:"duration"`
 }
 
 // Global variable for SQLite database connection
@@ -58,7 +58,7 @@ func checkIfExpired(w http.ResponseWriter, r *http.Request) {
 	// If first time diff between first row and now is larger than 1 day
 	if now.Sub(lastUpdated).Seconds() >= 86400000 {
 		handlers.StopSnifferHandler(w, r)
-		/* 
+		/*
 		 - Pause sniffer module
 		 - Export statistics to another table (same db)
 		 - Ensure it was saved
@@ -109,6 +109,73 @@ func FetchFlows(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func FetchThreats(w http.ResponseWriter, r *http.Request) {
+	rows, err := DB.Query("SELECT id, flow_id, prediction, certainty, timestamp FROM predictions WHERE prediction = 1")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	var threats []map[string]interface{}
+	for rows.Next() {
+		var id, flowID int
+		var prediction, certainty float64
+		var timestamp time.Time // Change from int64 to time.Time
+
+		if err := rows.Scan(&id, &flowID, &prediction, &certainty, &timestamp); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		threat := map[string]interface{}{
+			"id":         id,
+			"flow_id":    flowID,
+			"prediction": prediction,
+			"certainty":  certainty,
+			"timestamp":  timestamp.Format(time.RFC3339), // Convert time.Time to string
+		}
+		threats = append(threats, threat)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(threats)
+}
+
+func FetchFlaggedIPs(w http.ResponseWriter, r *http.Request) {
+	rows, err := DB.Query("SELECT id, flow_id, prediction, certainty, timestamp FROM flagged_flows") // Specify needed columns
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	var flaggedFlows []map[string]interface{}
+	for rows.Next() {
+		var id, flowID int
+		var prediction float64
+		var certainty float64
+		var timestamp time.Time // Assuming timestamp is stored as DATETIME
+
+		if err := rows.Scan(&id, &flowID, &prediction, &certainty, &timestamp); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		flowData := map[string]interface{}{
+			"id":         id,
+			"flow_id":    flowID,
+			"prediction": prediction,
+			"certainty":  certainty,
+			"timestamp":  timestamp.Format(time.RFC3339), // Convert timestamp to string
+		}
+		flaggedFlows = append(flaggedFlows, flowData)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(flaggedFlows)
+}
+
 func get_home_dir() string {
 	dirname, err := os.UserHomeDir()
 	if err != nil {
@@ -117,4 +184,3 @@ func get_home_dir() string {
 	full_dir := dirname + utils.DB_PATH
 	return full_dir
 }
-

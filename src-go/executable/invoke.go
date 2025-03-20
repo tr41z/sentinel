@@ -11,8 +11,8 @@ import (
 	"backend/utils"
 )
 
-// Sniffer health metrics
-type SnifferHealth struct {
+// Sniffer and AI module health metrics
+type ModuleHealth struct {
 	Status     string    `json:"status"`
 	Uptime     string    `json:"uptime"`
 	ErrorCount int       `json:"error_count"`
@@ -20,82 +20,112 @@ type SnifferHealth struct {
 }
 
 var (
-	health       SnifferHealth
-	healthMutex  sync.Mutex
-	snifferStart time.Time
-	Expired      bool
+	// Sniffer
+	healthSniffer       ModuleHealth
+	healthSnifferMutex  sync.Mutex
+	snifferStart        time.Time
+	SnifferExpired      bool
+
+	// AI Module
+	healthAI       ModuleHealth
+	healthAIMutex  sync.Mutex
+	aiStart        time.Time
+	AIExpired      bool
 )
 
 // GetSnifferHealth exposes the current health of the sniffer
-func GetSnifferHealth() SnifferHealth {
-	healthMutex.Lock()
-	defer healthMutex.Unlock()
+func GetSnifferHealth() ModuleHealth {
+	healthSnifferMutex.Lock()
+	defer healthSnifferMutex.Unlock()
 
-	if health.Status == "running" {
-		health.Uptime = fmt.Sprintf("%.0f s", time.Since(snifferStart).Seconds())
+	if healthSniffer.Status == "running" {
+		healthSniffer.Uptime = fmt.Sprintf("%.0f s", time.Since(snifferStart).Seconds())
 	} else {
-		health.Uptime = "0"
+		healthSniffer.Uptime = "0"
 	}
 
-	return health
+	return healthSniffer
 }
 
-func updateHealthStatus(status string, lastActive time.Time, incrementError bool) {
-	healthMutex.Lock()
-	defer healthMutex.Unlock()
+// GetAIHealth exposes the current health of the AI module
+func GetAIHealth() ModuleHealth {
+	healthAIMutex.Lock()
+	defer healthAIMutex.Unlock()
 
-	health.Status = status
+	if healthAI.Status == "running" {
+		healthAI.Uptime = fmt.Sprintf("%.0f s", time.Since(aiStart).Seconds())
+	} else {
+		healthAI.Uptime = "0"
+	}
+
+	return healthAI
+}
+
+func updateSnifferHealth(status string, lastActive time.Time, incrementError bool) {
+	healthSnifferMutex.Lock()
+	defer healthSnifferMutex.Unlock()
+
+	healthSniffer.Status = status
 	if !lastActive.IsZero() {
-		health.LastActive = lastActive
+		healthSniffer.LastActive = lastActive
 	}
 	if incrementError {
-		health.ErrorCount++
+		healthSniffer.ErrorCount++
 	}
 }
 
-func Invoke() {
-	// Reinitialize sniffer health
-	healthMutex.Lock()
-	health = SnifferHealth{
-		Status:     "initializing",
-		ErrorCount: 0,
-	}
-	snifferStart = time.Now()
-	healthMutex.Unlock()
+func updateAIHealth(status string, lastActive time.Time, incrementError bool) {
+	healthAIMutex.Lock()
+	defer healthAIMutex.Unlock()
 
-	// Check if the executable exists
-	if _, err := os.Stat(utils.SNIFFER_EXECUTABLE_PATH); os.IsNotExist(err) {
-		updateHealthStatus("error", time.Time{}, true)
-		fmt.Printf("Error: Sniffer executable not found at %s\n", utils.SNIFFER_EXECUTABLE_PATH)
+	healthAI.Status = status
+	if !lastActive.IsZero() {
+		healthAI.LastActive = lastActive
+	}
+	if incrementError {
+		healthAI.ErrorCount++
+	}
+}
+
+func InvokeSniffer() {
+	runExecutable("sniffer", utils.SNIFFER_EXECUTABLE_PATH, &SnifferExpired, updateSnifferHealth, &snifferStart)
+}
+
+func InvokeAI() {
+	runExecutable("AI module", utils.AI_EXECUTABLE_PATH, &AIExpired, updateAIHealth, &aiStart)
+}
+
+func runExecutable(name string, path string, expiredFlag *bool, updateHealth func(string, time.Time, bool), startTime *time.Time) {
+	updateHealth("initializing", time.Time{}, false)
+	*startTime = time.Now()
+
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		updateHealth("error", time.Time{}, true)
+		fmt.Printf("Error: %s executable not found at %s\n", name, path)
 		return
 	}
 
-	// Create a context with cancel function
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	cmd := exec.CommandContext(ctx, utils.SNIFFER_EXECUTABLE_PATH)
-
-	// Suppress stdout and stderr to avoid executable output
+	cmd := exec.CommandContext(ctx, path)
 	cmd.Stdout = nil
 	cmd.Stderr = nil
 
-	// Start the command
-	fmt.Println("Running the sniffer executable...")
-	updateHealthStatus("running", time.Now(), false)
+	fmt.Printf("Running the %s executable...\n", name)
+	updateHealth("running", time.Now(), false)
 
 	if err := cmd.Start(); err != nil {
-		updateHealthStatus("error", time.Now(), true)
-		fmt.Printf("Error starting sniffer: %s\n", err)
+		updateHealth("error", time.Now(), true)
+		fmt.Printf("Error starting %s: %s\n", name, err)
 		return
 	}
 
-	// Monitor for global condition
 	go func() {
 		for {
-			if Expired {
-				fmt.Println("Condition met, stopping the sniffer...")
-				updateHealthStatus("stopping", time.Now(), false)
+			if *expiredFlag {
+				fmt.Printf("Stopping %s...\n", name)
+				updateHealth("stopping", time.Now(), false)
 				cancel()
 				return
 			}
@@ -103,16 +133,13 @@ func Invoke() {
 		}
 	}()
 
-	// Wait for the command to finish
 	err := cmd.Wait()
 	if ctx.Err() == context.Canceled {
-		fmt.Println("Sniffer process terminated by user or condition.")
+		fmt.Printf("%s process terminated.\n", name)
 	} else if err != nil {
-		updateHealthStatus("error", time.Now(), true)
-		fmt.Printf("Error running sniffer: %s\n", err)
-	} else {
-		// No output from the sniffer is expected, so no need for logs here
+		updateHealth("error", time.Now(), true)
+		fmt.Printf("Error running %s: %s\n", name, err)
 	}
 
-	updateHealthStatus("stopped", time.Now(), false)
+	updateHealth("stopped", time.Now(), false)
 }

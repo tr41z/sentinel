@@ -1,24 +1,35 @@
+import logging
 import joblib
 import numpy as np
 import pandas as pd
-from config import CERTAINTY_THRESHOLD
 import os
 import sys
+from config import CERTAINTY_THRESHOLD
 
+# Configure logging
+logging.basicConfig(
+    filename="ai_module.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
+# Define paths
 if getattr(sys, 'frozen', False):
-    # If running as a PyInstaller bundle
     bundle_dir = sys._MEIPASS
 else:
-    # If running as a script
     bundle_dir = os.path.dirname(os.path.abspath(__file__))
 
-MODEL_PATH = os.path.join(bundle_dir, 'models', 'recondos_model_lr.joblib')
-SCALER_PATH = os.path.join(bundle_dir, 'models', 'scaler.joblib')
+MODEL_PATH = os.path.join(bundle_dir, 'models', 'recondos_model_gnb.joblib')
 
-# Load the trained model and the scaler
-model = joblib.load(MODEL_PATH)
-scaler = joblib.load(SCALER_PATH)
+# Load model
+try:
+    logging.info("Loading model from %s", MODEL_PATH)
+    model = joblib.load(MODEL_PATH)
+except Exception as e:
+    logging.error("Failed to load model: %s", e)
+    raise
 
+# Define feature columns
 FEATURE_COLUMNS = [
     "protocol", "total_bytes", "rate", "avg_packet_size", "total_packet_count",
     "src_system_ports_count", "src_registered_ports_count", "src_dynamic_ports_count",
@@ -27,19 +38,27 @@ FEATURE_COLUMNS = [
 ]
 
 def predict_flows(df):
+    """Predict malicious traffic using the trained model without scaling."""
     if df.empty:
+        logging.warning("Received empty DataFrame for prediction")
         return [], []
 
     try:
-        features = df[FEATURE_COLUMNS]
+        logging.info("Extracting features for prediction")
+        features = df[FEATURE_COLUMNS].copy()
     except KeyError as e:
+        logging.error("Missing expected feature columns: %s", e)
         raise ValueError(f"Missing expected feature columns: {e}")
 
-    # Convert the dataframe to match the structure the scaler expects
-    features_scaled = scaler.transform(features)  # scale using the same scaler that was used during training
-
+    # Extract flow IDs
     flow_ids = df["id"].tolist()
-    probabilities = model.predict_proba(features_scaled)
+
+    try:
+        logging.info("Making predictions on %d flows", len(flow_ids))
+        probabilities = model.predict_proba(features.to_numpy())
+    except Exception as e:
+        logging.error("Error during prediction: %s", e)
+        raise
 
     predictions = []
     flagged = []
@@ -48,12 +67,11 @@ def predict_flows(df):
         prediction = np.argmax(probs)
         certainty = np.max(probs)
 
-        # Append to predictions list for all flows
         predictions.append((flow_id, prediction, certainty))
 
-        # Only flag the flow if it's predicted as malicious (prediction == 1) and certainty > threshold
         if prediction == 1 and certainty > CERTAINTY_THRESHOLD:
             flagged.append((flow_id, prediction, certainty))
 
-    return predictions, flagged
+    logging.info("Predictions completed: %d total, %d flagged", len(predictions), len(flagged))
 
+    return predictions, flagged
