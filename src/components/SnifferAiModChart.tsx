@@ -1,4 +1,5 @@
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import {
   CartesianGrid,
   Line,
@@ -7,16 +8,26 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-} from 'recharts';
-import { Flow } from '../utils/props';
+  Legend
+} from "recharts";
+import { AIStats, Flow } from "../utils/props";
 
 interface SnifferAiModChartProps {
   flows: Flow[];
+  aiStats: AIStats;
 }
 
-const SnifferAiModChart = ({ flows }: SnifferAiModChartProps) => {
+const SnifferAiModChart = ({ flows, aiStats }: SnifferAiModChartProps) => {
+  const [aiPredictions, setAiPredictions] = useState(aiStats?.threatCount || 0);
+
+  useEffect(() => {
+    if (aiStats?.threatCount !== undefined && aiStats.threatCount > aiPredictions) {
+      setAiPredictions(aiStats.threatCount);
+    }
+  }, [aiStats?.threatCount, aiPredictions]);
+
   const data = flows.reduce(
-    (acc: { hour: string; snifferFlows: number, potentialThreats: number }[], flow) => {
+    (acc: { hour: string; snifferFlows: number; aiPredictions: number }[], flow) => {
       // Convert Unix timestamp (seconds) to milliseconds
       const date = new Date(flow.last_updated_time * 1000);
 
@@ -28,9 +39,10 @@ const SnifferAiModChart = ({ flows }: SnifferAiModChartProps) => {
       const existing = acc.find((item) => item.hour === hourString);
 
       if (existing) {
-        existing.snifferFlows += 1; // Increment snifferFlows count
+        existing.snifferFlows += 1;
+        existing.aiPredictions = aiPredictions; // Use stable state
       } else {
-        acc.push({ hour: hourString, snifferFlows: 1, potentialThreats: 0}); // Add new hour entry
+        acc.push({ hour: hourString, snifferFlows: 1, aiPredictions });
       }
 
       return acc;
@@ -45,37 +57,38 @@ const SnifferAiModChart = ({ flows }: SnifferAiModChartProps) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
     >
-      <h2 className="text-lg font-medium mb-4 text-gray-200">Flows Overview</h2>
+      <h2 className="text-lg font-medium mb-4 text-gray-200">Flows & AI Predictions</h2>
 
       <div className="h-80">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data}>
             <CartesianGrid strokeDasharray="3 3" stroke="#4B5563" />
             <XAxis dataKey="hour" />
-            <YAxis stroke="#9ca3af" allowDataOverflow domain={['auto', 'auto']}/>
+            <YAxis stroke="#9ca3af" />
             <Tooltip
               contentStyle={{
-                backgroundColor: 'rgba(31, 41, 55, 0.8)',
-                borderColor: '#4B5563',
+                backgroundColor: "rgba(31, 41, 55, 0.8)",
+                borderColor: "#4B5563",
               }}
-              itemStyle={{ color: '#E5E7EB' }}
+              itemStyle={{ color: "#E5E7EB" }}
             />
+            <Legend />
             <Line
               type="monotone"
               dataKey="snifferFlows"
-              name="Flows Processed"
+              name="Sniffer Flows"
               stroke="#39FF14"
               strokeWidth={3}
-              dot={{ fill: '#39FF14', strokeWidth: 2, r: 6 }}
+              dot={{ fill: "#39FF14", strokeWidth: 2, r: 6 }}
               activeDot={{ r: 8, strokeWidth: 2 }}
             />
             <Line
               type="monotone"
-              dataKey="potentialThreats"
-              name="Threats Detected"
+              dataKey="aiPredictions"
+              name="AI Threat Predictions"
               stroke="#ef233c"
               strokeWidth={3}
-              dot={{ fill: '#ef233c', strokeWidth: 2, r: 6 }}
+              dot={{ fill: "#ef233c", strokeWidth: 2, r: 6 }}
               activeDot={{ r: 8, strokeWidth: 2 }}
             />
           </LineChart>
