@@ -36,7 +36,7 @@ function App() {
     const fetchStats = async () => {
       try {
         // Fetch Sniffer stats
-        const snifferRes = await fetch("http://localhost:8080/api/v1/health");
+        const snifferRes = await fetch("http://localhost:8080/api/v1/sniffer/health");
         if (snifferRes.ok) {
           const snifferData = await snifferRes.json();
           setSnifferStatus(snifferData.status);

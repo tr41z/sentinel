@@ -19,7 +19,7 @@ func main() {
 	mux.HandleFunc("/api/v1/flagged_ips", db.FetchFlaggedIPs)
 
 	// Sniffer Module Endpoints
-	mux.HandleFunc("/api/v1/health", handlers.HealthHandler)
+	mux.HandleFunc("/api/v1/sniffer/health", handlers.HealthHandler)
 	mux.HandleFunc("/api/v1/sniffer/start", handlers.StartSnifferHandler)
 	mux.HandleFunc("/api/v1/sniffer/stop", handlers.StopSnifferHandler)
 
