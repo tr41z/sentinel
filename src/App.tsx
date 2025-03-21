@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import './App.css'
-import { Flow } from './utils/props';
+import { AIStats, Flow } from './utils/props';
 import { Route, Routes } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import InspectorPage from './pages/InspectorPage';
@@ -13,6 +13,14 @@ function App() {
     const [snifferStatus, setSnifferStatus] = useState("");
     const [snifferUptime, setSnifferUptime] = useState(0);
     const [snifferErrorCount, setSnifferErrorCount] = useState(0);
+    const [aiStats, setAiStats] = useState<AIStats>({ 
+      status: "", 
+      uptime: 0, 
+      error_count: 0, 
+      threats_detected: 0, 
+      ips_flagged: 0, 
+      threatCount: 0 
+    });
   
     const fetchFlows = async () => {
       const res = await fetch("http://localhost:8080/api/v1/flows");
@@ -26,18 +34,55 @@ function App() {
     }
 
     const fetchStats = async () => {
-      const res = await fetch("http://localhost:8080/api/v1/health");
-
-      if (res.ok) {
-        const data = await res.json();
-        setSnifferStatus(data.status);
-        setSnifferUptime(data.uptime);
-        setSnifferErrorCount(data.error_count);
-      } else {
-        console.error("There was an error while fetching health data!");
+      try {
+        // Fetch Sniffer stats
+        const snifferRes = await fetch("http://localhost:8080/api/v1/sniffer/health");
+        if (snifferRes.ok) {
+          const snifferData = await snifferRes.json();
+          setSnifferStatus(snifferData.status);
+          setSnifferUptime(snifferData.uptime);
+          setSnifferErrorCount(snifferData.error_count);
+        } else {
+          console.error("Error fetching Sniffer health data");
+        }
+    
+        // Fetch AI module stats
+        const aiRes = await fetch("http://localhost:8080/api/v1/ai/health");
+        if (aiRes.ok) {
+          const aiData = await aiRes.json();
+          setAiStats(aiData); // Store AI stats in state
+        } else {
+          console.error("Error fetching AI health data");
+        }
+    
+      } catch (error) {
+        console.error("Failed to fetch health data:", error);
       }
-    }
+      try {
+        const threatRes = await fetch("http://localhost:8080/api/v1/threats");
+        const flaggedRes = await fetch("http://localhost:8080/api/v1/flagged_ips");
+    
+        if (threatRes.ok && flaggedRes.ok) {
+          const threatsData = await threatRes.json();
+          const flaggedData = await flaggedRes.json();
+    
+          setAiStats(prev => ({
+            status: prev?.status ?? "",
+            uptime: prev?.uptime ?? 0,
+            error_count: prev?.error_count ?? 0,
+            threats_detected: threatsData.length, 
+            ips_flagged: flaggedData.length,  
+            threatCount: prev?.threatCount ?? threatsData.length // Use threatsData.length as fallback
+          }));
 
+        } else {
+          console.error("Error fetching threats or flagged IPs data");
+        }
+      } catch (error) {
+        console.error("Failed to fetch threats or flagged IPs:", error);
+      }
+    };
+    
     useEffect(() => {
       const flowsInterval = setInterval(() => {
         fetchFlows();
@@ -93,13 +138,16 @@ function App() {
 
         <Routes>
           <Route path='/' element={
-            <HomePage 
-                snifferStatus={snifferStatus} 
-                snifferUptime={snifferUptime} 
-                snifferErrorCount={snifferErrorCount} 
-                flows={flows}
-                bandwidth={bandwidth}
-              />
+            aiStats && (
+              <HomePage 
+                  snifferStatus={snifferStatus} 
+                  snifferUptime={snifferUptime} 
+                  snifferErrorCount={snifferErrorCount} 
+                  flows={flows}
+                  bandwidth={bandwidth}
+                  aiStats={aiStats}
+                />
+            )
           }/>
           <Route path='/dashboard' element={
             <DashboardPage 
