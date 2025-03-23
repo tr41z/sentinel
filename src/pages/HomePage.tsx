@@ -42,14 +42,14 @@ const HomePage = ({
         >
           <ModuleStatCard
             moduleName="Network Sniffer Module"
-            moduleType="sniffer"            
+            moduleType="sniffer"
             icon={HeartPulse}
             color="#39FF14"
             statistics={[
               { name: "Status", value: snifferStatus },
               { name: "Uptime", value: snifferUptime },
               { name: "Flows Processed", value: flows.length },
-              { name: "Bandwidth", value: `${bandwidth.toFixed(2)} kbps` },
+              { name: "Bandwidth", value: `${bandwidth.toFixed(1)} kbps` },
               { name: "Error Count", value: snifferErrorCount },
             ]}
           />
@@ -60,11 +60,28 @@ const HomePage = ({
             icon={Bot}
             color="#ff0000"
             statistics={[
-              { name: "Status", value: aiStats?.status || aiStats?.status !== undefined ? aiStats?.status : "Loading..." }, 
-              { name: "Uptime", value: aiStats?.uptime ?? "Loading..." }, 
-              { name: "IPs Flagged", value: aiStats?.ips_flagged ?? "Loading..." },
-              { name: "Threats Detected", value: Number.isInteger(aiStats?.threatCount) ? aiStats?.threatCount : 0 },
-              { name: "Error Count", value: aiStats?.error_count ?? "Loading..." },
+              {
+                name: "Status",
+                value:
+                  aiStats?.status || aiStats?.status !== undefined
+                    ? aiStats?.status
+                    : "Loading...",
+              },
+              { name: "Uptime", value: aiStats?.uptime ?? "Loading..." },
+              {
+                name: "IPs Flagged",
+                value: aiStats?.ips_flagged ?? "Loading...",
+              },
+              {
+                name: "Threats Detected",
+                value: Number.isInteger(aiStats?.threatCount)
+                  ? aiStats?.threatCount
+                  : 0,
+              },
+              {
+                name: "Error Count",
+                value: aiStats?.error_count ?? "Loading...",
+              },
             ]}
           />
         </motion.div>
