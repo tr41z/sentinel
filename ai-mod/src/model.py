@@ -19,12 +19,12 @@ if getattr(sys, 'frozen', False):
 else:
     bundle_dir = os.path.dirname(os.path.abspath(__file__))
 
-MODEL_PATH = os.path.join(bundle_dir, 'models', 'recondos_model_gnb.joblib')
+MODEL_PATH = os.path.join(bundle_dir, 'models', 'RandomForestClassifier.pkl')  # The pipeline with scaler
 
-# Load model
+# Load model (pipeline includes scaler)
 try:
-    logging.info("Loading model from %s", MODEL_PATH)
-    model = joblib.load(MODEL_PATH)
+    logging.info("Loading model pipeline from %s", MODEL_PATH)
+    model_pipeline = joblib.load(MODEL_PATH)  # This includes both the scaler and model
 except Exception as e:
     logging.error("Failed to load model: %s", e)
     raise
@@ -34,11 +34,11 @@ FEATURE_COLUMNS = [
     "protocol", "total_bytes", "rate", "avg_packet_size", "total_packet_count",
     "src_system_ports_count", "src_registered_ports_count", "src_dynamic_ports_count",
     "dst_system_ports_count", "dst_registered_ports_count", "dst_dynamic_ports_count",
-    "packets_per_sec", "is_brute_target", "is_dos_target", "duration"
+    "packets_per_sec"
 ]
 
 def predict_flows(df):
-    """Predict malicious traffic using the trained model without scaling."""
+    """Predict malicious traffic using the trained model pipeline (which includes scaling)."""
     if df.empty:
         logging.warning("Received empty DataFrame for prediction")
         return [], []
@@ -50,12 +50,15 @@ def predict_flows(df):
         logging.error("Missing expected feature columns: %s", e)
         raise ValueError(f"Missing expected feature columns: {e}")
 
+    # Convert to DataFrame to preserve feature names
+    features_df = pd.DataFrame(features, columns=FEATURE_COLUMNS)  
+
     # Extract flow IDs
     flow_ids = df["id"].tolist()
 
     try:
         logging.info("Making predictions on %d flows", len(flow_ids))
-        probabilities = model.predict_proba(features.to_numpy())
+        probabilities = model_pipeline.predict_proba(features_df)
     except Exception as e:
         logging.error("Error during prediction: %s", e)
         raise
