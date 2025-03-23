@@ -140,10 +140,12 @@ endif()
 
 # Link libraries (SQLite and platform-specific)
 target_link_libraries(sniffer pthread sqlite3 ${PLATFORM_LIBS} ${PCAP_LIBRARIES})
-target_link_libraries(tests PRIVATE gtest gtest_main sqlite3 ${PLATFORM_LIBS} ${PCAP_LIBRARIES} ws2_32)
 
 if(WIN32)
     target_link_libraries(sniffer ws2_32)
+    target_link_libraries(tests PRIVATE gtest gtest_main sqlite3 ${PLATFORM_LIBS} ${PCAP_LIBRARIES} ws2_32)
+else()
+    target_link_libraries(tests PRIVATE gtest gtest_main sqlite3 ${PLATFORM_LIBS} ${PCAP_LIBRARIES})
 endif()
 
 include(GoogleTest)
