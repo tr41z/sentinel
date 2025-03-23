@@ -50,7 +50,7 @@ function App() {
         const aiRes = await fetch("http://localhost:8080/api/v1/ai/health");
         if (aiRes.ok) {
           const aiData = await aiRes.json();
-          setAiStats(aiData); // Store AI stats in state
+          setAiStats(prev => ({ ...prev, ...aiData }));
         } else {
           console.error("Error fetching AI health data");
         }
@@ -58,6 +58,7 @@ function App() {
       } catch (error) {
         console.error("Failed to fetch health data:", error);
       }
+    
       try {
         const threatRes = await fetch("http://localhost:8080/api/v1/threats");
         const flaggedRes = await fetch("http://localhost:8080/api/v1/flagged_ips");
@@ -67,14 +68,12 @@ function App() {
           const flaggedData = await flaggedRes.json();
     
           setAiStats(prev => ({
-            status: prev?.status ?? "",
-            uptime: prev?.uptime ?? 0,
-            error_count: prev?.error_count ?? 0,
-            threats_detected: threatsData.length, 
-            ips_flagged: flaggedData.length,  
-            threatCount: prev?.threatCount ?? threatsData.length // Use threatsData.length as fallback
+            ...prev,
+            threats_detected: threatsData,
+            ips_flagged: flaggedData.length,
+            threatCount: Math.max(prev?.threatCount ?? 0, threatsData.length)
           }));
-
+    
         } else {
           console.error("Error fetching threats or flagged IPs data");
         }
@@ -119,7 +118,7 @@ function App() {
           },
           { totalData: 0, totalDuration: 0 } // Initial accumulator values
       );
-      return totalDuration > 0 ? totalData / totalDuration : 0; // Avoid divide by zero
+      return totalDuration > 0 ? totalData / totalDuration : 0;
   }, [flows]);
 
     const avgFlowSize = totalFlows > 0 ? totalBytes / totalFlows : 0;
@@ -158,7 +157,14 @@ function App() {
                 flows={flows}
               />
           }/>
-          <Route path='/flows/inspector' element={<InspectorPage/>}/>
+          <Route path='/flows/inspector' element={<InspectorPage flows={flows.map(flow => ({ 
+            id: `${flow.source_ip} -> ${flow.destination_ip}`, 
+            src_ip: flow.source_ip, 
+            dst_ip: flow.destination_ip, 
+            total_bytes: flow.total_bytes, 
+            duration: flow.duration, 
+            rate: flow.rate 
+          }))} />} />
           <Route path='/settings' element={<SettingsPage/>}/>
         </Routes>
       </div>

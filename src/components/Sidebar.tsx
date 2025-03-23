@@ -27,7 +27,7 @@ const Sidebar = () => {
             </motion.button>
 
             <nav className='mt-8 flex-grow'>
-                {SIDEBAR_ITEMS.map((item, _index) => (
+                {SIDEBAR_ITEMS.map((item) => (
                     <Link key={item.path} to={item.path}>
                         <motion.div
                         className='flex items-center p-4 text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors mb-2'

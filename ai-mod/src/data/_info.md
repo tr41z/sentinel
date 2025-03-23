@@ -1,7 +1,7 @@
 # Dataset Information
 
 ### The data was collected using isolated network 🌐  
-The data will be collected throughout the days, as the naming convention suggests (day1-recon, day2-dos, etc.).
+The data will be collected throughout the days, as the naming convention suggests (day1-recon, day2-recon, etc.).
 
 ### Data Collection Details 📊
 - **Day 1: Reconnaissance 🔍**
@@ -16,13 +16,29 @@ The data will be collected throughout the days, as the naming convention suggest
   |___________________________________________|
   ```
 
-- **Day 2: Denial of Service (DoS) ⚡**
-  - Activities: Flooding the network with traffic to cause disruption.
-  - Tools used: Slowloris, Hping3 (TCP SYN flood, UDP flood, ICMP flood, TCP RST flood), Slowhttptest, Xerxes, GoldenEye.
+- **Day 2: Reconnaissance 🔍 ⚡**
   ```
   ___________________________________________
   |                                           |
   |            Denial of Service              |
-  |       MALICIOUS IP IS: 192.168.0.23       |
+  |       MALICIOUS IP IS: 192.168.0.20       |
+  |___________________________________________|
+  ```
+
+- **Day 3: Reconnaissance 🔍 ⚡**
+  ```
+  ___________________________________________
+  |                                           |
+  |            Denial of Service              |
+  |       MALICIOUS IP IS: 192.168.0.20       |
+  |___________________________________________|
+  ```
+
+- **Day 4: Reconnaissance 🔍 ⚡**
+  ```
+  ___________________________________________
+  |                                           |
+  |            Denial of Service              |
+  |       MALICIOUS IP IS: 192.168.0.20       |
   |___________________________________________|
   ```

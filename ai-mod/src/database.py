@@ -1,6 +1,7 @@
 import sqlite3
 import pandas as pd
 from config import DB_PATH, BATCH_SIZE
+import logging
 
 def initialize_db():
     """Ensure that required tables exist in the database."""
@@ -26,6 +27,16 @@ def initialize_db():
             prediction INTEGER,
             certainty REAL, 
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # Create flagged_ips table with unique src_ip and last_seen timestamp
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS flagged_ips (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            src_ip TEXT UNIQUE,
+            first_seen DATETIME DEFAULT CURRENT_TIMESTAMP,
+            last_seen DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     ''')
 
@@ -72,3 +83,40 @@ def insert_flagged_flows(flagged):
 
     conn.commit()
     conn.close()
+
+def update_flagged_ips():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    logging.info("Updating flagged_ips...")  # Log execution start
+
+    # Check if flagged_flows has data
+    cursor.execute("SELECT COUNT(*) FROM flagged_flows")
+    flagged_count = cursor.fetchone()[0]
+    logging.info(f"Flagged flows count: {flagged_count}")
+
+    if flagged_count == 0:
+        logging.info("No flagged flows found, skipping flagged_ips update.")
+        conn.close()
+        return
+
+    # Insert new flagged IPs
+    cursor.execute('''
+        INSERT OR IGNORE INTO flagged_ips (src_ip, first_seen, last_seen)
+        SELECT DISTINCT f.src_ip, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+        FROM flagged_flows ff
+        JOIN flows f ON ff.flow_id = f.id
+    ''')
+
+    # Update last_seen for already existing IPs
+    cursor.execute('''
+        UPDATE flagged_ips
+        SET last_seen = CURRENT_TIMESTAMP
+        WHERE src_ip IN (SELECT f.src_ip FROM flagged_flows ff JOIN flows f ON ff.flow_id = f.id)
+    ''')
+
+    rows_affected = cursor.rowcount
+    conn.commit()
+    conn.close()
+
+    logging.info(f"Updated {rows_affected} rows in flagged_ips")  # Log completion
