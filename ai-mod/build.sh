@@ -1,12 +1,28 @@
 #!/bin/bash
 
+# Ensure the script stops on errors
+set -e
+
+# Check if the virtual environment exists, create it if not
+if [ ! -d ".venv" ]; then
+  echo "Creating virtual environment..."
+  python3 -m venv .venv
+fi
+
 # Activate the virtual environment
 source .venv/bin/activate
+
+# Ensure necessary dependencies are installed
+pip install --upgrade pip
+pip install pyinstaller scikit-learn numpy fastapi pandas uvicorn
 
 # Define the source and destination directories
 SRC_DIR="src"
 BIN_DIR="bin"
 HOOKS_DIR="$SRC_DIR/hooks"
+
+# Ensure the bin directory exists
+mkdir -p "$BIN_DIR"
 
 # Run PyInstaller to build the executable with all necessary hidden imports
 pyinstaller --onefile --name ai \
