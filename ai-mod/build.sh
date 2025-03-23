@@ -24,12 +24,18 @@ HOOKS_DIR="$SRC_DIR/hooks"
 # Ensure the bin directory exists
 mkdir -p "$BIN_DIR"
 
+# Find the xgboost shared library and VERSION file
+XGBOOST_LIB=$(python -c "import xgboost.libpath as lp; print(lp.find_lib_path()[0])")
+XGBOOST_VERSION=$(python -c "import xgboost; import os; print(os.path.join(os.path.dirname(xgboost.__file__), 'VERSION'))")
+
 # Run PyInstaller to build the executable with all necessary hidden imports
 pyinstaller --onefile --name ai \
   --add-data "$SRC_DIR/models:models" \
   --add-data "$SRC_DIR/config.py:." \
   --add-data "$SRC_DIR/database.py:." \
   --add-data "$SRC_DIR/scheduler.py:." \
+  --add-data "$XGBOOST_LIB:lib" \
+  --add-data "$XGBOOST_VERSION:xgboost" \  # Include the xgboost VERSION file
   --additional-hooks-dir="$HOOKS_DIR" \
   --hidden-import "sklearn" \
   --hidden-import "sklearn.pipeline" \
@@ -44,6 +50,7 @@ pyinstaller --onefile --name ai \
   --hidden-import "sklearn.ensemble._hist_gradient_boosting" \
   --hidden-import "numpy" \
   --hidden-import "numpy.core.multiarray" \
+  --hidden-import "xgboost" \
   "$SRC_DIR/main.py"
 
 # Move the executable to the 'bin' directory

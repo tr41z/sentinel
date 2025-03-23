@@ -15,7 +15,7 @@ call .\.venv\Scripts\activate
 
 :: Ensure necessary dependencies are installed
 pip install --upgrade pip
-pip install pyinstaller scikit-learn numpy fastapi uvicorn
+pip install pyinstaller scikit-learn numpy fastapi uvicorn xgboost
 
 :: Define the source and destination directories
 set SRC_DIR=src
@@ -27,12 +27,18 @@ if not exist "%BIN_DIR%" (
     mkdir "%BIN_DIR%"
 )
 
+:: Find the xgboost shared library and VERSION file
+for /f "delims=" %%i in ('python -c "import xgboost.libpath as lp; print(lp.find_lib_path()[0])"') do set XGBOOST_LIB=%%i
+for /f "delims=" %%i in ('python -c "import xgboost; import os; print(os.path.join(os.path.dirname(xgboost.__file__), 'VERSION'))"') do set XGBOOST_VERSION=%%i
+
 :: Run PyInstaller to build the executable with the necessary hidden imports
 pyinstaller --onefile --name ai ^
   --add-data "%SRC_DIR%\models;models" ^
   --add-data "%SRC_DIR%\config.py;." ^
   --add-data "%SRC_DIR%\database.py;." ^
   --add-data "%SRC_DIR%\scheduler.py;." ^
+  --add-data "%XGBOOST_LIB%;lib" ^
+  --add-data "%XGBOOST_VERSION%;xgboost" ^
   --additional-hooks-dir "%HOOKS_DIR%" ^
   --hidden-import sklearn ^
   --hidden-import sklearn.pipeline ^
@@ -47,6 +53,7 @@ pyinstaller --onefile --name ai ^
   --hidden-import sklearn.ensemble._hist_gradient_boosting ^
   --hidden-import numpy ^
   --hidden-import numpy.core.multiarray ^
+  --hidden-import xgboost ^
   "%SRC_DIR%\main.py"
 
 :: Move the executable to the 'bin' directory
