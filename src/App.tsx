@@ -157,7 +157,14 @@ function App() {
                 flows={flows}
               />
           }/>
-          <Route path='/flows/inspector' element={<InspectorPage/>}/>
+          <Route path='/flows/inspector' element={<InspectorPage flows={flows.map(flow => ({ 
+            id: `${flow.source_ip} -> ${flow.destination_ip}`, 
+            src_ip: flow.source_ip, 
+            dst_ip: flow.destination_ip, 
+            total_bytes: flow.total_bytes, 
+            duration: flow.duration, 
+            rate: flow.rate 
+          }))} />} />
           <Route path='/settings' element={<SettingsPage/>}/>
         </Routes>
       </div>
