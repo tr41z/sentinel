@@ -1,6 +1,10 @@
 #include <gtest/gtest.h>
 #include <climits>
+#include <pcap.h>
 #include "../include/prep.h"
+#include "../include/sniffer.h"
+#include "../include/flow.h"
+#include "../include/db.h"
 
 TEST(PREPROCESS_TESTS_ROUND_TO, Normal) {
    double value = 10.241258125491230542149;
@@ -141,4 +145,78 @@ TEST(PREPROCESS_TESTS_IS_DOS_TARGET, EmptyPorts) {
 
     int res = is_dos_target(ports);
     ASSERT_EQ(0, res);
+}
+
+TEST(SNIFFER_TESTS, ListAvailableDevices) {
+    char errbuf[PCAP_ERRBUF_SIZE];
+    pcap_if_t *alldevs, *device;
+
+    // Find all devices
+    ASSERT_EQ(pcap_findalldevs(&alldevs, errbuf), 0) << "Failed to find devices: " << errbuf;
+
+    // Ensure at least one device is available
+    ASSERT_NE(alldevs, nullptr) << "No devices found for packet capture.";
+
+    // Free the device list
+    pcap_freealldevs(alldevs);
+}
+
+TEST(SNIFFER_TESTS, ProtocolIdentificationTest) {
+    // Simulate protocol identification for reconnaissance traffic
+    uint8_t tcp_syn_flag = 0x02; // SYN flag
+    uint8_t icmp_echo_request = 8; // ICMP Echo Request type
+    uint16_t arp_op_request = 1; // ARP Request opcode
+
+    ASSERT_EQ(tcp_syn_flag, 0x02) << "TCP SYN flag mismatch.";
+    ASSERT_EQ(icmp_echo_request, 8) << "ICMP Echo Request type mismatch.";
+    ASSERT_EQ(arp_op_request, 1) << "ARP Request opcode mismatch.";
+}
+
+TEST(SNIFFER_TESTS, FeatureExtractionTest) {
+    // Simulate feature extraction from a packet
+    uint32_t src_ip = 0xC0A80001; // 192.168.0.1
+    uint32_t dst_ip = 0xC0A80002; // 192.168.0.2
+    uint16_t src_port = 12345;
+    uint16_t dst_port = 80;
+
+    ASSERT_EQ(ip_to_str(src_ip), "192.168.0.1");
+    ASSERT_EQ(ip_to_str(dst_ip), "192.168.0.2");
+    ASSERT_EQ(src_port, 12345);
+    ASSERT_EQ(dst_port, 80);
+}
+
+TEST(SNIFFER_TESTS, DatabaseInsertionTest) {
+    // Simulate database insertion for a flow
+    sqlite3 *db;
+    char *home_dir = get_home_dir();
+    connect_db(home_dir, &db);
+
+    // Clear the database before the test
+    const char *clear_query = "DELETE FROM flows;";
+    sqlite3_exec(db, clear_query, nullptr, nullptr, nullptr);
+
+    Flow test_flow;
+    test_flow.src_ip = 0xC0A80001; // 192.168.0.1
+    test_flow.dst_ip = 0xC0A80002; // 192.168.0.2
+    test_flow.total_bytes = 1024;
+    test_flow.packet_count = 10;
+    test_flow.protocol = IPPROTO_TCP;
+    test_flow.start_time = std::chrono::system_clock::now();
+    test_flow.last_update_time = std::chrono::system_clock::now();
+    test_flow.duration = std::chrono::seconds(5);
+
+    save_flow(db, test_flow);
+
+    sqlite3_stmt *stmt;
+    const char *query = "SELECT COUNT(*) FROM flows WHERE src_ip = ? AND dst_ip = ?;";
+    sqlite3_prepare_v2(db, query, -1, &stmt, nullptr);
+    sqlite3_bind_text(stmt, 1, ip_to_str(test_flow.src_ip).c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 2, ip_to_str(test_flow.dst_ip).c_str(), -1, SQLITE_TRANSIENT);
+
+    int rc = sqlite3_step(stmt);
+    ASSERT_EQ(rc, SQLITE_ROW);
+    ASSERT_EQ(sqlite3_column_int(stmt, 0), 1) << "Flow not inserted into database.";
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
 }

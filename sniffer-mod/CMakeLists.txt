@@ -110,6 +110,9 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 FetchContent_MakeAvailable(sqlite3)
 
+# Include SQLite directory
+include_directories(${sqlite3_SOURCE_DIR})
+
 # Create static library from sqlite3.c
 add_library(sqlite3 STATIC ${sqlite3_SOURCE_DIR}/sqlite3.c)
 target_include_directories(sqlite3 PUBLIC ${sqlite3_SOURCE_DIR})
@@ -120,7 +123,15 @@ include_directories(${gtest_SOURCE_DIR}/include ${gtest_BINARY_DIR})
 
 # Executable for sniffer
 add_executable(sniffer ${SNIFFER_SOURCES})
-add_executable(tests "src/tests/sniffer_tests.cpp" "src/prep.cpp")
+
+# Add missing source files to the tests target
+add_executable(tests 
+    "src/tests/sniffer_tests.cpp" 
+    "src/prep.cpp" 
+    "src/ip.cpp" 
+    "src/db.cpp" 
+    "src/flow.cpp"
+)
 
 if(APPLE)
     # Ensure sniffer depends on build_pcap
@@ -129,7 +140,7 @@ endif()
 
 # Link libraries (SQLite and platform-specific)
 target_link_libraries(sniffer pthread sqlite3 ${PLATFORM_LIBS} ${PCAP_LIBRARIES})
-target_link_libraries(tests PRIVATE gtest gtest_main)
+target_link_libraries(tests PRIVATE gtest gtest_main sqlite3 ${PLATFORM_LIBS} ${PCAP_LIBRARIES} ws2_32)
 
 if(WIN32)
     target_link_libraries(sniffer ws2_32)
