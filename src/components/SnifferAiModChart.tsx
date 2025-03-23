@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
 import {
   CartesianGrid,
   Line,
@@ -8,7 +7,6 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-  Legend
 } from "recharts";
 import { AIStats, Flow } from "../utils/props";
 
@@ -18,41 +16,49 @@ interface SnifferAiModChartProps {
 }
 
 const SnifferAiModChart = ({ flows, aiStats }: SnifferAiModChartProps) => {
-  const [aiPredictions, setAiPredictions] = useState(aiStats?.threatCount || 0);
-
-  useEffect(() => {
-    if (aiStats?.threatCount !== undefined && aiStats.threatCount > aiPredictions) {
-      setAiPredictions(aiStats.threatCount);
-    }
-  }, [aiStats?.threatCount, aiPredictions]);
-
-  const data = flows.reduce(
-    (acc: { hour: string; snifferFlows: number; aiPredictions: number }[], flow) => {
-      // Convert Unix timestamp (seconds) to milliseconds
-      const date = new Date(flow.last_updated_time * 1000);
-
-      // Group data by local hour
+  // Group AI threats by hour
+  const threatsByHour = aiStats?.threats_detected && Array.isArray(aiStats.threats_detected)
+  ? aiStats.threats_detected.reduce((acc, threat) => {
+      const date = new Date(threat.timestamp);
       const hour = date.getHours();
       const hourString = hour < 10 ? `0${hour}:00` : `${hour}:00`;
 
-      // Check if the hour already exists in the accumulator
-      const existing = acc.find((item) => item.hour === hourString);
+      acc[hourString] = (acc[hourString] || 0) + 1;
+      return acc;
+    }, {})
+  : {};
 
+  // Transform flow data
+  const data = flows.reduce(
+    (acc: { hour: string; snifferFlows: number; aiPredictions: number }[], flow) => {
+      const date = new Date(flow.last_updated_time * 1000);
+      const hour = date.getHours();
+      const hourString = hour < 10 ? `0${hour}:00` : `${hour}:00`;
+  
+      const existing = acc.find((item) => item.hour === hourString);
       if (existing) {
         existing.snifferFlows += 1;
-        existing.aiPredictions = aiPredictions; // Use stable state
+        existing.aiPredictions = threatsByHour[hourString] || 0;
       } else {
-        acc.push({ hour: hourString, snifferFlows: 1, aiPredictions });
+        acc.push({
+          hour: hourString,
+          snifferFlows: 1,
+          aiPredictions: threatsByHour[hourString] || 0,
+        });
       }
-
       return acc;
     },
     []
-  );
+  );  
+
+  // Assign AI threat predictions per hour
+  data.forEach((item) => {
+    item.aiPredictions = threatsByHour[item.hour] || 0;
+  });
 
   return (
     <motion.div
-      className="bg-[#1A1A1A] bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-800"
+      className="bg-[#1A1A1A] bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-8 border border-gray-800"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
@@ -72,7 +78,6 @@ const SnifferAiModChart = ({ flows, aiStats }: SnifferAiModChartProps) => {
               }}
               itemStyle={{ color: "#E5E7EB" }}
             />
-            <Legend />
             <Line
               type="monotone"
               dataKey="snifferFlows"
