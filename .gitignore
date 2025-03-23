@@ -29,6 +29,9 @@ sniffer-mod/build
 sniffer-mod/_obj
 sniffer-mod/note
 
+ai-mod/bin/ai
+ai-mod/bin/ai.exe
+
 package-lock.json
 
 .vscode
