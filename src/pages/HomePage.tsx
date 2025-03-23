@@ -49,7 +49,7 @@ const HomePage = ({
               { name: "Status", value: snifferStatus },
               { name: "Uptime", value: snifferUptime },
               { name: "Flows Processed", value: flows.length },
-              { name: "Bandwidth", value: `${bandwidth.toFixed(1)} kbps` },
+              { name: "Bandwidth", value: `${bandwidth.toFixed(2)} kbps` },
               { name: "Error Count", value: snifferErrorCount },
             ]}
           />
