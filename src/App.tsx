@@ -72,7 +72,7 @@ function App() {
             error_count: prev?.error_count ?? 0,
             threats_detected: threatsData.length, 
             ips_flagged: flaggedData.length,  
-            threatCount: prev?.threatCount ?? threatsData.length // Use threatsData.length as fallback
+            threatCount: prev?.threatCount ?? threatsData.length 
           }));
 
         } else {
@@ -119,7 +119,7 @@ function App() {
           },
           { totalData: 0, totalDuration: 0 } // Initial accumulator values
       );
-      return totalDuration > 0 ? totalData / totalDuration : 0; // Avoid divide by zero
+      return totalDuration > 0 ? totalData / totalDuration : 0;
   }, [flows]);
 
     const avgFlowSize = totalFlows > 0 ? totalBytes / totalFlows : 0;
