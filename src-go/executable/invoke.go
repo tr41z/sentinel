@@ -21,17 +21,26 @@ type ModuleHealth struct {
 
 var (
 	// Sniffer
-	healthSniffer       ModuleHealth
-	healthSnifferMutex  sync.Mutex
-	snifferStart        time.Time
-	SnifferExpired      bool
+	healthSniffer      ModuleHealth
+	healthSnifferMutex sync.Mutex
+	snifferStart       time.Time
+	SnifferExpired     bool
 
 	// AI Module
-	healthAI       ModuleHealth
-	healthAIMutex  sync.Mutex
-	aiStart        time.Time
-	AIExpired      bool
+	healthAI      ModuleHealth
+	healthAIMutex sync.Mutex
+	aiStart       time.Time
+	AIExpired     bool
 )
+
+// Function variables for health checks (can be overridden for testing)
+var (
+	GetSnifferHealthFunc = GetSnifferHealth
+	GetAIHealthFunc      = GetAIHealth
+)
+
+// Function variable for running executables (can be overridden for testing)
+var RunExecutableFunc = runExecutable
 
 // GetSnifferHealth exposes the current health of the sniffer
 func GetSnifferHealth() ModuleHealth {
@@ -88,11 +97,11 @@ func updateAIHealth(status string, lastActive time.Time, incrementError bool) {
 }
 
 func InvokeSniffer() {
-	runExecutable("sniffer", utils.SNIFFER_EXECUTABLE_PATH, &SnifferExpired, updateSnifferHealth, &snifferStart)
+	RunExecutableFunc("sniffer", utils.SNIFFER_EXECUTABLE_PATH, &SnifferExpired, updateSnifferHealth, &snifferStart)
 }
 
 func InvokeAI() {
-	runExecutable("AI module", utils.AI_EXECUTABLE_PATH, &AIExpired, updateAIHealth, &aiStart)
+	RunExecutableFunc("AI module", utils.AI_EXECUTABLE_PATH, &AIExpired, updateAIHealth, &aiStart)
 }
 
 func runExecutable(name string, path string, expiredFlag *bool, updateHealth func(string, time.Time, bool), startTime *time.Time) {
