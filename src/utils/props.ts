@@ -52,7 +52,9 @@ export interface AIStats {
     ips_flagged: number;
     error_count: number;
     threatCount: number;
-    threats_detected: number;
+    threats_detected: {
+        data: { timestamp: string }[];
+    };
 }
 
 export interface HomePageProps {

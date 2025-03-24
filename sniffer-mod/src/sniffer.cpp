@@ -79,46 +79,7 @@ void *sniffer_thread(void *args) {
   return NULL;
 }
 
-// // Function to start sniffing on all available devices using threads
-// void start_multithreaded_sniffing() {
-//   pthread_t threads[20];
-//   int thread_count = 0;
-//   ThreadArgs *args;
-
-//   // Find all devices
-//   if (pcap_findalldevs(&interfaces, err_buff) == -1) {
-//     fprintf(stderr, "Error finding devices: %s\n", err_buff);
-//     return;
-//   }
-
-//   // Iterate over each device
-//   for (temp = interfaces; temp; temp = temp->next) {
-//     if (thread_count >= 20) {
-//       fprintf(stderr,
-//               "Maximum thread limit reached. Skipping extra devices.\n");
-//       break;
-//     }
-
-//     args = (ThreadArgs *)malloc(sizeof(ThreadArgs));
-//     if (!args) {
-//       fprintf(stderr, "Memory allocation failed for thread arguments.\n");
-//       continue;
-//     }
-//     args->device_name = strdup(temp->name);
-
-//     // Create a thread for each interface
-//     if (pthread_create(&threads[thread_count], NULL, sniffer_thread,
-//                        (void *)args) != 0) {
-//       fprintf(stderr, "Error creating thread for device %s\n", temp->name);
-//       free(args->device_name);
-//       free(args);
-//       continue;
-//     }
-
-//     thread_count++;
-//  }
-
-// Function to start sniffing on all available devices using threads !!!DATA COLLECTION ONLY!!!
+// Function to start sniffing on all available devices using threads
 void start_multithreaded_sniffing() {
   pthread_t threads[20];
   int thread_count = 0;
@@ -130,63 +91,40 @@ void start_multithreaded_sniffing() {
     return;
   }
 
-  // Check for 'bridge100' interface and assign it first
+  // Iterate over each device
   for (temp = interfaces; temp; temp = temp->next) {
-    if (strcmp(temp->name, "bridge100") == 0) {
-      // 'bridge100' found, start sniffing on it
-      args = (ThreadArgs *)malloc(sizeof(ThreadArgs));
-      if (!args) {
-        fprintf(stderr, "Memory allocation failed for thread arguments.\n");
-        continue;
-      }
-      args->device_name = strdup(temp->name);
-
-      // Create a thread for the 'bridge100' interface
-      if (pthread_create(&threads[thread_count], NULL, sniffer_thread, (void *)args) != 0) {
-        fprintf(stderr, "Error creating thread for device %s\n", temp->name);
-        free(args->device_name);
-        free(args);
-        continue;
-      }
-
-      thread_count++;
-      break;  // Exit the loop once 'bridge100' is found and processed
+    if (thread_count >= 20) {
+      fprintf(stderr,
+              "Maximum thread limit reached. Skipping extra devices.\n");
+      break;
     }
-  }
 
-  // After capturing from 'bridge100', continue with the rest of the devices
-  for (temp = interfaces; temp; temp = temp->next) {
-    if (strcmp(temp->name, "bridge100") != 0) {  // Skip 'bridge100'
-      if (thread_count >= 20) {
-        fprintf(stderr, "Maximum thread limit reached. Skipping extra devices.\n");
-        break;
-      }
-
-      args = (ThreadArgs *)malloc(sizeof(ThreadArgs));
-      if (!args) {
-        fprintf(stderr, "Memory allocation failed for thread arguments.\n");
-        continue;
-      }
-      args->device_name = strdup(temp->name);
-
-      // Create a thread for the current interface
-      if (pthread_create(&threads[thread_count], NULL, sniffer_thread, (void *)args) != 0) {
-        fprintf(stderr, "Error creating thread for device %s\n", temp->name);
-        free(args->device_name);
-        free(args);
-        continue;
-      }
-
-      thread_count++;
+    args = (ThreadArgs *)malloc(sizeof(ThreadArgs));
+    if (!args) {
+      fprintf(stderr, "Memory allocation failed for thread arguments.\n");
+      continue;
     }
-  }
+    args->device_name = strdup(temp->name);
 
-  // Wait for all threads to finish
-  for (int i = 0; i < thread_count; i++) {
-    pthread_join(threads[i], NULL);
+    // Create a thread for each interface
+    if (pthread_create(&threads[thread_count], NULL, sniffer_thread,
+                       (void *)args) != 0) {
+      fprintf(stderr, "Error creating thread for device %s\n", temp->name);
+      free(args->device_name);
+      free(args);
+      continue;
+    }
+
+    thread_count++;
   }
 
   // Free device list
   pcap_freealldevs(interfaces);
+
+  // Wait for all threads to complete
+  for (int i = 0; i < thread_count; i++) {
+    pthread_join(threads[i], NULL);
+  }
+
   printf("All threads completed. Exiting.\n");
 }
