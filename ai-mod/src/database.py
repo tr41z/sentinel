@@ -3,6 +3,12 @@ import pandas as pd
 from config import DB_PATH, BATCH_SIZE
 import logging
 
+def get_db_connection():
+    conn = sqlite3.connect("sentinel.db", check_same_thread=False)
+    conn.execute("PRAGMA journal_mode=WAL;")  # Enable write-ahead logging
+    conn.commit()
+    return conn
+
 def initialize_db():
     """Ensure that required tables exist in the database."""
     conn = sqlite3.connect(DB_PATH)
@@ -62,12 +68,14 @@ def fetch_unprocessed_flows():
     return df
 
 def insert_predictions(predictions):
-    """Insert predictions into the database."""
+    """Insert predictions into the database, avoiding duplicate flow_id entries."""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
     cursor.executemany("""
-        INSERT INTO predictions (flow_id, prediction, certainty) VALUES (?, ?, ?)
+        INSERT INTO predictions (flow_id, prediction, certainty)
+        VALUES (?, ?, ?)
+        ON CONFLICT(flow_id) DO UPDATE SET prediction=excluded.prediction, certainty=excluded.certainty
     """, [(flow_id, int(prediction), float(certainty)) for flow_id, prediction, certainty in predictions])
 
     conn.commit()
