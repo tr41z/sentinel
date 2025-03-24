@@ -66,12 +66,12 @@ function App() {
         if (threatRes.ok && flaggedRes.ok) {
           const threatsData = await threatRes.json();
           const flaggedData = await flaggedRes.json();
-    
+
           setAiStats(prev => ({
             ...prev,
             threats_detected: threatsData,
-            ips_flagged: flaggedData.length,
-            threatCount: Math.max(prev?.threatCount ?? 0, threatsData.length)
+            ips_flagged: flaggedData.data.length,
+            threatCount: Math.max(prev?.threatCount ?? 0, threatsData.data.length)
           }));
     
         } else {

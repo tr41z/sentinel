@@ -19,7 +19,7 @@ if getattr(sys, 'frozen', False):
 else:
     bundle_dir = os.path.dirname(os.path.abspath(__file__))
 
-MODEL_PATH = os.path.join(bundle_dir, 'models', 'VotingClassifier.pkl')  # The pipeline with scaler
+MODEL_PATH = os.path.join(bundle_dir, 'models', 'RandomForestClassifier.pkl')  # The pipeline with scaler
 
 # Load model (pipeline includes scaler)
 try:
