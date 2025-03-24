@@ -17,9 +17,9 @@ function App() {
       status: "", 
       uptime: 0, 
       error_count: 0, 
-      threats_detected: 0, 
       ips_flagged: 0, 
-      threatCount: 0 
+      threatCount: 0, 
+      threats_detected: { data: [] } 
     });
   
     const fetchFlows = async () => {
