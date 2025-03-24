@@ -15,14 +15,14 @@ var (
 
 // HealthHandler exposes the health of the sniffer process
 func HealthHandler(w http.ResponseWriter, r *http.Request) {
-	health := executable.GetSnifferHealth()
+	health := executable.GetSnifferHealthFunc()
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(health)
 }
 
 // AI Health Handler
 func AIHealthHandler(w http.ResponseWriter, r *http.Request) {
-	health := executable.GetAIHealth()
+	health := executable.GetAIHealthFunc()
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(health)
 }
@@ -32,7 +32,7 @@ func StartSnifferHandler(w http.ResponseWriter, r *http.Request) {
 	snifferControlMutex.Lock()
 	defer snifferControlMutex.Unlock()
 
-	if executable.GetSnifferHealth().Status == "running" {
+	if executable.GetSnifferHealthFunc().Status == "running" {
 		http.Error(w, "Sniffer is already running", http.StatusBadRequest)
 		return
 	}
@@ -48,7 +48,7 @@ func StopSnifferHandler(w http.ResponseWriter, r *http.Request) {
 	snifferControlMutex.Lock()
 	defer snifferControlMutex.Unlock()
 
-	if executable.GetSnifferHealth().Status != "running" {
+	if executable.GetSnifferHealthFunc().Status != "running" {
 		http.Error(w, "Sniffer is not running", http.StatusBadRequest)
 		return
 	}
@@ -63,7 +63,7 @@ func StartAIHandler(w http.ResponseWriter, r *http.Request) {
 	aiControlMutex.Lock()
 	defer aiControlMutex.Unlock()
 
-	if executable.GetAIHealth().Status == "running" {
+	if executable.GetAIHealthFunc().Status == "running" {
 		http.Error(w, "AI module is already running", http.StatusBadRequest)
 		return
 	}
@@ -79,7 +79,7 @@ func StopAIHandler(w http.ResponseWriter, r *http.Request) {
 	aiControlMutex.Lock()
 	defer aiControlMutex.Unlock()
 
-	if executable.GetAIHealth().Status != "running" {
+	if executable.GetAIHealthFunc().Status != "running" {
 		http.Error(w, "AI module is not running", http.StatusBadRequest)
 		return
 	}
