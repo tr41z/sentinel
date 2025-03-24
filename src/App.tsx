@@ -26,8 +26,8 @@ function App() {
       const res = await fetch("http://localhost:8080/api/v1/flows");
       
       if (res.ok) {
-          const data = await res.json();
-          setFlows(data);
+          const response = await res.json();
+          setFlows(response.data || []); // Extract 'data' field and ensure it's an array
       } else {
           console.error("There was an error while fetching flows!");
       }
@@ -100,17 +100,17 @@ function App() {
     // Calculate totalBytes and other derived values
     const totalFlows = flows.length;
     const totalBytes = useMemo(() => 
-        flows.reduce((sum, flow) => sum + flow.total_bytes, 0), 
+        (flows || []).reduce((sum, flow) => sum + flow.total_bytes, 0), 
         [flows]
     );
 
     const totalDuration = useMemo(() => 
-      flows.reduce((sum, flow) => sum + flow.duration, 0),
+      (flows || []).reduce((sum, flow) => sum + flow.duration, 0),
       [flows]
     )
 
     const avgFlowRate = useMemo(() => {
-      const { totalData, totalDuration } = flows.reduce(
+      const { totalData, totalDuration } = (flows || []).reduce(
           (acc, flow) => {
               acc.totalData += flow.rate * flow.duration; // Total data transferred
               acc.totalDuration += flow.duration;        // Total duration
@@ -157,7 +157,7 @@ function App() {
                 flows={flows}
               />
           }/>
-          <Route path='/flows/inspector' element={<InspectorPage flows={flows.map(flow => ({ 
+          <Route path='/flows/inspector' element={<InspectorPage flows={(flows || []).map(flow => ({ 
             id: `${flow.source_ip} -> ${flow.destination_ip}`, 
             src_ip: flow.source_ip, 
             dst_ip: flow.destination_ip, 

@@ -100,11 +100,14 @@ func FetchFlows(w http.ResponseWriter, r *http.Request) {
 		flows = append(flows, flow)
 	}
 
-	// Set the response content type to JSON
-	w.Header().Set("Content-Type", "application/json")
+	response := map[string]interface{}{
+		"status":  "success",
+		"message": "Flows fetched successfully",
+		"data":    flows,
+	}
 
-	// Write the JSON response
-	if err := json.NewEncoder(w).Encode(flows); err != nil {
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(response); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
@@ -138,8 +141,16 @@ func FetchThreats(w http.ResponseWriter, r *http.Request) {
 		threats = append(threats, threat)
 	}
 
+	response := map[string]interface{}{
+		"status":  "success",
+		"message": "Threats fetched successfully",
+		"data":    threats,
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(threats)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func FetchFlaggedIPs(w http.ResponseWriter, r *http.Request) {
@@ -160,8 +171,16 @@ func FetchFlaggedIPs(w http.ResponseWriter, r *http.Request) {
 		flaggedIPs = append(flaggedIPs, srcIP)
 	}
 
+	response := map[string]interface{}{
+		"status":  "success",
+		"message": "Flagged IPs fetched successfully",
+		"data":    flaggedIPs,
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(flaggedIPs)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func get_home_dir() string {
