@@ -10,6 +10,10 @@ Sentinel is a **machine learning-based Intrusion Detection System (IDS)** design
 
 ---
 
+![Dashboard](https://github.com/user-attachments/assets/53423096-14f7-45c4-b84a-3968601b6ff4)
+
+---
+
 ## 🌟 Features
 
 - **Sniffer Module**: Captures and analyzes network traffic.
