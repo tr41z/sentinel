@@ -1,12 +1,12 @@
 # 🚨 Sentinel
 
-Sentinel is a **machine learning-based Intrusion Detection System (IDS)** designed to provide **real-time threat detection**. It integrates the following components:
+Sentinel is a **machine learning-powered Intrusion Detection System (IDS)** designed for **real-time threat detection**. It combines multiple components for efficient monitoring and alerting:
 
-- 🕵️ **Sniffer Module** (C++): Captures and analyzes network traffic.
-- ⚙️ **Backend Server** (Golang): Manages data flow and communication between modules.
-- 💻 **Frontend Interface** (React + Vite): User-friendly app for visualization and threat inspection.
-- 🧠 **Machine Learning Module** (Python): Enhances threat detection using AI.
-- 🔔 **Notification System**: Alerts users about detected threats.
+- 🕵️ **Sniffer Module** (C++): Captures and inspects network traffic.
+- ⚙️ **Backend Server** (Golang): Manages data flow and communication.
+- 💻 **Frontend Interface** (React + Vite): Intuitive dashboard for threat visualization.
+- 🧠 **Machine Learning Module** (Python): AI-driven threat detection.
+- 🔔 **Notification System**: Instantly alerts users about detected threats.
 
 ---
 
@@ -14,32 +14,32 @@ Sentinel is a **machine learning-based Intrusion Detection System (IDS)** design
 
 ---
 
-## 🌟 Features
+## 🌟 Key Features
 
-- **Sniffer Module**: Captures and analyzes network traffic.
-- **Backend Server**: Ensures smooth communication between modules.
-- **Frontend Interface**: Provides an intuitive interface for users.
-- **Machine Learning Module**: Implements AI to detect threats.
-- **Notification System**: Real-time alerts to users.
+- **Network Sniffer**: Monitors and analyzes live network traffic.
+- **AI-Powered Detection**: Uses machine learning to identify threats.
+- **User-Friendly Dashboard**: Visualize and inspect security events easily.
+- **Real-Time Alerts**: Get instant notifications on potential threats.
+- **Modular & Scalable**: Built with separate components for flexibility.
 
 ---
 
-## 🛠️ Setup Instructions
+## 🛠️ Setup Guide
 
 ### 📋 Prerequisites
 
-Ensure the following tools are installed:
+Ensure you have the following installed:
 
-- **C++ Compiler** (e.g., GCC or MSVC)
+- **C++ Compiler** (e.g., GCC, MSVC)
 - **CMake**
 - **Golang**
 - **Node.js & npm**
 
-or follow steps below
+Alternatively, follow the steps below.
 
 ---
 
-### ⚙️ Steps
+### ⚙️ Installation Steps
 
 1. **Clone the repository**:
    ```bash
@@ -50,38 +50,15 @@ or follow steps below
 2. Run the configuration script:
    - **Linux/Mac**:
      ```bash
-     sh scripts/config.sh
+     sh setup.sh
      ```
      or
      
      ```bash
-     bash scripts/config.sh
+     bash setup.sh
      ```
     - **Windows**:
-      Right click on `scripts/config.bat` file and open it as administor
-   
-3. Build the Sniffer Module:
-   ```bash
-   cd sniffer-mod
-   mkdir build
-   cd build
-   ```
-    - **For Linux/Mac**:
-      ```bash
-      cmake ..
-      make
-      ```
-    - **For Windows**:
-      ```bash
-      cmake -G "MinGW Makefiles" ..
-      cmake --build .
-      ```
-      **OR**
-      ```bash
-      cmake -G "Unix Makefiles" ..
-      make
-      ```
-      Depending on your compiler
+      Right click on `setup.bat` file and open it as administor
 
 4. Open other console and install dependencies:
    ```bash
@@ -92,22 +69,12 @@ or follow steps below
    ```bash
    npm start
    ```
-**OR** manually start each:
-
-Run the Backend Server: Open a new terminal and navigate to the src-go directory:
-   ```bash
-   cd sentinel/src-go
-   go run main.go
-   ```
-Start the Frontend: Open another terminal in the sentinel directory:
-   ```bash
-   npm run dev
-   ```
+   
 6. Access the Application: After starting the frontend, a URL will be displayed in the terminal (e.g., http://localhost:3000). Open it in your browser to use the app.
 
 ## 📊 Usage
-- **Dashboard**: View an overview of network activity and detected threats.
-- **Inspector**: Analyze specific data points for deeper insights.
-- **Notifications**: Stay informed of potential threats in real-time.
+- **📈 Dashboard**: View an overview of network activity and detected threats.
+- **🔎 Inspector**: Analyze specific data points for deeper insights.
+- **🚨 Notifications**: Stay informed of potential threats in real-time.
 
 ### Learn more about approach [here!](https://github.com/tr41z/sentinel/blob/sentinel/docs/APPROACH.md)
