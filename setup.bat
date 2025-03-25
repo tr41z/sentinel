@@ -20,6 +20,13 @@ if exist config.bat (
 )
 cd ..
 
+:: Load MinGW environment variables
+echo 🔧 Loading MinGW environment variables...
+set PATH=%PATH%;C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin
+set CXX=g++
+set CC=gcc
+echo ✅ MinGW environment variables loaded.
+
 :: Step 2: Run ai-mod\build.bat or build.sh
 echo 📂 Navigating to ai-mod...
 cd ai-mod || (echo ❌ Failed to enter 'ai-mod' directory! & exit /b 1)

@@ -66,6 +66,25 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 echo CMake and C++ compiler installation verified.
+goto :check_mingw
+
+:check_mingw
+:: Install MinGW if not installed
+where gcc >nul 2>nul
+if %ERRORLEVEL% NEQ 0 (
+    echo Installing MinGW using Chocolatey...
+    choco install mingw -y
+    refreshenv
+) else (
+    echo MinGW is already installed.
+)
+
+:: Set MinGW environment variables
+setx PATH "%PATH%;C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin" /M
+setx CXX "g++" /M
+setx CC "gcc" /M
+echo MinGW environment variables set.
+
 goto :check_python
 
 :check_python
