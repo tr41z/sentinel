@@ -86,7 +86,7 @@ const SnifferAiModChart = ({ flows, aiStats }: SnifferAiModChartProps) => {
             <YAxis 
               stroke="#9ca3af" 
               yAxisId="left" 
-              domain={[0, Math.ceil(maxSnifferFlows * 1.1)]} // Rounds up
+              domain={[0, Math.ceil(maxSnifferFlows * 1.05)]} // Rounds up
               allowDecimals={false} // Ensures only whole numbers
             />
             
@@ -95,7 +95,7 @@ const SnifferAiModChart = ({ flows, aiStats }: SnifferAiModChartProps) => {
               stroke="#9ca3af" 
               yAxisId="right" 
               orientation="right" 
-              domain={[0, Math.ceil(maxAiPredictions * 5.0)]} // Rounds up
+              domain={[0, Math.ceil(maxAiPredictions * 5.5)]} // Rounds up
               allowDecimals={false} // Ensures only whole numbers
             />
 
@@ -111,7 +111,7 @@ const SnifferAiModChart = ({ flows, aiStats }: SnifferAiModChartProps) => {
             <Line
               type="monotone"
               dataKey="snifferFlows"
-              name="Sniffer Flows"
+              name="Flows Captured"
               stroke="#39FF14"
               strokeWidth={3}
               dot={{ fill: "#39FF14", strokeWidth: 2, r: 6 }}
@@ -123,7 +123,7 @@ const SnifferAiModChart = ({ flows, aiStats }: SnifferAiModChartProps) => {
             <Line
               type="monotone"
               dataKey="aiPredictions"
-              name="AI Threat Predictions"
+              name="Threats Detected"
               stroke="#ef233c"
               strokeWidth={3}
               dot={{ fill: "#ef233c", strokeWidth: 2, r: 6 }}
