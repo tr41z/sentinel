@@ -18,8 +18,8 @@ interface SnifferAiModChartProps {
 const SnifferAiModChart = ({ flows, aiStats }: SnifferAiModChartProps) => {
   // Group AI threats by hour
   const threatsByHour =
-    aiStats?.threats_detected && Array.isArray(aiStats.threats_detected)
-      ? aiStats.threats_detected.reduce((acc, threat) => {
+    aiStats?.threats_detected.data && Array.isArray(aiStats.threats_detected.data)
+      ? aiStats.threats_detected.data.reduce((acc: Record<string, number>, threat) => {
           const date = new Date(threat.timestamp);
           const hour = date.getHours();
           const hourString = hour < 10 ? `0${hour}:00` : `${hour}:00`;
@@ -35,6 +35,7 @@ const SnifferAiModChart = ({ flows, aiStats }: SnifferAiModChartProps) => {
       acc: { hour: string; snifferFlows: number; aiPredictions: number }[],
       flow
     ) => {
+            
       const date = new Date(flow.last_updated_time * 1000);
       const hour = date.getHours();
       const hourString = hour < 10 ? `0${hour}:00` : `${hour}:00`;

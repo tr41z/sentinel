@@ -39,10 +39,7 @@ pyinstaller --onefile --name ai \
   --hidden-import "sklearn.neighbors._partition_nodes" \
   --hidden-import "sklearn.tree._utils" \
   --hidden-import "sklearn.ensemble._forest" \
-  --hidden-import "sklearn.ensemble._gb" \
-  --hidden-import "sklearn.ensemble._gradient_boosting" \
-  --hidden-import "sklearn.ensemble._hist_gradient_boosting" \
-  --hidden-import "numpy" \
+=  --hidden-import "numpy" \
   --hidden-import "numpy.core.multiarray" \
   "$SRC_DIR/main.py"
 

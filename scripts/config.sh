@@ -25,29 +25,6 @@ install_golang_macos() {
     brew install go
 }
 
-# Function to install Node.js and NPM on Debian-based systems
-install_node_debian() {
-    echo "Installing Node.js and NPM on Debian-based system..."
-    sudo apt update
-    sudo apt install -y nodejs npm
-}
-
-# Function to install Node.js and NPM on Red Hat-based systems
-install_node_redhat() {
-    echo "Installing Node.js and NPM on Red Hat-based system..."
-    if command -v dnf >/dev/null 2>&1; then
-        sudo dnf install -y nodejs npm
-    else
-        sudo yum install -y nodejs npm
-    fi
-}
-
-# Function to install Node.js and NPM on macOS
-install_node_macos() {
-    echo "Installing Node.js and NPM on macOS..."
-    brew install node
-}
-
 # Function to install CMake on Debian-based systems
 install_cmake_debian() {
     echo "Installing CMake on Debian-based system..."
@@ -78,25 +55,48 @@ install_cmake_macos() {
     brew install cmake gcc
 }
 
+# Function to install Python on Debian-based systems
+install_python_debian() {
+    echo "Installing Python on Debian-based system..."
+    sudo apt update
+    sudo apt install -y python3 python3-pip
+}
+
+# Function to install Python on Red Hat-based systems
+install_python_redhat() {
+    echo "Installing Python on Red Hat-based system..."
+    if command -v dnf >/dev/null 2>&1; then
+        sudo dnf install -y python3 python3-pip
+    else
+        sudo yum install -y python3 python3-pip
+    fi
+}
+
+# Function to install Python on macOS
+install_python_macos() {
+    echo "Installing Python on macOS..."
+    brew install python
+}
+
 # Main script logic
 echo "Detecting platform..."
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     if command -v apt >/dev/null 2>&1; then
         install_golang_debian
-        install_node_debian
         install_cmake_debian
+        install_python_debian
     elif command -v yum >/dev/null 2>&1 || command -v dnf >/dev/null 2>&1; then
         install_golang_redhat
-        install_node_redhat
         install_cmake_redhat
+        install_python_redhat
     else
-        echo "Unsupported Linux distribution. Please install Golang, Node.js, and CMake manually."
+        echo "Unsupported Linux distribution. Please install Golang, CMake, and Python manually."
         exit 1
     fi
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     install_golang_macos
-    install_node_macos
     install_cmake_macos
+    install_python_macos
 else
     echo "Unsupported platform: $OSTYPE. This script only supports macOS and Linux."
     exit 1
@@ -104,13 +104,13 @@ fi
 
 # Verify installations
 echo "Verifying installations..."
-if command -v go >/dev/null 2>&1 && command -v node >/dev/null 2>&1 && command -v npm >/dev/null 2>&1 && command -v cmake >/dev/null 2>&1 && command -v g++ >/dev/null 2>&1; then
+if command -v go >/dev/null 2>&1 && command -v cmake >/dev/null 2>&1 && command -v g++ >/dev/null 2>&1 && command -v python3 >/dev/null 2>&1 && command -v pip3 >/dev/null 2>&1; then
     go version
-    node --version
-    npm --version
     cmake --version
     g++ --version
+    python3 --version
+    pip3 --version
 else
-    echo "Golang, Node.js, NPM, CMake, or C++ compiler installation failed. Please check the log and install manually."
+    echo "One or more installations failed. Please check the log and install manually."
     exit 1
 fi
