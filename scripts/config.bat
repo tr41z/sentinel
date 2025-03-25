@@ -3,8 +3,8 @@ SETLOCAL ENABLEDELAYEDEXPANSION
 
 :: Detect Windows architecture
 echo Detecting Windows architecture...
-wmic os get osarchitecture | findstr /C:"64-bit" >nul 2>nul
-if %ERRORLEVEL% EQU 0 (
+for /f "tokens=*" %%A in ('powershell -NoProfile -Command "[Environment]::Is64BitOperatingSystem"') do set IS_64BIT=%%A
+if /i "%IS_64BIT%"=="True" (
     set ARCH=64-bit
 ) else (
     set ARCH=32-bit
@@ -23,7 +23,9 @@ if %ERRORLEVEL% NEQ 0 (
     )
     refreshenv
 )
+goto :check_golang
 
+:check_golang
 :: Install Golang if not installed
 where go >nul 2>nul
 if %ERRORLEVEL% NEQ 0 (
@@ -42,32 +44,9 @@ if %ERRORLEVEL% NEQ 0 (
     exit /b 1
 )
 echo Golang installation verified.
+goto :check_cmake
 
-:: Install Node.js and NPM if not installed
-where node >nul 2>nul
-if %ERRORLEVEL% NEQ 0 (
-    echo Installing Node.js and NPM using Chocolatey...
-    choco install nodejs -y
-    refreshenv
-) else (
-    echo Node.js is already installed.
-)
-
-:: Verify Node.js and NPM installation
-node --version >nul 2>nul
-if %ERRORLEVEL% NEQ 0 (
-    echo Node.js installation failed. Please install manually.
-    pause
-    exit /b 1
-)
-npm --version >nul 2>nul
-if %ERRORLEVEL% NEQ 0 (
-    echo NPM installation failed. Please install manually.
-    pause
-    exit /b 1
-)
-echo Node.js and NPM installation verified.
-
+:check_cmake
 :: Install CMake if not installed
 where cmake >nul 2>nul
 if %ERRORLEVEL% NEQ 0 (
@@ -78,16 +57,6 @@ if %ERRORLEVEL% NEQ 0 (
     echo CMake is already installed.
 )
 
-:: Install Visual Studio Build Tools if not installed
-where cl >nul 2>nul
-if %ERRORLEVEL% NEQ 0 (
-    echo Installing Visual Studio Build Tools using Chocolatey...
-    choco install visualstudio2022buildtools -y --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools --includeRecommended --includeOptional"
-    refreshenv
-) else (
-    echo Visual Studio Build Tools are already installed.
-)
-
 :: Verify CMake and C++ compiler installation
 cmake --version >nul 2>nul
 if %ERRORLEVEL% NEQ 0 (
@@ -95,14 +64,35 @@ if %ERRORLEVEL% NEQ 0 (
     pause
     exit /b 1
 )
-cl >nul 2>nul
+
+echo CMake and C++ compiler installation verified.
+goto :check_python
+
+:check_python
+:: Install Python if not installed
+where python >nul 2>nul
 if %ERRORLEVEL% NEQ 0 (
-    echo Visual Studio C++ Compiler not found. Please install manually.
+    echo Installing Python using Chocolatey...
+    choco install python -y
+    refreshenv
+) else (
+    echo Python is already installed.
+)
+
+:: Verify Python installation
+python --version >nul 2>nul
+if %ERRORLEVEL% NEQ 0 (
+    echo Python installation failed. Please install manually.
     pause
     exit /b 1
 )
-echo CMake and C++ compiler installation verified.
+pip --version >nul 2>nul
+if %ERRORLEVEL% NEQ 0 (
+    echo Pip installation failed. Please install manually.
+    pause
+    exit /b 1
+)
+echo Python installation verified.
 
 ENDLOCAL
-pause
 exit /b 0
