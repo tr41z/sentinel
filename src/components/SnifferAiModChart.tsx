@@ -111,7 +111,7 @@ const SnifferAiModChart = ({ flows, aiStats }: SnifferAiModChartProps) => {
             <Line
               type="monotone"
               dataKey="snifferFlows"
-              name="Sniffer Flows"
+              name="Flows Captured"
               stroke="#39FF14"
               strokeWidth={3}
               dot={{ fill: "#39FF14", strokeWidth: 2, r: 6 }}
@@ -123,7 +123,7 @@ const SnifferAiModChart = ({ flows, aiStats }: SnifferAiModChartProps) => {
             <Line
               type="monotone"
               dataKey="aiPredictions"
-              name="AI Threat Predictions"
+              name="Potential Threats Detected"
               stroke="#ef233c"
               strokeWidth={3}
               dot={{ fill: "#ef233c", strokeWidth: 2, r: 6 }}
