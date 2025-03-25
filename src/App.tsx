@@ -99,30 +99,31 @@ function App() {
 
     // Calculate totalBytes and other derived values
     const totalFlows = flows.length;
+
     const totalBytes = useMemo(() => 
         (flows || []).reduce((sum, flow) => sum + flow.total_bytes, 0), 
         [flows]
     );
 
     const totalDuration = useMemo(() => 
-      (flows || []).reduce((sum, flow) => sum + flow.duration, 0),
-      [flows]
-    )
+        (flows || []).reduce((sum, flow) => sum + flow.duration, 0),
+        [flows]
+    );
 
     const avgFlowRate = useMemo(() => {
-      const { totalData, totalDuration } = (flows || []).reduce(
-          (acc, flow) => {
-              acc.totalData += flow.rate * flow.duration; // Total data transferred
-              acc.totalDuration += flow.duration;        // Total duration
-              return acc;
-          },
-          { totalData: 0, totalDuration: 0 } // Initial accumulator values
-      );
-      return totalDuration > 0 ? totalData / totalDuration : 0;
-  }, [flows]);
+        const { totalData, totalDuration } = (flows || []).reduce(
+            (acc, flow) => {
+                acc.totalData += flow.rate * flow.duration; // Total data transferred
+                acc.totalDuration += flow.duration;        // Total duration
+                return acc;
+            },
+            { totalData: 0, totalDuration: 0 } // Initial accumulator values
+        );
+        return totalDuration !== 0 ? Math.abs(totalData / totalDuration) : 0;
+    }, [flows]);
 
-    const avgFlowSize = totalFlows > 0 ? totalBytes / totalFlows : 0;
-    const bandwidth = totalDuration > 0 ? (totalBytes * 8.0) / (totalDuration * 1000) : 0;
+    const avgFlowSize = totalFlows > 0 ? Math.abs(totalBytes / totalFlows) : 0;
+    const bandwidth = totalDuration > 0 ? Math.abs((totalBytes * 8.0) / totalDuration) : 0;
 
     return (
       <div className='flex h-screen bg-[#040404] text-gray-200 overflow-hidden'>
