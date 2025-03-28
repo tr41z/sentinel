@@ -1,10 +1,29 @@
 import { useState } from "react";
 import Header from "../components/Header";
 import { motion } from "framer-motion";
+import { MapPin } from "lucide-react";
 
-const InspectorPage = ({ flows }: { flows: { id: string; total_bytes: number; duration: number; rate: number; src_ip: string; dst_ip: string }[] }) => {
+const InspectorPage = ({
+  flows,
+}: {
+  flows: {
+    id: string;
+    total_bytes: number;
+    duration: number;
+    rate: number;
+    src_ip: string;
+    dst_ip: string;
+  }[];
+}) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedFlow, setSelectedFlow] = useState<{ id: string; total_bytes: number; duration: number; rate: number; src_ip: string; dst_ip: string } | null>(null);
+  const [selectedFlow, setSelectedFlow] = useState<{
+    id: string;
+    total_bytes: number;
+    duration: number;
+    rate: number;
+    src_ip: string;
+    dst_ip: string;
+  } | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const itemsPerPage = 20;
@@ -14,7 +33,14 @@ const InspectorPage = ({ flows }: { flows: { id: string; total_bytes: number; du
     setCurrentPage(page);
   };
 
-  const handleFlowClick = (flow: { id: string; total_bytes: number; duration: number; rate: number; src_ip: string; dst_ip: string }) => {
+  const handleFlowClick = (flow: {
+    id: string;
+    total_bytes: number;
+    duration: number;
+    rate: number;
+    src_ip: string;
+    dst_ip: string;
+  }) => {
     setSelectedFlow(flow);
     setIsModalOpen(true);
   };
@@ -32,51 +58,47 @@ const InspectorPage = ({ flows }: { flows: { id: string; total_bytes: number; du
   return (
     <div className="flex-1 flex flex-col relative z-10">
       <Header title="Inspector" />
-      <div className="flex-1 overflow-auto p-4">
-        <table className="table-auto w-full border-collapse border border-gray-700">
-          <thead>
-            <tr className="bg-gray-950 text-left">
-              <th className="border border-gray-700 px-4 py-2">Source IP</th>
-              <th className="border border-gray-700 px-4 py-2">Destination IP</th>
-              <th className="border border-gray-700 px-4 py-2">Total Bytes</th>
-              <th className="border border-gray-700 px-4 py-2">Duration</th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedFlows.map((flow, index) => (
-              <motion.tr
-                key={index}
-                className="hover:bg-gray-900 cursor-pointer duration-150"
-                onClick={() => handleFlowClick(flow)}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-              >
-                <td className="border border-gray-700 px-4 py-2">{flow.src_ip}</td>
-                <td className="border border-gray-700 px-4 py-2">{flow.dst_ip}</td>
-                <td className="border border-gray-700 px-4 py-2">{flow.total_bytes}</td>
-                <td className="border border-gray-700 px-4 py-2">{flow.duration}s</td>
-              </motion.tr>
-            ))}
-          </tbody>
-        </table>
-        <div className="mt-4 flex justify-between items-center">
+      <div className="flex-1 overflow-auto p-6 space-y-4">
+        {paginatedFlows.map((flow, index) => (
+          <motion.div
+            key={index}
+            className="flex items-center p-4 bg-[#121212] rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+            onClick={() => handleFlowClick(flow)}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+          >
+            <p className="text-sm font-medium text-gray-300 flex-1">
+              <strong>Source:</strong> {flow.src_ip}
+            </p>
+            <p className="text-sm font-medium text-gray-300 flex-1">
+              <strong>Destination:</strong> {flow.dst_ip}
+            </p>
+            <p className="text-sm font-medium text-gray-300 flex-1">
+              <strong>Bytes:</strong> {flow.total_bytes}
+            </p>
+            <p className="text-sm font-medium text-gray-300 flex-1">
+              <strong>Duration:</strong> {flow.duration}s
+            </p>
+          </motion.div>
+        ))}
+        <div className="mt-6 flex justify-between items-center">
           <motion.button
             disabled={currentPage === 1}
             onClick={() => handlePageChange(currentPage - 1)}
-            className="px-4 py-2 bg-gray-700 rounded disabled:opacity-50"
+            className="px-4 py-2 bg-gray-700 text-gray-200 rounded-lg disabled:opacity-50 hover:bg-gray-600 transition-transform"
             whileHover={{ scale: 1.05 }}
             transition={{ duration: 0.2 }}
           >
             Previous
           </motion.button>
-          <span>
+          <span className="text-gray-400">
             Page {currentPage} of {totalPages}
           </span>
           <motion.button
             disabled={currentPage === totalPages}
             onClick={() => handlePageChange(currentPage + 1)}
-            className="px-4 py-2 bg-gray-700 rounded disabled:opacity-50"
+            className="px-4 py-2 bg-gray-700 text-gray-200 rounded-lg disabled:opacity-50 hover:bg-gray-600 transition-transform"
             whileHover={{ scale: 1.05 }}
             transition={{ duration: 0.2 }}
           >
@@ -93,23 +115,43 @@ const InspectorPage = ({ flows }: { flows: { id: string; total_bytes: number; du
           transition={{ duration: 0.3 }}
         >
           <motion.div
-            className="bg-black p-10 rounded-lg shadow-lg w-1/2"
+            className="bg-[#1A1A1A] p-6 rounded-lg shadow-lg border border-gray-700 w-2/3 flex"
             initial={{ scale: 0.95 }}
             animate={{ scale: 1 }}
             transition={{ duration: 0.3 }}
           >
-            <h2 className="text-xl font-bold mb-4">Flow Details</h2>
-            <div className="space-y-4 mb-4">
-              <p><strong>ID:</strong> {selectedFlow.id}</p>
-              <p><strong>Source IP:</strong> {selectedFlow.src_ip}</p>
-              <p><strong>Destination IP:</strong> {selectedFlow.dst_ip}</p>
-              <p><strong>Total Bytes:</strong> {selectedFlow.total_bytes}</p>
-              <p><strong>Duration:</strong> {selectedFlow.duration}s</p>
-              <p><strong>Rate:</strong> {selectedFlow.rate}</p>
+            <div className="flex-1 text-gray-300 space-y-3 text-left">
+              <h2 className="text-xl font-semibold text-green-500 mb-4">
+                Flow Details
+              </h2>
+              <p>
+                <strong>ID:</strong> {selectedFlow.id}
+              </p>
+              <p>
+                <strong>Source IP:</strong> {selectedFlow.src_ip}
+              </p>
+              <p>
+                <strong>Destination IP:</strong> {selectedFlow.dst_ip}
+              </p>
+              <p>
+                <strong>Total Bytes:</strong> {selectedFlow.total_bytes}
+              </p>
+              <p>
+                <strong>Duration:</strong> {selectedFlow.duration}s
+              </p>
+              <p>
+                <strong>Rate:</strong> {selectedFlow.rate}
+              </p>
+            </div>
+            <div className="flex-1 flex items-center justify-center">
+              <div className="bg-gray-800 rounded-lg p-4 flex flex-col items-center justify-center">
+                <MapPin size={48} className="text-gray-400 mb-2" />
+                <p className="text-sm text-gray-400">Location Map</p>
+              </div>
             </div>
             <motion.button
               onClick={closeModal}
-              className="mt-4 px-4 py-2 bg-red-600 rounded"
+              className="absolute top-4 right-4 px-4 py-2 bg-red-600 text-gray-200 rounded-lg hover:bg-red-500 transition-transform"
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.2 }}
             >
