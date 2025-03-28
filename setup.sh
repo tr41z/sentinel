@@ -51,8 +51,10 @@ if [[ -d "sniffer-mod" ]]; then
     echo -e "🔨 Running CMake..."
     if [[ "$(uname)" == "Darwin" ]] || [[ "$(uname)" == "Linux" ]]; then
         cmake -G "Unix Makefiles" ..
+        make
     else
         cmake ..
+        make
     fi
 
     echo -e "✅ CMake setup completed!"
