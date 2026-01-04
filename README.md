@@ -1,12 +1,12 @@
-# 🚨 Sentinel
+# Sentinel
 
 Sentinel is a **machine learning-powered Intrusion Detection System (IDS)** designed for **real-time threat detection**. It combines multiple components for efficient monitoring and alerting:
 
-- 🕵️ **Sniffer Module** (C++): Captures and inspects network traffic.
-- ⚙️ **Backend Server** (Golang): Manages data flow and communication.
-- 💻 **Frontend Interface** (React + Vite): Intuitive dashboard for threat visualization.
-- 🧠 **Machine Learning Module** (Python): AI-driven threat detection.
-- 🔔 **Notification System**: Instantly alerts users about detected threats.
+- **Sniffer Module** (C++): Captures and inspects network traffic.
+- **Backend Server** (Golang): Manages data flow and communication.
+- **Frontend Interface** (React + Vite): Intuitive dashboard for threat visualization.
+- **Machine Learning Module** (Python): AI-driven threat detection.
+- **Notification System**: Instantly alerts users about detected threats.
 
 ---
 
@@ -14,7 +14,7 @@ Sentinel is a **machine learning-powered Intrusion Detection System (IDS)** desi
 
 ---
 
-## 🌟 Key Features
+## Key Features
 
 - **Network Sniffer**: Monitors and analyzes live network traffic.
 - **AI-Powered Detection**: Uses machine learning to identify threats.
@@ -24,9 +24,9 @@ Sentinel is a **machine learning-powered Intrusion Detection System (IDS)** desi
 
 ---
 
-## 🛠️ Setup Guide
+## Setup Guide
 
-### 📋 Prerequisites
+### Prerequisites
 
 Ensure you have the following installed:
 
@@ -39,7 +39,7 @@ Alternatively, follow the steps below.
 
 ---
 
-### ⚙️ Installation Steps
+### Installation Steps
 
 1. **Clone the repository**:
    ```bash
@@ -72,9 +72,9 @@ Alternatively, follow the steps below.
    
 6. Access the Application: After starting the frontend, a URL will be displayed in the terminal (e.g., http://localhost:3000). Open it in your browser to use the app.
 
-## 📊 Usage
-- **📈 Dashboard**: View an overview of network activity and detected threats.
-- **🔎 Inspector**: Analyze specific data points for deeper insights.
-- **🚨 Notifications**: Stay informed of potential threats in real-time.
+## Usage
+- **Dashboard**: View an overview of network activity and detected threats.
+- **Inspector**: Analyze specific data points for deeper insights.
+- **Notifications**: Stay informed of potential threats in real-time.
 
 ### Learn more about approach [here!](https://github.com/tr41z/sentinel/blob/sentinel/docs/APPROACH.md)
